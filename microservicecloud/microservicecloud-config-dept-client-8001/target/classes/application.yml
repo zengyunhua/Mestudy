@@ -1,4 +1,0 @@
-spring:
-  application:
-    name: microservicecloud-config-dept-client
-
