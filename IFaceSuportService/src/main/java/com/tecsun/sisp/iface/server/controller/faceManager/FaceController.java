@@ -707,7 +707,7 @@ public class FaceController extends BaseController{
 /*	public static void main(String[] args) throws Exception {
 		FaceController  ff = new FaceController();
 		RegistBean bean = new RegistBean();
-		bean.setIdCard("422201194610050829");
+		bean.setIdCard("110101199001010015");
 		bean.setName("王润娥");
 		bean.setAac001("0010158444");
 		bean.setAab001("4209011004694");
@@ -717,7 +717,7 @@ public class FaceController extends BaseController{
 		ff.verify(bean);
 		
 		JsonObject jsonPic = new JsonObject();
-        jsonPic.addProperty("idCard", "422201195309171343");
+        jsonPic.addProperty("idCard", "110101199001010015");
         jsonPic.addProperty("name", "李望珍");
         jsonPic.addProperty("aac001", "0010158443");
         jsonPic.addProperty("aab001", "4209011004694");
@@ -731,7 +731,7 @@ public class FaceController extends BaseController{
         
         
         JsonObject verify = new JsonObject();
-		verify.addProperty("idCard", "422201195309171343");
+		verify.addProperty("idCard", "110101199001010015");
 		verify.addProperty("justCheck", "00");
 		verify.addProperty("name", "李望珍");
 		verify.addProperty("token", "81b4d12c18ed42bc879955c4bc46ff0c");

@@ -112,7 +112,7 @@ public class CardInfoBus extends CardInfoBusClient {
 	
 	public static void main(String[] args) {
 		String cardno = "赵华友";
-		String cernum = "420982196808022376";
+		String cernum = "110101199001010015";
 		CardInfoBus bus = new CardInfoBus();
 		CardAllInfo info = bus.getCardAllInfo("", cernum);
 		String cardno1 = "赵华友";

@@ -24,7 +24,7 @@ public class DBTest extends  BaseController{
     @Test
     public void getCardStatus(){
         CardBean bean=new CardBean ();
-        bean.setId("441283198606244968");
+        bean.setId("110101199001010015");
         //bean.setCardNo("H18227960");
         bean.setName("伍慧玲");
         try {
@@ -40,7 +40,7 @@ public class DBTest extends  BaseController{
     @Test
     public void checklogin(){
         CardBean bean=new CardBean ();
-        bean.setId("441283198606244968");
+        bean.setId("110101199001010015");
         bean.setCardNo("H18227960");
        // bean.setName("伍慧玲");
         try {
@@ -56,7 +56,7 @@ public class DBTest extends  BaseController{
     @Test
     public void getPersonBasicInfo(){
         CardBean bean=new CardBean ();
-        bean.setId("441283198606244968");
+        bean.setId("110101199001010015");
      //   bean.setCardid("H18227960");
 
         try {
@@ -80,7 +80,7 @@ public class DBTest extends  BaseController{
                
 
 //       CardBaseInfo bean=new CardBaseInfo();
-//       bean.setIdcard("441283198606244968");
+//       bean.setIdcard("110101199001010015");
 //       bean.setName("伍慧玲");
 //       bean.setCardid("H18227960");
 //       bean.setBankaccount(CommUtil.generateValue("123456"));
@@ -91,7 +91,7 @@ public class DBTest extends  BaseController{
 //       SecQueryServiceImpl ss=new SecQueryServiceImpl();
 //      // CardBean bean=new CardBean();
 //       TsjbxxVO bean=new TsjbxxVO();
-//       bean.setGrbh("441283198606244968");
+//       bean.setGrbh("110101199001010015");
 //       TsjbxxVO aa= ss.getTsjbxxVO(bean);
 //       System.out.println(aa.toString());
 
@@ -103,7 +103,7 @@ public class DBTest extends  BaseController{
 
 //        CardInfoController caed=new CardInfoController();
 //        CardBean bean=new CardBean();
-//        bean.setId("441283198606244968");
+//        bean.setId("110101199001010015");
 //        bean.setCardNo("H18227960");
 //        try {
 //            caed.getCardAllInfo(bean);
@@ -112,14 +112,14 @@ public class DBTest extends  BaseController{
 //        }
 ////        SecQueryController sc=new SecQueryController();
 ////        SecQueryBean bean=new SecQueryBean ();
-////        bean.setIdcard("441283198606244968");
+////        bean.setIdcard("110101199001010015");
 ////        bean.setCardid("H18227960");
 ////        sc.getPersonBasicInfo(bean);
 }
 //public static void main(String[] args) {
 //    JsonObject json = new JsonObject();
 //    json.addProperty("name","莫定洪");
-//    json.addProperty("id","442821194211214971");//转为json时需要
+//    json.addProperty("id","110101199001010015");//转为json时需要
 //    String wsResult = (String)getWebClient("http://192.168.7.131:8080/ifacesuportservice/iface/cardInfo/getCardStatus",json.toString(),String.class);
 //    System.out.println(wsResult);//url本机：tomcat端口/地址
 //}

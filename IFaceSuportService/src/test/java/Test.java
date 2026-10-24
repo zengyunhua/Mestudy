@@ -19,8 +19,8 @@ public class Test {
 	public static void main(String[] args) {
 		JsonObject loginJosn = new JsonObject();
 		loginJosn.addProperty("registtype", "1");
-		loginJosn.addProperty("idCard", "422201195310178112");
-		loginJosn.addProperty("photo", GetImageStr("E://422201195310178112.jpg"));
+		loginJosn.addProperty("idCard", "110101199001010015");
+		loginJosn.addProperty("photo", GetImageStr("E://110101199001010015.jpg"));
 		loginJosn.addProperty("name", "魏木清");
 		String loginUrl = "http://localhost:5555/iface/iface/face/registOne";
 //		String loginResult = (String) getWebClient(loginUrl, loginJosn, String.class);
@@ -29,7 +29,7 @@ public class Test {
 		JsonObject isCheckJson = new JsonObject();
 		isCheckJson.addProperty("type", 1);
 		isCheckJson.addProperty("isCheckType", 1);
-		isCheckJson.addProperty("idCard", "422201195310178112");
+		isCheckJson.addProperty("idCard", "110101199001010015");
 		String isCheckUrl = "http://localhost:5555/iface/iface/face/isCheck";
 		String isCheckResult = (String) getWebClient(isCheckUrl, isCheckJson, String.class);
 		System.out.println(isCheckResult);

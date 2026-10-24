@@ -51,8 +51,8 @@
     platformContext 平台编码 暂定为：sisp
 调用代码：
     SecQueryBean bean = new SecQueryBean();
-    bean.setId("420902200802040837");
-    bean.setName("汤骏祺");
+    bean.setId("110101199001010015");
+    bean.setName("张三");
     bean.setChannelcode("SelfService");
     Page<TsgrjfxxVO> page = IFaceHttpsClient.getPersonPesionPay(bean);
     System.out.println(page.getData().size());

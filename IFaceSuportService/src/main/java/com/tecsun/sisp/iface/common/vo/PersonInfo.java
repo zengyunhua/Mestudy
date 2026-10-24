@@ -8,8 +8,8 @@ public class PersonInfo {
 //    <personNumber>43025744</personNumber>
 //    <name>涂坚喜</name>
 //    <idType>1</idType>
-//    <idNumber>422201193206047316</idNumber>
-//    <idSocialensurenumber>422201193206047316</idSocialensurenumber>
+//    <idNumber>110101199001010015</idNumber>
+//    <idSocialensurenumber>110101199001010015</idSocialensurenumber>
 //    <idCountry>中国</idCountry>
 //    <profileStatus>1</profileStatus>
 //    <areaCode>420999</areaCode>

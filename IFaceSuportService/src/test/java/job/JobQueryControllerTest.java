@@ -55,7 +55,7 @@ public class JobQueryControllerTest {
 		String test_url = basic_url+""+"/addJobSeekerInfo";
 		JsonObject jo = new JsonObject();
 		jo.addProperty("zjlxid", "01");//身份证
-		jo.addProperty("zjhm", "123456789123456789");//51062319740829644X，张玉
+		jo.addProperty("zjhm", "123456789123456789");//110101199001010015，张三
 		jo.addProperty("sblx", "3");//设备类型(3:自助一体机)
 		String jsonStr = (String) WebClient.getWebClient(test_url, jo, String.class);
 		System.out.println(jsonStr);

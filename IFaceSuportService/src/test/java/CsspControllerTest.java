@@ -18,7 +18,7 @@ public class CsspControllerTest {
 	public void canApply(){
 		String url = TEST_URL + "register?deviceid=864881020737852";
 		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty("certNum", "42100319810420154X22222333");
+		jsonObject.addProperty("certNum", "11010119900101001522222333");
 		jsonObject.addProperty("name", "xx");
 		jsonObject.addProperty("soCardNum", "xx");
 		String result = (String) WebClient.getWebClient(url, jsonObject,String.class);
@@ -33,12 +33,12 @@ public class CsspControllerTest {
 		String url = TEST_URL + "uploadCardPicInfo?deviceid=864881020745178";
 		JsonObject jsonObject = new JsonObject();
 		
-		jsonObject.addProperty("certNum", "420902199108072155");
+		jsonObject.addProperty("certNum", "110101199001010015");
 		jsonObject.addProperty("name", "张志威");
 		jsonObject.addProperty("soCardNum", "K41607920");
 		
 		//jsonObject.addProperty("agentName", "汤唯");
-		//jsonObject.addProperty("agentcertNum", "666681199109248888");
+		//jsonObject.addProperty("agentcertNum", "110101199001010015");
 		jsonObject.addProperty("no", "0");//0_本人领卡
 		jsonObject.addProperty("base64String",PicUtil.GetImageStr("d:/tangwei.jpg"));
 		String result = (String) WebClient.getWebClient(url, jsonObject,String.class);
@@ -53,7 +53,7 @@ public class CsspControllerTest {
 		String url = TEST_URL + "register?deviceid=864881020745178";
 		//for(int i = 0;i < 15; i++){
 			JsonObject jsonObject = new JsonObject();
-			jsonObject.addProperty("certNum", "420116201309121720");
+			jsonObject.addProperty("certNum", "110101199001010015");
 			jsonObject.addProperty("name", "吴诗诗");
 			jsonObject.addProperty("soCardNum", "K41798165");
 			jsonObject.addProperty("reason", "联系不上参保人");
