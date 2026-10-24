@@ -2,28 +2,23 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.zengyunhua</groupId>
+        <artifactId>mestudy</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
     <name>sisp_NetworkOfficeService</name>
     <groupId>com.tecsun.sisp</groupId>
     <artifactId>NetworkOfficeService</artifactId>
     <packaging>war</packaging>
     <version>V1.0.0.180612</version>
 
-    <repositories> 
-        <repository>
-            <id>tecsun-cmmon-maven-repos</id>
-            <url>http://11.11.11.8:8686/nexus/content/groups/public/</url>
-        </repository>
-    </repositories>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>tecsun-cmmon-maven-repos</id>
-            <url>http://11.11.11.8:8686/nexus/content/groups/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <properties>
-        <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>4.0.8.RELEASE</spring.version>
         <slf4j.version>1.6.6</slf4j.version>
         <log4j.version>1.2.12</log4j.version>
@@ -187,9 +182,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.oracle</groupId>
+            <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc6</artifactId>
-            <version>11.2.0</version>
+            <version>11.2.0.4</version>
         </dependency>
 
         <!--<dependency>-->

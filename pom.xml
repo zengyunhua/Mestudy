@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Mestudy - aggregator POM.
+
+    This file exists so that `mvn install` at the repository root builds every
+    module. It is intentionally NOT a <parent>: the five modules carry their own
+    groupId / version / dependency sets and are kept independent, because they
+    were separate deployments and are published here as reference material.
+
+    Build prerequisites are documented in docs/GETTING_STARTED.md. In short:
+      * JDK 8 (the sources target Java 7; JDK 12+ refuses source level 7)
+      * two dependencies are not on Maven Central - com.oracle:ojdbc6 and the
+        private "bee" framework - so a fully green build needs them installed
+        into your local repository first. See docs/TROUBLESHOOTING.md.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.zengyunhua</groupId>
+    <artifactId>mestudy</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>Mestudy</name>
+    <description>
+        Backend interface services for a Chinese social-insurance / human-resources
+        public service platform. Published for reference and educational use.
+    </description>
+    <url>https://github.com/zengyunhua/Mestudy</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <modules>
+        <module>IFaceSuportService</module>
+        <module>NetworkOfficeService</module>
+        <module>IFaceSuperService_hn</module>
+        <module>InterfaceFunction</module>
+        <module>NetPortalManagement</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+    </properties>
+</project>

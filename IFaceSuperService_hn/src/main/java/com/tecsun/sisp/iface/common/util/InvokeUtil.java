@@ -1,4 +1,4 @@
-﻿package com.tecsun.sisp.iface.common.util;
+package com.tecsun.sisp.iface.common.util;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;

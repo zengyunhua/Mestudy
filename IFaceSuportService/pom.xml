@@ -1,28 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+	    <groupId>io.github.zengyunhua</groupId>
+	    <artifactId>mestudy</artifactId>
+	    <version>1.0.0</version>
+	    <relativePath>../pom.xml</relativePath>
+	</parent>
+
 	<name>sisp_IFaceSuportService</name>
 	<groupId>com.tecsun.sisp</groupId>
 	<artifactId>IFaceSuportService</artifactId>
 	<packaging>war</packaging>
 	<version>V1.0.0.150630</version>
 
-	<repositories>
-		<repository>
-			<id>tecsun-cmmon-maven-repos</id>
-			<url>http://192.168.1.8:8686/nexus/content/groups/public/</url>
-		</repository>
-	</repositories>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>tecsun-cmmon-maven-repos</id>
-			<url>http://192.168.1.8:8686/nexus/content/groups/public/</url>
-		</pluginRepository>
-	</pluginRepositories>
 
 	<properties>
-		<project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>4.0.8.RELEASE</spring.version>
 		<slf4j.version>1.6.6</slf4j.version>
 		<log4j.version>1.2.12</log4j.version>
@@ -231,9 +226,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.oracle</groupId>
+			<groupId>com.oracle.database.jdbc</groupId>
 			<artifactId>ojdbc6</artifactId>
-			<version>11.2.0</version>
+			<version>11.2.0.4</version>
 		</dependency>
 
 		<dependency>
@@ -286,7 +281,7 @@
 
 		<!-- 登录验证码 start -->
 		<dependency>
-			<groupId>com.google.code</groupId>
+			<groupId>com.github.penggle</groupId>
 			<artifactId>kaptcha</artifactId>
 			<version>2.3.2</version>
 		</dependency>
@@ -357,11 +352,6 @@
 			<version>1.6.2</version>
 		</dependency>
 
-		<dependency>
-			<groupId>unieap-dataexchange-client</groupId>
-			<artifactId>unieap-dataexchange-client</artifactId>
-			<version>1.0</version>
-		</dependency>
 		<!-- 省农保jar end -->
 
 		<!-- 上传照片 -->
