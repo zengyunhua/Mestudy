@@ -1,4 +1,0 @@
-dependencies{
-    compile project(":util")
-    compile project(":entity")
-}
