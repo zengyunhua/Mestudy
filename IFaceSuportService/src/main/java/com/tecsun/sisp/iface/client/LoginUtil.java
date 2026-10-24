@@ -16,7 +16,7 @@ import java.security.MessageDigest;
  * {@code data} is the token, returned here as a String.
  *
  * <p><strong>Failure is an exception, not a return value.</strong> A non-{@code "200"}
- * status throws {@code Exception("接口鉴权失败！渠道：" + type)}. A {@code null} or empty
+ * status throws {@code Exception("Interface authentication failed, channel: " + type)}. A {@code null} or empty
  * response body also throws — {@code result} is dereferenced without a null check, so an
  * empty body surfaces as {@code NullPointerException} rather than a clear message.
  *
@@ -36,7 +36,7 @@ public class LoginUtil {
             result = JsonMapper.buildNormalMapper().fromJson(msg, Result.class);
         }
         if (!result.getStatusCode().equals(Constants.RESULT_MESSAGE_SUCCESS)) {
-            throw new Exception("接口鉴权失败！渠道：" + type);
+            throw new Exception("Interface authentication failed, channel: " + type);
         }
         return result.getData().toString();
     }

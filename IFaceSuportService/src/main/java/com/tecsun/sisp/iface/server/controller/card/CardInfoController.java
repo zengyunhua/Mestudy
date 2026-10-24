@@ -34,12 +34,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * 1.社保卡卡数据、制卡查询 2. 临时挂失、解挂、领卡
+ * Social-security card services: card data and card-production queries, plus temporary
+ * loss reporting, suspension removal and card activation.
+ *
+ * <p>Every operation is forwarded to the provincial card-management gateway
+ * ({@code CARDBUESS_URL}); this class only validates the request, translates dictionary
+ * codes into display names, and wraps the outcome in the standard {@code Result}
+ * envelope.
+ *
+ * <p><strong>Required input.</strong> Most operations need at least one of card number or
+ * ID number; the mutating operations (activate, report lost, remove suspension) need card
+ * number, ID number <em>and</em> name.
+ *
+ * <p><strong>Status semantics.</strong> A gateway reply of {@code "00"} means the operation
+ * succeeded now, {@code "01"} means it had already succeeded earlier, anything else is a
+ * failure whose text is passed through in {@code message}.
  *
  * @author thl
- * @ClassName: CardInfoController
- * @Description: TODO(这里用一句话描述这个类的作用)
- * @date 2015年5月31日 下午8:06:25
  */
 @Controller
 @RequestMapping(value = "/iface/cardInfo")
@@ -51,7 +62,16 @@ public class CardInfoController extends BaseController {
     private NetUserServiceImpl netUserService;*/
 
     /**
-     * SISP_IFACE_CARD_001 卡基础数据（不包含个人照片)  社保卡号和身份证号码至少有一项不为空
+     * SISP_IFACE_CARD_001 — card base data, excluding the personal photo.
+     *
+     * <p>At least one of card number or ID number must be supplied. Dictionary-coded
+     * fields (sex, ethnicity, person status, registration type) are expanded to display
+     * names before the response is returned.
+     *
+     * @param bean request carrying the card number and/or ID number
+     * @return the card base data, or a failure envelope when neither identifier is present
+     *         or the gateway rejects the lookup
+     * @throws Exception if the gateway call fails
      */
     @RequestMapping(value = "/getCardInfo", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
@@ -66,7 +86,7 @@ public class CardInfoController extends BaseController {
             CardBaseInfo info = bus.getCardBaseInfo(cardno,cernum);
             if (info != null && info.getErr().equals("OK")) {
                 result = Constants.RESULT_MESSAGE_SUCCESS;
-                message = "卡基础数据（不包含个人照片)获取成功";
+                message = "Card base data retrieved (personal photo excluded).";
                 info.setSex(DictionaryUtil.getDictName(Constants.SEX_GROUP, info.getSex()));
                 info.setEthnic(DictionaryUtil.getDictName(Constants.PARAM_NATION_GROUP, info.getEthnic()));
                 info.setPersonstatus(DictionaryUtil.getDictName(Constants.PERATATUS_GROUP, info.getPersonstatus()));
@@ -78,7 +98,7 @@ public class CardInfoController extends BaseController {
             return this.result(result, message, info);
         } else {
             result = Constants.RESULT_MESSAGE_ERROR;
-            message = "社保卡号和身份证号码至少有一项不为空";
+            message = "At least one of card number or ID number is required.";
             return this.result(result, message, null);
         }
 
@@ -99,7 +119,7 @@ public class CardInfoController extends BaseController {
             CardBaseInfo info = bus.getCardBaseInfo(cardno,cernum);
             if (info != null && info.getErr().equals("OK")) {
                 result = Constants.RESULT_MESSAGE_SUCCESS;
-                message = "卡基础数据（不包含个人照片)获取成功";
+                message = "Card base data retrieved (personal photo excluded).";
                 info.setSex(info.getSex());
                 info.setEthnic(info.getEthnic());
                 info.setPersonstatus(info.getPersonstatus());
@@ -111,13 +131,15 @@ public class CardInfoController extends BaseController {
             return this.result(result, message, info);
         } else {
             result = Constants.RESULT_MESSAGE_ERROR;
-            message = "社保卡号和身份证号码至少有一项不为空";
+            message = "At least one of card number or ID number is required.";
             return this.result(result, message, null);
         }
 
     }
     /**
-     * SISP_IFACE_CARD_002 卡基础数据（包含个人照片） 社保卡号和身份证号码至少有一项不为空
+     * SISP_IFACE_CARD_002 — card base data including the personal photo.
+     *
+     * <p>At least one of card number or ID number must be supplied.
      */
     @RequestMapping(value = "/getCardAllInfo", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
@@ -136,7 +158,7 @@ public class CardInfoController extends BaseController {
                 info.setPersonstatus(DictionaryUtil.getDictName(Constants.PERATATUS_GROUP, info.getPersonstatus()));
                 info.setRegisttype(DictionaryUtil.getDictName(Constants.REGNATURE_GROUP, info.getRegisttype()));
                 result = Constants.RESULT_MESSAGE_SUCCESS;
-                message = "卡基础数据获取成功";
+                message = "Card base data retrieved.";
             } else {
                 result = Constants.RESULT_MESSAGE_ERROR;
                 message = info.getErr();
@@ -144,13 +166,13 @@ public class CardInfoController extends BaseController {
             return this.result(result, message, info);
         } else {
             result = Constants.RESULT_MESSAGE_ERROR;
-            message = "社保卡号和身份证号码至少有一项不为空";
+            message = "At least one of card number or ID number is required.";
             return this.result(result, message, null);
         }
 
     }
     /**
-     * 卡数据 社保卡号和身份证号码至少有一项不为空
+     * Card data. At least one of card number or ID number must be supplied.
      */
    /* @RequestMapping(value = "/getCard", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
@@ -164,32 +186,39 @@ public class CardInfoController extends BaseController {
             CardInfoBus bus = new CardInfoBus();
             CardAllInfo allInfo = bus.getCard(cardno, cernum);
            // CardAllInfo allInfo=bus.getCardAllInfo(cardno,cernum);
-            if (allInfo != null && allInfo.getErr().equals("OK")) {//省厅存在该用户
+            if (allInfo != null && allInfo.getErr().equals("OK")) {//the person exists at the provincial gateway
                 result = Constants.RESULT_MESSAGE_SUCCESS;
-                message = "卡数据获取成功";
+                message = "Card data retrieved.";
                 return result(result,message,allInfo);
              }
-            else{//省厅不存在该用户
+            else{//no such person at the provincial gateway
                 result = Constants.RESULT_MESSAGE_ERROR;
-                message = "您的用户名输入错误，请重新输入";
-                logger.error("省厅不存在该用户");
+                message = "The name you entered is incorrect. Please try again.";
+                logger.error("No such person at the provincial gateway.");
                 return result(result, message,null);
             }
         } else {
             result = Constants.RESULT_MESSAGE_ERROR;
-            message = "社保卡号和身份证号码至少有一项不为空";
+            message = "At least one of card number or ID number is required.";
             return this.result(result, message, null);
         }
     }*/
 
     /**
-     * SISP_IFACE_CARD_003 设置卡的维护状态
-     * 1.当server为01临时挂失、02正式挂失、03解除挂失时，系统对bank、bankno、cityno不作判断，允许跨地区执行这些请求。
-     * 2.当server为04注销、11领卡启用时，系统不判断bankno，其他全部数据项都将做严格判断，不允许跨地区执行这两项请求。
+     * SISP_IFACE_CARD_003 — set the card maintenance status.
      *
-     * @param bean
-     * @return message 为返回信息 ，00为成功，01为之前已经成功，失败原因
-     * @throws
+     * <ol>
+     *   <li>When {@code server} is 01 (temporary loss), 02 (permanent loss) or 03 (remove
+     *       loss), the gateway does not validate {@code bank}, {@code bankno} or
+     *       {@code cityno}, so these requests may cross regions.</li>
+     *   <li>When {@code server} is 04 (cancel) or 11 (activate on collection), every field
+     *       except {@code bankno} is validated strictly, so these requests may not cross
+     *       regions.</li>
+     * </ol>
+     *
+     * @param bean request carrying the operation code and card identifiers
+     * @return {@code message} is the gateway reply: {@code 00} on success, {@code 01} if
+     *         the operation had already succeeded, otherwise the failure reason
      */
 //    @RequestMapping(value = "/setCard", method = RequestMethod.POST, produces = "application/json")
 //    public Result setCardStatus(CardInfoBean bean) {
@@ -205,14 +234,17 @@ public class CardInfoController extends BaseController {
 //        String result = Constants.RESULT_MESSAGE_SUCCESS;
 //        if (message == null) {
 //            result = Constants.RESULT_MESSAGE_ERROR;
-//            message = "调用省厅接口异常";
+//            message = "Provincial gateway call failed.";
 //        }
 //        return this.result(result, message, null);
 //    }
 
     /**
-     * SISP_IFACE_CARD_004 制卡进度查询
-     * TSB传入身份证，大终端微信传入身份证和姓名
+     * SISP_IFACE_CARD_004 — card production progress query.
+     *
+     * <p>TSB terminals send the ID number only; large-format terminals and WeChat send both
+     * ID number and name. When the name is missing it is looked up from the card record
+     * first.
      */
     @RequestMapping(value = "/getCardStatus", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
@@ -233,7 +265,7 @@ public class CardInfoController extends BaseController {
                 info.setTransacttype(DictionaryUtil.getDictName(Constants.APPLYTYPE_GROUP, info.getTransacttype()));
                 info.setBank(DictionaryUtil.getDictName(Constants.BANK_GROUP, info.getBank()));
                 result = Constants.RESULT_MESSAGE_SUCCESS;
-                message = "制卡进度查询成功";
+                message = "Card production progress retrieved.";
             } else {
                 result = Constants.RESULT_MESSAGE_ERROR;
                 message = info.getErr();
@@ -242,22 +274,26 @@ public class CardInfoController extends BaseController {
         } else {
             result = Constants.RESULT_MESSAGE_ERROR;
             if(Constants.TSB.equals(bean.getChannelcode())){
-                message = "请输入正确的身份证";
+                message = "Please enter a valid ID number.";
             }else{
-                message = "请输入正确的身份证和姓名";
+                message = "Please enter a valid ID number and name.";
             }
             return this.result(result, message, null);
         }
     }
 
     /**
-     * SISP_IFACE_CARD_005 领卡启用
+     * SISP_IFACE_CARD_005 — activate a collected card.
      *
-     * @param bean
-     * @return 1.当result为1时，调用接口成功，根据message来判断调用的情况。
-     * 2.message： 00为成功，01为之前已经成功，失败原因
-     * 3.当result为0时，调用接口失败，message为失败原因
-     * @throws
+     * @param bean request carrying card number, ID number and name
+     * @return <ol>
+     *   <li>{@code statusCode} 200 means the gateway call succeeded; read {@code message}
+     *       for the outcome.</li>
+     *   <li>{@code message}: {@code 00} success, {@code 01} already succeeded earlier,
+     *       otherwise the failure reason.</li>
+     *   <li>{@code statusCode} 0 means the gateway call failed and {@code message} holds
+     *       the reason.</li>
+     * </ol>
      */
     @RequestMapping(value = "/setStart", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
@@ -274,31 +310,29 @@ public class CardInfoController extends BaseController {
             message = bus.setStart(cardno, cernum, name);
             if (message == null || "".equals(message)) {
                 result = Constants.RESULT_MESSAGE_ERROR;
-                message = "调用省厅接口异常";
+                message = "Provincial gateway call failed.";
             }else if(message.equals("00")){
             	result = Constants.RESULT_MESSAGE_SUCCESS;
-            	message = "社保卡激活成功";
+            	message = "Card activated.";
             }else if(message.equals("01")){
             	 result = Constants.RESULT_MESSAGE_ERROR;
-                 message = "社保卡已激活";
+                 message = "Card was already activated.";
             }else{
             	result = Constants.RESULT_MESSAGE_ERROR;
             }
         } else {
             result = Constants.RESULT_MESSAGE_ERROR;
-            message = "领卡条件数据不能为空";
+            message = "Card number, ID number and name are all required.";
         }
         return this.result(result, message, null);
     }
 
     /**
-     * SISP_IFACE_CARD_006 临时挂失
+     * SISP_IFACE_CARD_006 — report the card lost (temporary).
      *
-     * @param bean
-     * @return 1.当result为1时，调用接口成功，根据message来判断调用的情况。
-     * 2.message： 00为成功，01为之前已经成功，失败原因
-     * 3.当result为0时，调用接口失败，message为失败原因
-     * @throws
+     * @param bean request carrying card number, ID number and name
+     * @return same contract as {@link #setStart}: {@code 00} success, {@code 01} already
+     *         reported lost, otherwise the failure reason
      */
     @RequestMapping(value = "/setLoss", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
@@ -315,31 +349,29 @@ public class CardInfoController extends BaseController {
             message = bus.setLoss(cardno, cernum, name);
             if (message == null || "".equals(message)) {
                 result = Constants.RESULT_MESSAGE_ERROR;
-                message = "调用省厅接口异常";
+                message = "Provincial gateway call failed.";
             }else if(message.equals("00")){
             	result = Constants.RESULT_MESSAGE_SUCCESS;
-            	message = "社保卡临时挂失成功";
+            	message = "Card reported lost (temporary).";
             }else if(message.equals("01")){
             	 result = Constants.RESULT_MESSAGE_ERROR;
-                 message = "之前已经挂失";
+                 message = "Card was already reported lost.";
             }else{
             	result = Constants.RESULT_MESSAGE_ERROR;
             }
         } else {
             result = Constants.RESULT_MESSAGE_ERROR;
-            message = "领卡条件数据不能为空";
+            message = "Card number, ID number and name are all required.";
         }
         return this.result(result, message, null);
     }
 
     /**
-     * SISP_IFACE_CARD_007 解挂
+     * SISP_IFACE_CARD_007 — remove a suspension.
      *
-     * @param bean
-     * @return 1.当result为1时，调用接口成功，根据message来判断调用的情况。
-     * 2.message： 00为成功，01为之前已经成功，失败原因
-     * 3.当result为0时，调用接口失败，message为失败原因
-     * @throws
+     * @param bean request carrying card number, ID number and name
+     * @return same contract as {@link #setStart}: {@code 00} success, {@code 01} already
+     *         removed, otherwise the failure reason
      */
     @RequestMapping(value = "/setHanging", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
@@ -356,64 +388,65 @@ public class CardInfoController extends BaseController {
             message = bus.setHanging(cardno, cernum, name);
             if (message == null || "".equals(message)) {
                 result = Constants.RESULT_MESSAGE_ERROR;
-                message = "调用省厅接口异常";
+                message = "Provincial gateway call failed.";
             }else if(message.equals("00")){
             	result = Constants.RESULT_MESSAGE_SUCCESS;
-            	message = "社保卡解挂成功";
+            	message = "Suspension removed.";
             }else if(message.equals("01")){
             	 result = Constants.RESULT_MESSAGE_ERROR;
-                 message = "之前已经解挂";
+                 message = "Suspension was already removed.";
             }else{
             	result = Constants.RESULT_MESSAGE_ERROR;
             }
         } else {
             result = Constants.RESULT_MESSAGE_ERROR;
-            message = "领卡条件数据不能为空";
+            message = "Card number, ID number and name are all required.";
         }
         return this.result(result, message, null);
     }
     
     
     /**
-	 * 
-	 * @author 作者名  付伟锋
-	 * @date 日期   2017-03-30 15:22
-	 * @version 版本标识 V.1.0.0
-	 * @parameter 参数及其意义
-	 * 
-	 * @return Result结果
-	 * @throws 异常类及抛出条件
-	 * @方法说明-省厅卡管接口-卡状态接口
-	 */
+     * Card status query against the provincial card gateway.
+     *
+     * <p>Calls the {@code getCard} SOAP operation directly with Axis rather than going
+     * through {@code CardInfoBus}, because this endpoint predates that facade.
+     *
+     * @param bean request carrying card number, ID number and name — all three required
+     * @return {@code data} is the gateway's raw reply when it equals {@code "OK"};
+     *         otherwise a failure envelope describing the problem
+     * @author fuweifeng
+     * @version V.1.0.0
+     */
     @RequestMapping(value = "/getCard", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
 	public   Result getCard(@RequestBody CardInfoBean bean){
     	 insertTransLog(bean,Constants.BUSINESSCODE.get("getCard"));
 		String result  = Constants.RESULT_MESSAGE_SUCCESS;
-		String message = "操作成功";
+		String message = "Success.";
 		String wsResult = "";
 		if(bean!=null){
-			String idCard = bean.getId();//身份证号码；
-			String cardNo = bean.getCardNo();//社保卡号码；
-			String name = bean.getName();//名称；
+			String idCard = bean.getId();//ID number
+			String cardNo = bean.getCardNo();//card number
+			String name = bean.getName();//name
 			
 			if((idCard!=null && idCard.length()>0) &&(cardNo!=null && cardNo.length()>0) && (name!=null && cardNo.length()>0)){
 				Service service = new Service();
 				Call call;
 				Map<String , String > map = new HashMap<String , String>();
 				try {
-					String url = Config.getInstance().get("CARDBUESS_URL");//公共就业服务;
+					String url = Config.getInstance().get("CARDBUESS_URL");//provincial card gateway
 					call = (Call) service.createCall();
 		            call.setTargetEndpointAddress( new URL(url));
-		            call.setOperationName( new QName("http://ws.apache.org/axis2","getCard"));// 设置要调用哪个方法
+		            call.setOperationName( new QName("http://ws.apache.org/axis2","getCard"));//operation to invoke
 		            call.setSOAPActionURI("http://ws.apache.org/axis2" + "getCard");
-		            call.addParameter(new QName("http://ws.apache.org/axis2", "user"), XMLType.SOAP_STRING, ParameterMode.IN);//设置传入参数的属性
-		            call.addParameter(new QName("http://ws.apache.org/axis2", "pass"), XMLType.SOAP_STRING, ParameterMode.IN);//设置传入参数的属性
-		            call.addParameter(new QName("http://ws.apache.org/axis2", "aaz500"), XMLType.SOAP_STRING, ParameterMode.IN);//设置传入参数的属性
-		            call.addParameter(new QName("http://ws.apache.org/axis2", "aac002"), XMLType.SOAP_STRING, ParameterMode.IN);//设置传入参数的属性
-		            call.addParameter(new QName("http://ws.apache.org/axis2", "aac003"), XMLType.SOAP_STRING, ParameterMode.IN);//设置传入参数的属性
-		            call.setReturnType(XMLType. SOAP_STRING); // 要返回的数据类型（自定义类型）
-		            wsResult = (String) call.invoke(new String[]{"szytj","szytj12333",cardNo, idCard, name});/// 调用方法并传递参数
+		            call.addParameter(new QName("http://ws.apache.org/axis2", "user"), XMLType.SOAP_STRING, ParameterMode.IN);//declare an input parameter
+		            call.addParameter(new QName("http://ws.apache.org/axis2", "pass"), XMLType.SOAP_STRING, ParameterMode.IN);//declare an input parameter
+		            call.addParameter(new QName("http://ws.apache.org/axis2", "aaz500"), XMLType.SOAP_STRING, ParameterMode.IN);//declare an input parameter
+		            call.addParameter(new QName("http://ws.apache.org/axis2", "aac002"), XMLType.SOAP_STRING, ParameterMode.IN);//declare an input parameter
+		            call.addParameter(new QName("http://ws.apache.org/axis2", "aac003"), XMLType.SOAP_STRING, ParameterMode.IN);//declare an input parameter
+		            call.setReturnType(XMLType. SOAP_STRING); //return type
+		            wsResult = (String) call.invoke(new String[]{"szytj","szytj12333",cardNo, idCard, name});///invoke with parameters
 		            if((wsResult!=null && wsResult.length()>0) && wsResult.equals("OK")){
 		            	 return this.result(result, message, wsResult);
 		            }else{
@@ -421,24 +454,33 @@ public class CardInfoController extends BaseController {
 		            }
 				} catch (Exception e) {
 					result =  Constants.RESULT_MESSAGE_ERROR;
-					message = "获取卡状态接口getCard接口失败"+e.getMessage();
+					message = "getCard call failed: " + e.getMessage();
 				}
 				 return this.result(result, message);
 			}else{
 				result =  Constants.RESULT_MESSAGE_ERROR;
-				message ="社保卡号、身份证号码及姓名都不能为空";
+				message ="Card number, ID number and name are all required.";
 				return this.result(result, message);
 			}
 			
 		}else{
 			result =  Constants.RESULT_MESSAGE_ERROR;
-			message = "获取卡状态接口getCard接口入参不能为空";
+			message = "getCard requires a request body.";
 			return this.result(result, message);
 		}
 		
 
 	}
 
+    /**
+     * Queues an asynchronous transaction record for the business-analytics subsystem.
+     *
+     * <p>Runs on the shared thread pool, so a failure here never fails the business call —
+     * it is logged and swallowed.
+     *
+     * @param bean     the request being served, used to populate the audit record
+     * @param funcName business code recorded against the transaction
+     */
     public void insertTransLog(CardInfoBean bean,String funcName){
         try {
             TransBean transBean=new TransBean();
@@ -448,7 +490,7 @@ public class CardInfoController extends BaseController {
             transBean.setDeviceid(bean.getDeviceid());
             ThreadPoolUtil.getThreadPool().execute(new ThreadPoolTask(transBean));
         } catch (Exception e) {
-            logger.error("添加卡业务操作记录到业务分析子系统出错：" + e.getMessage());
+            logger.error("Failed to queue the card transaction log: " + e.getMessage());
         }
     }
 

@@ -3,14 +3,14 @@ package com.tecsun.sisp.iface.client;
 /**
  * ClassName: LoginVO
  * Description:
- * Author： 张清洁
- * CreateTime： 2015年06月09日 19时:47分
+ * @author Zhang Qingjie
+ * @since 2015-06-09
  */
 public class LoginVO {
 
-    private String userName; //用户名
-    private String type;  //渠道类型：网办 NetPortal，德生宝 TSB，自助终端 SelfService,微信 WeChat,手机app App
-    private String net_password;// 登录密码
+    private String userName; // user name
+    private String type;  // channel type: NetPortal, TSB (Deshunbao), SelfService, WeChat, App
+    private String net_password;// login password
 
     public String getUserName() {
         return userName;

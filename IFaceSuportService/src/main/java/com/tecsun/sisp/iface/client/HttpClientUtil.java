@@ -14,8 +14,8 @@ import org.apache.http.util.EntityUtils;
 /**
  * ClassName: HttpClientUtil
  * Description:
- * Author： 张清洁
- * CreateTime： 2015年06月09日 12时:09分
+ * @author Zhang Qingjie
+ * @since 2015-06-09
  */
 public class HttpClientUtil {
 

@@ -29,11 +29,11 @@ public class Test {
 		  
 		  
 //		String wsResult2 = conn("https://61.28.113.182:9443/sisp/iface/sec/FuncXa021",json1.toString());
-//	    System.out.println("缴费记录 2 = "+wsResult2);
+//	    System.out.println("Contribution record 2 = "+wsResult2);
 	    
 	    
 	    String wsResult3 = (String) getWebClient("http://61.28.113.182:8080/sisp/iface/sec/FuncXa021",json1 ,String.class);
-	    System.out.println("缴费记录 3 = "+wsResult3);
+	    System.out.println("Contribution record 3 = "+wsResult3);
 	    
 	}
 	

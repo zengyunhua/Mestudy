@@ -101,10 +101,10 @@ public class IFaceHttpsClient {
             throw new Exception("Error: Do not init again !!!!! ");
         }
         if (ip == null || ip.length() == 0) {
-            throw new Exception("请求参数 ip 不能为空");
+            throw new Exception("Parameter \"ip\" must not be empty.");
         }
         if (port == 0) {
-            throw new Exception("请求参数 port 不能为空");
+            throw new Exception("Parameter \"port\" must not be empty.");
         }
         if (tokenTimeOut <= 60) {
             tokenTimeOut = 60;
@@ -130,7 +130,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 修改手机号码	SISP_IFACE_SO_01
+     * Change the bound mobile number. SISP_IFACE_SO_01
      *
      * @param bean
      * @throws Exception
@@ -144,7 +144,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 查询个人社保基本信息	SISP_IFACE_SO_002
+     * Query personal social-insurance basic info. SISP_IFACE_SO_002
      *
      * @param bean
      * @throws Exception
@@ -169,7 +169,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 个人缴费基数信息	SISP_IFACE_SO_003
+     * Personal contribution base. SISP_IFACE_SO_003
      *
      * @param bean
      * @throws Exception
@@ -194,7 +194,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 个人养老保险缴费信息	SISP_IFACE_SO_004
+     * Pension contribution detail. SISP_IFACE_SO_004
      *
      * @param bean
      * @throws Exception
@@ -219,7 +219,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 失业保险基本信息	SISP_IFACE_SO_005
+     * Unemployment insurance basic info. SISP_IFACE_SO_005
      *
      * @param bean
      * @return
@@ -245,7 +245,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 失业人员待遇支付明细表	SISP_IFACE_SO_006
+     * Unemployment benefit payment details. SISP_IFACE_SO_006
      *
      * @param bean
      * @return
@@ -271,7 +271,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 医疗保险费用结算信息	SISP_IFACE_SO_007
+     * Medical expense settlement. SISP_IFACE_SO_007
      *
      * @param bean
      * @return
@@ -297,7 +297,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 医疗保险个人帐户信息	SISP_IFACE_SO_008
+     * Medical individual account. SISP_IFACE_SO_008
      *
      * @param bean
      * @return
@@ -324,7 +324,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 医疗保险个人缴费信息	SISP_IFACE_SO_009
+     * Medical contribution detail. SISP_IFACE_SO_009
      *
      * @param bean
      * @return
@@ -351,7 +351,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 生育保险基本信息	SISP_IFACE_SO_010
+     * Maternity insurance basic info. SISP_IFACE_SO_010
      *
      * @param bean
      * @return
@@ -379,7 +379,7 @@ public class IFaceHttpsClient {
 
 
     /**
-     * 养老保险月账户	SISP_IFACE_SO_011
+     * Pension monthly account. SISP_IFACE_SO_011
      *
      * @param bean
      * @return
@@ -407,7 +407,7 @@ public class IFaceHttpsClient {
 
 
     /**
-     * 在职人员养老保险个人年帐户	SISP_IFACE_SO_012
+     * Pension annual account, in-service. SISP_IFACE_SO_012
      *
      * @param bean
      * @return
@@ -434,7 +434,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 养老保险个人缴费明细	SISP_IFACE_SO_013
+     * Pension contribution detail. SISP_IFACE_SO_013
      *
      * @param bean
      * @return
@@ -462,7 +462,7 @@ public class IFaceHttpsClient {
 
 
     /**
-     * 养老保险待遇支付信息	SISP_IFACE_SO_014
+     * Pension benefit payments. SISP_IFACE_SO_014
      *
      * @param bean
      * @return
@@ -489,7 +489,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 养老保险基本信息	SISP_IFACE_SO_015
+     * Pension insurance basic info. SISP_IFACE_SO_015
      *
      * @param bean
      * @return
@@ -516,7 +516,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 离退休人员待遇信息	SISP_IFACE_SO_016
+     * Retiree benefit details. SISP_IFACE_SO_016
      *
      * @param bean
      * @return
@@ -543,7 +543,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 个人工伤保险基本信息	SISP_IFACE_SO_017
+     * Work-injury insurance basic info. SISP_IFACE_SO_017
      *
      * @param bean
      * @throws Exception
@@ -569,7 +569,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 获取个人基本信息
+     * Personal basic info.
      * @param bean
      * @return
      * @throws Exception
@@ -595,7 +595,8 @@ public class IFaceHttpsClient {
 
 
     /**
-     * 卡业务  SISP_IFACE_CARD_001 卡基础数据（不包含个人照片)  社保卡号和身份证号码至少有一项不为空
+     * Card services. SISP_IFACE_CARD_001 - card base data, photo excluded. At least one of
+     * card number or ID number is required.
      *
      * @param bean
      * @return
@@ -619,7 +620,8 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * SISP_IFACE_CARD_002 卡基础数据（包含个人照片） 社保卡号和身份证号码至少有一项不为空
+     * SISP_IFACE_CARD_002 - card base data, photo included. At least one of card number
+     * or ID number is required.
      *
      * @param bean
      * @return
@@ -643,7 +645,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * SISP_IFACE_CARD_004 制卡进度查询
+     * SISP_IFACE_CARD_004 - card production progress.
      *
      * @param bean
      * @return
@@ -667,7 +669,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * SISP_IFACE_CARD_005 领卡启用
+     * SISP_IFACE_CARD_005 - activate a collected card.
      *
      * @param bean
      * @return
@@ -683,7 +685,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * SISP_IFACE_CARD_006 临时挂失
+     * SISP_IFACE_CARD_006 - report the card lost, temporary.
      *
      * @param bean
      * @return
@@ -699,7 +701,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * SISP_IFACE_CARD_007 解挂
+     * SISP_IFACE_CARD_007 - remove the suspension.
      *
      * @param bean
      * @return
@@ -715,7 +717,7 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 定时更新tokenId
+     * Renews the token on a fixed interval.
      */
     private static class TokenGetter implements Runnable {
         public void run() {

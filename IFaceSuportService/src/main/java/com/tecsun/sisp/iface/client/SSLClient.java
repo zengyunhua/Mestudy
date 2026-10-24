@@ -9,8 +9,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 /**
  * ClassName: SSLClient
  * Description:
- * Author： 张清洁
- * CreateTime： 2015年06月09日 12时:18分
+ * @author Zhang Qingjie
+ * @since 2015-06-09
  */
 public class SSLClient extends DefaultHttpClient {
     /**
