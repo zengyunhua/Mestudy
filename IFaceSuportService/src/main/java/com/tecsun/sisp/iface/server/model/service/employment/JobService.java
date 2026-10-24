@@ -33,9 +33,6 @@ import com.tecsun.sisp.iface.common.vo.employment.param.job.SavePictureVo;
 import com.tecsun.sisp.iface.common.vo.employment.param.job.SendJobChoiceVo;
 import com.tecsun.sisp.iface.common.vo.employment.param.job.SmsSendCodeVo;
 
-/**
- * @date 2016年12月16日 上午10:56:08
- */
 public interface JobService {
 
 	Result getJobOffer(String url, QueryJobOfferVo param);

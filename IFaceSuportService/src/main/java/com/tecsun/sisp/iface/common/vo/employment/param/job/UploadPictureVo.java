@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月28日 下午1:25:17
- */
 public class UploadPictureVo {
 
 	private String pic;

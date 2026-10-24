@@ -44,7 +44,6 @@ import com.tecsun.sisp.iface.server.outerface.his.HTHisIface;
  * 航天医院接口
  *
  * @ClassName: HangTianHisController
- * @date 2015年6月19日 下午12:59:58
  */
 @Controller
 @RequestMapping(value = "/iface/his/hangtianhis")
@@ -422,7 +421,6 @@ public class HangTianHisController extends BaseController {
     
 
     /*
-   @date     2015-6-22
    @version
    @parameter
    @return
@@ -456,7 +454,6 @@ public class HangTianHisController extends BaseController {
     }
 
     /*
-    @date     2015-7-3
     @version
     @parameter
     @return
@@ -498,7 +495,6 @@ public class HangTianHisController extends BaseController {
     }
 
     /*
-    @date     2015-7-3
     @version
     @parameter
     @return
@@ -1375,7 +1371,6 @@ public class HangTianHisController extends BaseController {
     
     
     /*
-    @date     2015-6-22
     @version
     @parameter
     @return 1表示下午；0表示上午；

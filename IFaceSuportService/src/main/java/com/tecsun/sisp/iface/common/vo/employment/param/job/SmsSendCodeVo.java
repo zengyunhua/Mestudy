@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月22日 上午10:35:07
- */
 public class SmsSendCodeVo extends JobBasicVo {
 
 	private String sjhm;// 手机号码

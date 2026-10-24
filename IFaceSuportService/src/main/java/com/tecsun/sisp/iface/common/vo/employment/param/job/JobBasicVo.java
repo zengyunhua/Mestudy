@@ -2,9 +2,6 @@ package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 import com.tecsun.sisp.iface.common.vo.BaseVO;
 
-/**
- * @date 2016年12月16日 上午10:02:16
- */
 public class JobBasicVo extends BaseVO {
 
 	private String deviceid;// 设备编码

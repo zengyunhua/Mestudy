@@ -76,9 +76,6 @@ import com.tecsun.sisp.iface.server.model.service.employment.JobService;
 import com.tecsun.sisp.iface.server.util.Config;
 import com.tecsun.sisp.iface.server.util.JobUtil;
 
-/**
- * @date 2016年12月16日 上午10:57:42 
- */
 @Service("jobServiceImpl")
 public class JobServiceImpl implements JobService {
 

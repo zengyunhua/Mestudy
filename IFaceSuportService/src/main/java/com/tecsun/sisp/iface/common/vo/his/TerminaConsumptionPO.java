@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo.his;
  * 终端缴费
  * 
  * @ClassName: TerminaConsumptionPO
- * @date 2015年6月18日 下午6:13:18
  *
  */
 public class TerminaConsumptionPO {

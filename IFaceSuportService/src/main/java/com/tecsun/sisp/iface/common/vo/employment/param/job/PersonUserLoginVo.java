@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月20日 上午9:37:14
- */
 public class PersonUserLoginVo extends JobBasicVo {
 
 	private String dlid;// 登录id、需编码(不区分大小写)第一个字符必须为字母

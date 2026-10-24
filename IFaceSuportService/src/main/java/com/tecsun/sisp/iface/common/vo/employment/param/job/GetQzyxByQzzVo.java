@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月20日 下午4:28:32
- */
 public class GetQzyxByQzzVo extends JobBasicVo {
 
 	private String qzzid;// 求职者id

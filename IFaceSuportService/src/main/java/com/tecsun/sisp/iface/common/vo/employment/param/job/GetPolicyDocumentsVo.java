@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月21日 下午3:59:38
- */
 public class GetPolicyDocumentsVo extends JobBasicVo {
 
 	private String id;// 政策文件id

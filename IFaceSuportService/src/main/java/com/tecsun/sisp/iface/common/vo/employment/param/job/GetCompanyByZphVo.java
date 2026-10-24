@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月20日 下午4:54:47
- */
 public class GetCompanyByZphVo extends JobBasicVo {
 
 	private String zphid;// 招聘会id

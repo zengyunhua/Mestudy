@@ -18,7 +18,6 @@ import com.sun.jersey.api.representation.Form;
  * @Title: BaseController2
  * @company :TECSUN
  * @developer: ZENGYUNHUA
- *	@date 2018年7月27日 上午9:55:25
  *	@version 1.0
  */
 public class BaseController2 {

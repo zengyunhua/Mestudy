@@ -66,7 +66,6 @@ import com.tecsun.sisp.iface.server.util.ThreadPoolUtil;
 /**
  * 这个类中的方法来自 《孝感自助一体机前后端交互接口.doc》 接口文档
  * 
- * @date 2016年12月13日 下午5:00:21
  */
 
 @Controller

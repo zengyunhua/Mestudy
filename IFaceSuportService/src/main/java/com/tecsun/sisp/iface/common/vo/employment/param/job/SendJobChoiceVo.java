@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月21日 上午11:40:30
- */
 public class SendJobChoiceVo extends JobBasicVo {
 
 	private String grxxid;// 个人信息id

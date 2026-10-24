@@ -139,7 +139,6 @@ public class PolicyController extends BaseController {
 	   * @Title:解析xml获取天气
 	   * @company :TECSUN
 	   * @developer: ZENGYUNHUA
-	   *	@date 2018年5月4日 上午9:02:29
 	   *	@version 1.0
 	   */
 	  	@RequestMapping(value = "/queryweather", method = RequestMethod.POST, produces = "application/json")
@@ -192,7 +191,6 @@ public class PolicyController extends BaseController {
 	  	 * @Title:获取
 	  	 * @company :TECSUN
 	  	 * @developer: ZENGYUNHUA
-	  	 *	@date 2018年5月13日 下午2:44:45
 	  	 *	@version 1.0
 	  	 */
 		@RequestMapping(value = "/querybyAuditTable", method = RequestMethod.POST, produces = "application/json")

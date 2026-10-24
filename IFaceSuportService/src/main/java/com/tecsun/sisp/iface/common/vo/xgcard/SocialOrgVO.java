@@ -5,7 +5,6 @@ package com.tecsun.sisp.iface.common.vo.xgcard;
  * @Title: 孝感补换卡社保网点
  * @company :TECSUN
  * @developer: ZENGYUNHUA
- *	@date 2018年5月9日 下午3:47:16
  *	@version 1.0
  */
 public class SocialOrgVO {

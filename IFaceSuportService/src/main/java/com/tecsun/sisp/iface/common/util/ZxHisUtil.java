@@ -20,7 +20,6 @@ public class ZxHisUtil {
     public static final Logger logger = Logger.getLogger(ZxHisUtil.class);
 
     /*
-@date     2015-8-12
 @ 生成BASE64加密
 */
  /*   public static String setBase64EncoderXml(String xml){
@@ -66,7 +65,6 @@ public class ZxHisUtil {
         return  "".getBytes();
     }
     /*
-@date     2015-8-12
 @ 解密BASE64
 */
     public static String getBase64DecoderXml(String xml){
@@ -87,7 +85,6 @@ public class ZxHisUtil {
     }
 
     /*
- @date     2015-8-12
  @ 组装报文的开始部分
  */
     public static String setStartXml(HisZxRequstBean bean){
@@ -99,7 +96,6 @@ public class ZxHisUtil {
     }
 
     /*
-       @date     2015-8-12
        @ 组装分页报文
        */
     public static String getHeadXml(HisZxRequstBean bean){
@@ -113,7 +109,6 @@ public class ZxHisUtil {
         return headXml.toString();
     }
     /*
-   @date     2015-8-12
    @ 组装报文的结束部分
    */
     public static String setEndXml(HisZxRequstBean bean){
@@ -123,7 +118,6 @@ public class ZxHisUtil {
     }
 
     /*
-     @date     2015-8-12
      @ 1.1 获取医院信息
      @ 1、组装报文的开始部分 setStartXml
      @ 2、组装分页报文  getHeadXml();
@@ -143,7 +137,6 @@ public class ZxHisUtil {
     }
 
     /*
-    @date     2015-8-12
     @ 1.2  获取科室信息
     @ 1、组装报文的开始部分 setStartXml
     @ 2、组装分页报文  getHeadXml();
@@ -180,7 +173,6 @@ public class ZxHisUtil {
     }
 
  /*
-    @date     2015-8-12
     @   1.3  获取医生信息
     @ 1、组装报文的开始部分 setStartXml
     @ 2、组装分页报文  getHeadXml();
@@ -218,7 +210,6 @@ public class ZxHisUtil {
  }
 
     /*
-    @date     2015-8-12
     @   1.4获取指定医生的当前可约状态
     @ 1、组装报文的开始部分 setStartXml
     @ 2、组装分页报文  getHeadXml();
@@ -259,7 +250,6 @@ public class ZxHisUtil {
     }
 
     /*
-   @date     2015-8-12
    @   1.5 取一个医生的排班列表
    @ 1、组装报文的开始部分 setStartXml
    @ 2、组装分页报文  getHeadXml();
@@ -292,7 +282,6 @@ public class ZxHisUtil {
     }
 
     /*
-      @date     2015-8-12
       @ 1.6 获取具体日期门诊安排的号源情况( 列表)
       @ 1、组装报文的开始部分 setStartXml
       @ 2、组装分页报文  getHeadXml();
@@ -345,7 +334,6 @@ public class ZxHisUtil {
     }
 
     /*
-     @date     2015-8-12
      @ 1.7 取一个日排班的分时信息
      @ 1、组装报文的开始部分 setStartXml
      @ 2、组装分页报文  getHeadXml();
@@ -378,7 +366,6 @@ public class ZxHisUtil {
     }
 
     /*    电子文档和纸质文档参数不一样 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-         @date     2015-8-12
          @ 1.8 生成挂号订单并申请锁号
          @ 1、组装报文的开始部分 setStartXml
          @ 2、组装分页报文  getHeadXml();
@@ -423,7 +410,6 @@ public class ZxHisUtil {
     }
 
     /*
-         @date     2015-8-12
          @ 1.9 查询锁号是否成功
          @ 1、组装报文的开始部分 setStartXml
          @ 2、组装报文的结束部分 setEndXml
@@ -450,7 +436,6 @@ public class ZxHisUtil {
     }
 
     /*
-        @date     2015-8-12
         @ 1.10更新订单信息 
         @ 1、组装报文的开始部分 setStartXml
         @ 2、组装报文的结束部分 setEndXml
@@ -503,7 +488,6 @@ public class ZxHisUtil {
     }
 
     /*
-        @date     2015-8-12
         @ 1.11   提交订单生效
         @ 1、组装报文的开始部分 setStartXml
         @ 2、组装报文的结束部分 setEndXml
@@ -529,7 +513,6 @@ public class ZxHisUtil {
     }
 
     /*
-        @date     2015-8-12
         @ 1.12   取历史订单列表
         @ 1、组装报文的开始部分 setStartXml
         @ 2、组装报文的结束部分 setEndXml
@@ -570,7 +553,6 @@ public class ZxHisUtil {
     }
 
     /*
-        @date     2015-8-12
         @ 1.13   取消订单
         @ 1、组装报文的开始部分 setStartXml
         @ 2、组装报文的结束部分 setEndXml
@@ -601,7 +583,6 @@ public class ZxHisUtil {
     }
 
     /*
-        @date     2015-8-12
         @ 1.14 确定退费
         @ 1、组装报文的开始部分 setStartXml
         @ 2、组装报文的结束部分 setEndXml
@@ -629,7 +610,6 @@ public class ZxHisUtil {
     }
 
     /*
-       @date     2015-8-12
        @ 1.15 取短信文本
        @ 1、组装报文的开始部分 setStartXml
        @ 2、组装报文的结束部分 setEndXml
@@ -653,7 +633,6 @@ public class ZxHisUtil {
     }
 
     /*
-       @date     2015-8-12
        @ 1.16 获取指定排班的当前可约状态
        @ 1、组装报文的开始部分 setStartXml
        @ 2、组装报文的结束部分 setEndXml
@@ -679,7 +658,6 @@ public class ZxHisUtil {
     }
 
     /*
-      @date     2015-8-12
       @ 1.17   获取退费记录接口
       @ 1、组装报文的开始部分 setStartXml
       @ 2、组装报文的结束部分 setEndXml
@@ -703,7 +681,6 @@ public class ZxHisUtil {
         return contextXml.toString();
     }
     /*
-        @date     2015-8-12
         @ 1.18 获取医院信息
         @ 1、组装报文的开始部分 setStartXml
         @ 2、组装分页报文  getHeadXml();
@@ -1130,7 +1107,6 @@ public class ZxHisUtil {
     
    
    /*
-   @date     2015-11-08
    @ 现场挂号-提交订单
    @ 1、组装报文的开始部分 setStartXml
    @ 2、组装报文的结束部分 setEndXml
@@ -1263,7 +1239,6 @@ public class ZxHisUtil {
 	    }
 	    
 	    /*
-	    @date     2015-11-08
 	    @ 现场挂号-获取科室列表
 	    @ 1、组装报文的开始部分 setStartXml
 	    @ 2、组装报文的结束部分 setEndXml

@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo.his.zx;
  * 中心医院历史订单列表
  *
  * @ClassName: HospitalZxOrderPO
- * @date 2015/9/17.
  */
 public class HospitalZxOrderPO {
     private String pinkey;//数字订单号

@@ -5,7 +5,6 @@ import java.util.List;
 /**
  *  内存分页
 * @ClassName: PageModel 
-* @date 2015年6月25日 下午12:09:05 
 * 
  */
 public class PageModel<T> {

@@ -14,7 +14,6 @@ import org.codehaus.jackson.type.TypeReference;
  * 
  * Jackson json 操作类
  * 
- * @date 2015-08-19 16:40:33
  */
 
 public class JsonHelper {

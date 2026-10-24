@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.card;
 
 /*
-@date     2015-7-7
 @version
 @return
 @throws

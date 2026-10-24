@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月22日 下午2:46:37
- */
 public class GetPdfVo extends JobBasicVo {
 
 	private String wjlj;// 文件路径

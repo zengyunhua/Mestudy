@@ -3,7 +3,6 @@ package com.tecsun.sisp.iface.common.vo.employment.param.job;
 /**
  * 就业-注册信息，不能为空的字段
  * 
- * @date 2017年1月12日 下午12:06:24
  */
 public class NoNullRegisteVo {
 

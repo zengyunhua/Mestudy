@@ -332,6 +332,11 @@ Do not open a public issue for a vulnerability. See [SECURITY.md](SECURITY.md).
 
 [Apache License 2.0](LICENSE).
 
+Third-party attribution is recorded in [NOTICE](NOTICE). A small number of files
+(`Dialect`, `PreparePaginationInterceptor`, `Reflections`) are copied from
+[JeeSite](https://github.com/thinkgem/jeesite) and keep their original `@author`
+tags — please leave those intact if you fork this project.
+
 ## Disclaimer
 
 This codebase is derived from systems built for Chinese public-service institutions.

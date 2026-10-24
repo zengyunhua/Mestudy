@@ -22,7 +22,6 @@ import com.tecsun.sisp.iface.common.vo.faceverify.KeyValueVO;
 /**
  * 解析xml
 * @ClassName: Dom4JUtil 
-* @date 2015年6月18日 下午9:46:56 
 *
  */
 public class Dom4JUtil {

@@ -5,7 +5,6 @@ import com.tecsun.sisp.iface.common.vo.Page;
 /**
  * 航天医院挂号实体类
 * @ClassName: BusInfoHTPO 
-* @date 2015年7月14日 下午10:26:09 
 *
  */
 public class BusInfoHTPO {

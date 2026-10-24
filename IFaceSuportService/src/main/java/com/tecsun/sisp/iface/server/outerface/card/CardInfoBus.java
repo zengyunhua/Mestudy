@@ -25,7 +25,6 @@ import java.rmi.RemoteException;
 /**
  *  省厅接口
 * @ClassName: CardInfoBus 
-* @date 2015年5月31日 下午4:05:15 
 *
  */
 public class CardInfoBus extends CardInfoBusClient {

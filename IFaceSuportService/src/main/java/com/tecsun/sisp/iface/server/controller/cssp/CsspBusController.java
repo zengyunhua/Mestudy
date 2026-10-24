@@ -1184,7 +1184,6 @@ public class CsspBusController extends BaseController {
      * @Title:
      * @company :TECSUN
      * @developer: ZENGYUNHUA
-     *	@date 2018年5月7日 下午8:38:04
      *	@version 1.0
      */
     @SuppressWarnings("unused")

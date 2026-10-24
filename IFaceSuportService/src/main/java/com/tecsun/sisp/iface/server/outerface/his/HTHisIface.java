@@ -16,7 +16,6 @@ import java.util.Map;
 /**
  * 航天医院接口  -- webservice接口
 * @ClassName: HTHisIface 
-* @date 2015年6月29日 上午11:32:17 
 *
  */
 public class HTHisIface {

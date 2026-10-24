@@ -963,17 +963,25 @@ public class FaceController extends BaseController{
 		return resultVerify(result, message);
 	}
 	
-	 /*@author   zengyunhua
-	   @date     2016-7-26
-	   @param bean 
-	   @return
-	   @throws
-	   @判断当年是否认证通过
-	   @说明：此方法是共用，type值类型：1、采集，2、认证，3、查年个人中心；
-	                       采集：只需要判断 是否为离退休人员或遗嘱和是否采集过照片；
-	                       认证：只需要判断  是否为离退休人员或遗嘱、是否采集过照片和是否认证成功过；
-	         查看个人中心：只需要判断  是否为离退休人员或遗嘱和是否认证成功过
-	   */
+	/**
+	 * Determines whether the given person has already passed the survival verification
+	 * for the current year.
+	 *
+	 * <p>The behaviour depends on {@code bean.getType()}:
+	 * <ol>
+	 *   <li><b>1 - enrolment</b>: only checks whether the person is a retiree or a
+	 *       surviving dependant, and whether a photo has already been captured.</li>
+	 *   <li><b>2 - verification</b>: checks retiree/dependant status, photo capture,
+	 *       and whether a verification has already succeeded.</li>
+	 *   <li><b>3 - personal centre query</b>: checks retiree/dependant status and
+	 *       whether a verification has already succeeded (photo capture is not
+	 *       required).</li>
+	 * </ol>
+	 *
+	 * @param bean registrant identity (ID number, name) and the {@code type} selector
+	 * @return the shared result envelope; {@code statusCode} carries the intermediate
+	 *         state constants (e.g. {@code 301} retiree, {@code 201} photo collected)
+	 */
 	@RequestMapping(value = "/getVerifyInfo", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
 	public ResultVerify getVerifyInfo(@RequestBody RegistBean bean) {

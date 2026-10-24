@@ -21,7 +21,6 @@ public class ArchiveUtil {
     public static final Logger logger = Logger.getLogger(ArchiveUtil.class);
 
     /*
- @date     2015-8-12
  @ 组装报文的开始部分
  */
     public static String setStartXml(ArchiveRequstBean bean){
@@ -45,7 +44,6 @@ public class ArchiveUtil {
     }
 
     /*
-   @date     2015-8-12
    @ 组装报文的结束部分
    */
     public static String setEndXml(ArchiveRequstBean bean){
@@ -55,7 +53,6 @@ public class ArchiveUtil {
     }
 
     /*
-     @date     2016-9-12
      <?xml version=’1.0’ encoding="UTF-8"?>
         <!--type业务类型 -->
         <StorageQuery>

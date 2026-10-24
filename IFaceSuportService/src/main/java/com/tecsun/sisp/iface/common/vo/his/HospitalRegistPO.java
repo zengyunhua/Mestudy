@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo.his;
  * 医院挂号号表
  * 
  * @ClassName: HospitalRegistPO
- * @date 2015年6月18日 下午12:09:43
  *
  */
 public class HospitalRegistPO {

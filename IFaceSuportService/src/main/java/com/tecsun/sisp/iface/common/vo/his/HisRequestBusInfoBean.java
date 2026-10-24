@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo.his;
  *  航天医院业务实体类
 * @ClassName: HisRequestBusInfoBean 
 * @Description: TODO(这里用一句话描述这个类的作用) 
-* @date 2015年7月15日 上午1:06:26 
 *
  */
 public class HisRequestBusInfoBean {

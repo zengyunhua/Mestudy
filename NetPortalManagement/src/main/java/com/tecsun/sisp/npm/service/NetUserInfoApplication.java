@@ -49,7 +49,6 @@ public class NetUserInfoApplication extends NetSuperApplication {
     }
 
     /*
-     * @date     2015-6-1
        @version
        @parameter
        @return
@@ -90,7 +89,6 @@ public class NetUserInfoApplication extends NetSuperApplication {
     }
 
     /*
-     * @date     2015-6-1
        @version
        @parameter
        @return
@@ -132,7 +130,6 @@ public class NetUserInfoApplication extends NetSuperApplication {
     }
 
     /*
-     * @date     2015-6-1
        @version
        @parameter
        @return
@@ -156,7 +153,6 @@ public class NetUserInfoApplication extends NetSuperApplication {
     }
 
     /*
-     * @date     2015-6-1
        @version
        @parameter
        @return
@@ -186,7 +182,6 @@ public class NetUserInfoApplication extends NetSuperApplication {
     }
 
     /*
-     * @date     2015-6-1
        @version
        @parameter
        @return

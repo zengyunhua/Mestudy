@@ -2,9 +2,6 @@ package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 import java.util.Date;
 
-/**
- * @date 2016年12月19日 上午11:42:15
- */
 public class AddJobSeekerInfoVo  extends JobBasicVo{
 
 	private String zjlxid;// 证件类型id(字典表的id)

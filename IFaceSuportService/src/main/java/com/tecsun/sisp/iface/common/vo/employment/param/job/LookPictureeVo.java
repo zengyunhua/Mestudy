@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月27日 上午11:23:13
- */
 public class LookPictureeVo extends JobBasicVo {
 
 	private String tpdz;// 图片地址

@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月20日 下午3:14:47
- */
 public class QueryJobFairVo extends JobBasicVo {
 
 	private String shzt;// 审核状态(传数字、多选）

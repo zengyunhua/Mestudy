@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo.his;
  * 医院科室实体类
  * 
  * @ClassName: DepartmentPO
- * @date 2015年6月18日 下午12:01:23
  *
  */
 public class DepartmentPO {

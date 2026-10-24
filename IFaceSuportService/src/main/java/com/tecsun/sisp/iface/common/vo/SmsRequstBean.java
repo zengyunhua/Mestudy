@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo;
  * 短信请求bean
  * 
  * @ClassName:
- * @date 2015年8月5日 
  *
  */
 public class SmsRequstBean {

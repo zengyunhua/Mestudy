@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月22日 下午2:46:37
- */
 public class GetPdfVo2 {
 
 	private String picBase64Str;// 照片base64字符串

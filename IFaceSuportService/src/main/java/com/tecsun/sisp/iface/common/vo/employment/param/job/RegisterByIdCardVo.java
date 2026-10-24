@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月20日 上午10:06:50
- */
 public class RegisterByIdCardVo extends JobBasicVo {
 	private String sfzh;// 身份证号、需编码
 	private String xm;// 姓名、需编码

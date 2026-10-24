@@ -1354,7 +1354,6 @@ public class ZhongxinHisController extends BaseController {
     }
 
     /*
-	@date     2015-7-3
 	@version
 	@parameter
 	@return

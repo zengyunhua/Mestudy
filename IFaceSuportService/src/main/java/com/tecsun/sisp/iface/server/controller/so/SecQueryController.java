@@ -568,7 +568,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -601,7 +600,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -631,7 +629,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -670,7 +667,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -739,7 +735,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -777,7 +772,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -816,7 +810,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -855,7 +848,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-8
     @version
     @return
     @throws
@@ -907,7 +899,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -948,7 +939,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -989,7 +979,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -1029,7 +1018,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -1070,7 +1058,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -1111,7 +1098,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -1146,7 +1132,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -1193,7 +1178,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -1244,7 +1228,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -1266,7 +1249,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -1312,7 +1294,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @date     2015-7-7
     @version
     @return
     @throws
@@ -1672,7 +1653,6 @@ public class SecQueryController extends BaseController {
 
 //    20160405新增接口 start
     /*
-    @date     2016-4-5
     @param bean
     @return
     @throws
@@ -1705,7 +1685,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
  /*
-    @date     2016-4-6
     @param bean
     @return
     @throws
@@ -1738,7 +1717,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
      /*
-    @date     2016-4-6
     @param bean
     @return
     @throws
@@ -1772,7 +1750,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-     @date     2016-4-6
      @param bean
      @return
      @throws
@@ -1805,7 +1782,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
     /*
-     @date     2016-4-19
      @param bean
      @return
      @throws
@@ -1838,7 +1814,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
     /*
-   @date     2016-4-18
    @param bean
    @return
    @throws

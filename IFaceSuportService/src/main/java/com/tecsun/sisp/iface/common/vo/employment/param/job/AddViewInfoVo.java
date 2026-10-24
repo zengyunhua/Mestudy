@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月22日 下午2:29:23
- */
 public class AddViewInfoVo extends JobBasicVo {
 
 	private String sblx;// 设备类型 3:自助一体机

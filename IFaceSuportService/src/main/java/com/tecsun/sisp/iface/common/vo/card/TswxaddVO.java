@@ -1,6 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.card;
 /*
-@date     2016-4-5
 @ 五险补充查询VO
 */
 public class TswxaddVO {

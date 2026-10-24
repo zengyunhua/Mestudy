@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo;
  * 医院门诊缴费请求bean
  * 
  * : DepartmentBean
- * @date 2015年6月19日 下午1:08:49
  *
  */
 public class HisRequstPayBean {

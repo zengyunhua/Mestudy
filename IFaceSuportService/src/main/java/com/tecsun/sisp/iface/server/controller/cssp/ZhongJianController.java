@@ -33,7 +33,6 @@ public class ZhongJianController extends BaseController{
 	 * @Title:基本养老获取
 	 * @company :TECSUN
 	 * @developer: ZENGYUNHUA
-	 *	@date 2018年5月11日 下午4:21:07
 	 *	@version 1.0
 	 */
 	  	@RequestMapping(value = "/endowmentinsurance", method = RequestMethod.POST, produces = "application/json")

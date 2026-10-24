@@ -5,7 +5,6 @@ package com.tecsun.sisp.iface.common.vo;
  * @Title: AreaManage
  * @company :TECSUN
  * @developer: ZENGYUNHUA
- *	@date 2018年5月8日 下午5:03:25
  *	@version 1.0
  */
 public class AreaManage {

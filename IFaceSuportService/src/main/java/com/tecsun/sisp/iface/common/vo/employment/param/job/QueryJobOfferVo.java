@@ -1,8 +1,5 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
-/**
- * @date 2016年12月16日 上午10:15:01
- */
 public class QueryJobOfferVo extends JobBasicVo {
 
 	private String qyid;// 企业ID

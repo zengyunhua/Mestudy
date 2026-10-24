@@ -8,9 +8,6 @@ import org.junit.Test;
 import com.google.gson.JsonObject;
 import com.tecsun.sisp.iface.client.WebClient;
 
-/**
- * @date 2016年12月16日 上午11:11:19 
- */
 public class JobQueryControllerTest {
 
 	private static String basic_url = "http://127.0.0.1:8081/IFaceSuportService-xg-temp/iface/job";
