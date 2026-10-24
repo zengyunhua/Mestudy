@@ -283,11 +283,13 @@ domain prefix (`/iface/rest/`, `/iface/cardInfo/`, `/iface/user/`, ...). The
 This repository is a **curated archive of production-derived modules**, published for
 reference. It is maintained on a best-effort basis.
 
-- **Documentation**: being filled in (this README, per-module READMEs and `docs/` were
-  added in the current pass).
-- **Build reproducibility**: partial — blocked by the private Nexus for some modules,
-  see below.
-- **Tests**: thin. A handful of `src/test` entry points exist; there is no CI yet.
+- **Documentation**: in place — this README, a per-module README each, and the eight
+  documents under `docs/`.
+- **Build reproducibility**: partial. `IFaceSuportService` and `IFaceSuperService_hn`
+  build from Maven Central alone and are compiled on every push; the other three need
+  private jars, see below.
+- **Tests**: thin. Four `src/test` entry points with `main()` methods, no assertions.
+  CI compiles the buildable modules and runs hygiene checks, but it runs no tests.
 - **Modernisation**: not planned in-place. The intent is to keep the original
   Spring 4 / XML style intact so the patterns stay readable.
 
@@ -312,7 +314,10 @@ is a good first contribution.
 4. **Thin test coverage.** There is no assertion-based test suite. The four classes
    under `src/test` are manual entry points with `main()` methods; one of them is not
    even on the test source path.
-5. **No release tags.** The `CHANGELOG.md` is not yet tied to tagged versions.
+5. **One release only.** `v1.0.0` is tagged and described in
+   [CHANGELOG.md](CHANGELOG.md); the per-module artifact versions in the POMs still
+   carry their original internal numbers (`V1.0.0.150630`, `V1.0.0.190107`) and are not
+   aligned with it.
 
 ## Roadmap
 
@@ -323,11 +328,11 @@ See [docs/ROADMAP.md](docs/ROADMAP.md). Near-term:
 - [x] Replace non-public dependency coordinates with their Maven Central equivalents
 - [x] Stop tracking `target/` and the real `config.properties` files
 - [x] GitHub Actions: compile the buildable modules on JDK 8, plus repository hygiene checks
+- [x] Tag `v1.0.0`
 - [ ] Make the remaining three modules build against public artifacts
 - [ ] Scrub credentials and personal data from the git history
 - [ ] Add JUnit + H2 tests for the `common` layer and one controller per module
 - [ ] Generate an OpenAPI description from the existing controllers
-- [ ] Tag `v1.0.0`
 
 ## Documentation
 
