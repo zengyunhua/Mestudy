@@ -69,33 +69,70 @@ unresolvable placeholder. The full key list is in
 
 ## 4. Build
 
+From the repository root — an aggregator POM ties the five modules together:
+
 ```bash
-cd IFaceSuportService
-mvn clean package -DskipTests
+# Compile the modules that have public dependencies
+mvn -B -pl IFaceSuportService,IFaceSuperService_hn compile
+
+# Package one module
+mvn -B -pl IFaceSuportService clean package -DskipTests
 ```
 
-Expected artefacts:
+Expected artefacts (paths are relative to the module directory):
 
 ```
-target/IFaceSuportService-V1.0.0.150630.war
-target/IFaceSuportService-V1.0.0.150630-client.jar
+IFaceSuportService/target/IFaceSuportService-V1.0.0.150630.war
+IFaceSuportService/target/IFaceSuportService-V1.0.0.150630-client.jar
 ```
 
 The `-client` jar is produced by the `maven-jar-plugin` execution with
 `classifier=client`, and contains only `**/client/**` and `**/common/**` classes. That is
 the artefact a downstream terminal embeds.
 
-### If the build fails to resolve dependencies
+### Which modules build
 
-The POMs declare internal Nexus repositories (`192.168.1.8`, `11.11.11.8`) that are not
-reachable from the public internet. Options:
+| Module | Builds from Maven Central | Missing |
+| --- | --- | --- |
+| `IFaceSuportService` | yes | — |
+| `IFaceSuperService_hn` | yes | — |
+| `NetworkOfficeService` | no | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
+| `InterfaceFunction` | no | same as above |
+| `NetPortalManagement` | no | `bee:cloud*` |
 
-1. **Build only the modules that resolve.** `InterfaceFunction` and
-   `NetPortalManagement` are the most self-contained.
-2. **Point the repository at a mirror you control.** Edit the `<repositories>` block, or
-   add a `~/.m2/settings.xml` mirror.
-3. **Vendor the missing jars** into `src/main/webapp/WEB-INF/lib/` and drop the
-   dependency declaration. Acceptable for local experiments, not for a contribution.
+### Using a Maven mirror
+
+The POMs no longer declare any repository, so Maven uses Central by default. If your
+network requires a proxy, declare it once in `~/.m2/settings.xml` — never in the project
+POM:
+
+```xml
+<settings>
+  <mirrors>
+    <mirror>
+      <id>internal</id>
+      <mirrorOf>*</mirrorOf>
+      <url>https://your-mirror.example.com/repository/maven-public/</url>
+    </mirror>
+  </mirrors>
+</settings>
+```
+
+### If the build still fails to resolve dependencies
+
+The remaining failures are the private `bee` framework and
+`com.tecsun.sisp_public:aamanagement-client`, which exist in no public repository.
+Options:
+
+1. **Build only the modules that resolve** — `IFaceSuportService` and
+   `IFaceSuperService_hn`.
+2. **Install the jars you have** into your local repository:
+   ```bash
+   mvn install:install-file -Dfile=bee.cloud-1.0.4.jar \
+       -DgroupId=bee -DartifactId=bee.cloud -Dversion=1.0.4 -Dpackaging=jar
+   ```
+3. **Drop the dependency** if nothing references it. This is how
+   `unieap-dataexchange-client` was removed: it was declared but never imported.
 
 This is a known limitation; see [ROADMAP.md](ROADMAP.md).
 
@@ -137,7 +174,7 @@ less docs/ARCHITECTURE.md
 # Inspect every HTTP endpoint without running anything
 grep -rn "@RequestMapping" --include=*.java . | head -50
 
-# Compile just the common layer, which has no datasource dependency
+# Compile the whole module - no datasource is contacted at build time
 cd IFaceSuportService
 mvn -q compile
 ```
@@ -159,7 +196,7 @@ public class Demo {
         IFaceHttpsClient.ClientInit("127.0.0.1", 8080, 60, false, "TSB", "sisp");
 
         SecQueryBean bean = new SecQueryBean();
-        bean.setId("000000199001010000");
+        bean.setId("110101199001010015");
         bean.setName("...");
         bean.setChannelcode("SelfService");
 

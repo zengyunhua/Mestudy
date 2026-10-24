@@ -1,0 +1,72 @@
+# ---------------------------------------------------------------------------
+# Mestudy — .gitignore
+#
+# Build output, IDE metadata and *local* configuration must never be committed.
+# ---------------------------------------------------------------------------
+
+# --- Maven build output -----------------------------------------------------
+target/
+build/
+out/
+*.war
+*.ear
+*.class
+*.jar
+*.zip
+!src/main/webapp/WEB-INF/lib/*.jar
+
+# --- Local / secret configuration ------------------------------------------
+# Real credentials live here. Only the .example templates are committed.
+config.properties
+ds.xml
+config-local.properties
+*.local.properties
+application-*.yml
+application-*.yaml
+
+# --- IntelliJ IDEA ----------------------------------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.idea_modules/
+
+# --- Eclipse / STS ----------------------------------------------------------
+.classpath
+.project
+.settings/
+.springBeans
+.factorypath
+.apt_generated/
+*.launch
+
+# --- NetBeans ---------------------------------------------------------------
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+
+# --- Visual Studio Code -----------------------------------------------------
+.vscode/
+
+# --- OS noise ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs & runtime artefacts ----------------------------------------------
+*.log
+logs/
+*.pid
+*.hprof
+hs_err_pid*.log
+
+# --- Local databases / exports ---------------------------------------------
+*.db
+*.sqlite
+*.mdb
+
+# --- Tooling / local agent workspace ---------------------------------------
+# Local notes and caches; never part of the published repository.
+.workbuddy-ai/

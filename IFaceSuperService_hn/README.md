@@ -6,18 +6,19 @@ login/token only, with a different datasource and a newer version string.
 
 | | |
 | --- | --- |
-| Artifact | `com.tecsun.sisp:IFaceSuportService` ⚠️ |
+| Artifact | `com.tecsun.sisp:IFaceSuperService_hn` |
 | Packaging | `war` |
 | Version | `V1.0.0.190107` |
 | Java files | 61 |
 | Endpoints | 8 |
 | Datasources | 2 |
 
-> **Artifact id collision.** This module declares the *same* `artifactId`
-> (`IFaceSuportService`) as `IFaceSuportService/`, distinguished only by version. If you
-> install both into the same local repository, one will shadow the other depending on
-> which version you depend on. Build them into separate repositories, or rename one
-> (tracked on the [roadmap](../docs/ROADMAP.md)).
+> **Former artifact id collision — fixed.** This module used to declare the same
+> `artifactId` (`IFaceSuportService`) as `IFaceSuportService/`, distinguished only by
+> version, so installing both into one local repository made them shadow each other.
+> It now builds as `IFaceSuperService_hn`. The war file is consequently named
+> `IFaceSuperService_hn-V1.0.0.190107.war`; rename it on deploy if your container
+> configuration expects the old name.
 
 ---
 
@@ -102,7 +103,7 @@ mvn clean package
 ```
 
 ```bash
-cp target/IFaceSuportService-V1.0.0.190107.war $CATALINA_HOME/webapps/sisp.war
+cp target/IFaceSuperService_hn-V1.0.0.190107.war $CATALINA_HOME/webapps/sisp.war
 ```
 
 ## Notes for contributors

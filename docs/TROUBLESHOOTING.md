@@ -16,32 +16,54 @@ do.
 ### Build fails to resolve dependencies
 
 ```
-Could not resolve dependencies for project com.tecsun.sisp:...
-Failed to read artifact descriptor ... 192.168.1.8:8686
+Could not resolve dependencies for project com.tecsun.sisp:NetworkOfficeService:...
+The following artifacts could not be resolved:
+  com.tecsun.sisp_public:aamanagement-client:jar:1.0.5, bee:xx.tool:jar:1.0.0
 ```
 
-**Cause.** Every `pom.xml` declares an internal Nexus repository
-(`http://192.168.1.8:8686/...` or `http://11.11.11.8:8686/...`). Those hosts are only
-reachable inside the original corporate network.
+**Cause.** The POMs no longer declare an internal repository, so Maven goes straight to
+Maven Central. Three modules still depend on artifacts that were only ever published to
+an internal Nexus: the `bee` application framework and the AA client
+(`com.tecsun.sisp_public:aamanagement-client`). Nothing in this repository can replace
+them.
 
 **Fix.** Pick one:
 
-1. Build only the modules whose dependencies resolve from Maven Central —
-   `InterfaceFunction` and `NetPortalManagement` are the most self-contained.
-2. Mirror the repository. In `~/.m2/settings.xml`:
+1. Build only the modules whose dependencies resolve — `IFaceSuportService` and
+   `IFaceSuperService_hn`. This is what CI does.
+2. Install the jars you already have into your local repository:
 
-   ```xml
-   <mirrors>
-     <mirror>
-       <id>internal</id>
-       <mirrorOf>*</mirrorOf>
-       <url>https://your-nexus/repository/maven-public/</url>
-     </mirror>
-   </mirrors>
+   ```bash
+   mvn install:install-file -Dfile=bee.cloud-1.0.4.jar \
+       -DgroupId=bee -DartifactId=bee.cloud -Dversion=1.0.4 -Dpackaging=jar
    ```
 
-3. Vendor the jars into `src/main/webapp/WEB-INF/lib/` and remove the dependency
-   declaration. Fine for local experiments; do not submit it as a patch.
+3. If nothing in the sources references the artifact, delete the `<dependency>` block.
+   That is how `unieap-dataexchange-client` was removed: it was declared for the
+   provincial rural-pension integration but no class imported it.
+
+> **Historical note.** Earlier revisions of this repository hard-coded the Nexus URLs
+> (`192.168.1.8:8686`, `11.11.11.8:8686`) directly in every POM, which made a public
+> clone fail immediately. Mirrors belong in `~/.m2/settings.xml`, not in a project POM.
+
+### `InvokeUtil.java` fails with "illegal character: '\ufeff'"
+
+```
+InvokeUtil.java:[1,1] illegal character: '\ufeff'
+InvokeUtil.java:[1,10] class, interface or enum expected
+```
+
+**Cause.** The file was saved with a UTF-8 BOM. `javac` does not strip a BOM and treats
+the three bytes as source characters.
+
+**Fix.** Strip the BOM. On Linux/macOS:
+
+```bash
+sed -i '1s/^\xEF\xBB\xBF//' path/to/InvokeUtil.java
+```
+
+Or in most editors: "Save with encoding → UTF-8" (not "UTF-8 with BOM"). This affected
+`IFaceSuperService_hn` and is fixed in the current tree.
 
 ### `mvn` compiles with warnings about source/target 1.7
 

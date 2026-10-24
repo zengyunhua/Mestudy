@@ -141,7 +141,7 @@ $CATALINA_HOME/bin/startup.sh
 IFaceHttpsClient.ClientInit("127.0.0.1", 8080, 60, false, "TSB", "sisp");
 
 SecQueryBean bean = new SecQueryBean();
-bean.setId("000000199001010000");
+bean.setId("110101199001010015");
 bean.setChannelcode("SelfService");
 
 Page<TsgrjfxxVO> page = IFaceHttpsClient.getPersonPesionPay(bean);

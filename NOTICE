@@ -1,0 +1,36 @@
+Mestudy
+Copyright 2015-2026 Yunhua Zeng and the Mestudy contributors
+
+This product includes software developed at JeeSite
+(https://github.com/thinkgem/jeesite), which is distributed under the
+Apache License, Version 2.0.
+
+The following source files are copies of, or are derived from, JeeSite and
+retain their original copyright headers and `@author` attribution. They must
+not be relicensed or stripped of attribution:
+
+  Dialect.java                       original author: poplar.yfyang
+  PreparePaginationInterceptor.java  original author: poplar.yfyang
+  Reflections.java                   original author: calvin
+
+Each file is present once per module, in the following locations:
+
+  IFaceSuportService/src/main/java/com/tecsun/sisp/iface/server/util/page/
+  IFaceSuportService/src/main/java/com/tecsun/sisp/iface/server/util/
+  IFaceSuperService_hn/src/main/java/com/tecsun/sisp/iface/common/page/
+  IFaceSuperService_hn/src/main/java/com/tecsun/sisp/iface/common/util/
+  InterfaceFunction/src/main/java/com/tecsun/sisp/fun/common/page/
+  InterfaceFunction/src/main/java/com/tecsun/sisp/fun/common/
+  NetworkOfficeService/src/main/java/com/tecsun/sisp/net/common/page/
+  NetworkOfficeService/src/main/java/com/tecsun/sisp/net/common/
+
+All other third-party code is consumed as declared Maven dependencies in each
+module's `pom.xml` and is not vendored into this repository, with one
+exception:
+
+  NetworkOfficeService/src/main/webapp/WEB-INF/lib/print-2.1.1.jar
+
+That jar carries no licence metadata and its provenance is not recorded in the
+repository. It is retained for build compatibility only. Anyone redistributing
+this project commercially should establish its origin and licence terms first,
+or replace it with a dependency that declares one.

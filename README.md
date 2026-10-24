@@ -6,6 +6,7 @@
 [![Spring](https://img.shields.io/badge/Spring-4.0.8-6db33f.svg)](#tech-stack)
 [![MyBatis](https://img.shields.io/badge/MyBatis-3.2.4-red.svg)](#tech-stack)
 [![Build](https://img.shields.io/badge/build-Maven-c71a36.svg)](#build-from-source)
+[![CI](https://github.com/zengyunhua/Mestudy/actions/workflows/ci.yml/badge.svg)](https://github.com/zengyunhua/Mestudy/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 ---
@@ -149,21 +150,39 @@ flowchart TB
 git clone https://github.com/zengyunhua/Mestudy.git
 cd Mestudy
 
-# Build one module
-cd IFaceSuportService
-mvn clean package
+# Compile every module whose dependencies are public (see the table below)
+mvn -B -pl IFaceSuportService,IFaceSuperService_hn compile
 
-# Output
-#   target/IFaceSuportService-V1.0.0.150630.war   -> deploy to the container
-#   target/IFaceSuportService-V1.0.0.150630-client.jar -> embeddable client SDK
+# Build one module into a deployable war
+mvn -B -pl IFaceSuportService package
+#   target/IFaceSuportService-V1.0.0.150630.war         -> deploy to the container
+#   target/IFaceSuportService-V1.0.0.150630-client.jar  -> embeddable client SDK
 ```
 
-> **Important — the build currently depends on a private artifact repository.**
-> Each `pom.xml` declares an internal Nexus (`http://192.168.1.8:8686/...` or
-> `http://11.11.11.8:8686/...`). Those hosts are not reachable from the public
-> internet, so a clean build will fail on modules that pull proprietary artifacts.
-> See [Known limitations](#known-limitations) and
-> [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md#build-fails-to-resolve-dependencies).
+The repository root holds an aggregator `pom.xml`, so Maven works from the top of the
+tree. Each module keeps its own coordinates and version — the root POM supplies only
+the module list, the source encoding and the compiler level.
+
+### Which modules build publicly
+
+| Module | Public build | Blocking dependency |
+| --- | --- | --- |
+| `IFaceSuportService` | yes | — |
+| `IFaceSuperService_hn` | yes | — |
+| `NetworkOfficeService` | no | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
+| `InterfaceFunction` | no | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
+| `NetPortalManagement` | no | `bee:cloud`, `bee.cloud.service`, `bee.cloud.impl`, `bee.cloud.entity` |
+
+The three blocked modules depend on an internal application framework (`bee`) and an
+internal AA client that were never published to a public repository. Nothing in this
+repository can substitute for them; they must be present in your local repository
+before those modules will build. Everything else — Spring, MyBatis, Axis, Jersey,
+kaptcha and the Oracle JDBC driver — resolves from Maven Central.
+
+> **Private mirrors.** The POMs no longer hard-code an internal Nexus. If your
+> organisation proxies Maven Central, declare the mirror in `~/.m2/settings.xml`
+> instead of in the project POM. See
+> [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md#using-a-maven-mirror).
 
 ### Run
 
@@ -198,7 +217,7 @@ IFaceHttpsClient.ClientInit(
 
 // Then call the typed API
 SecQueryBean bean = new SecQueryBean();
-bean.setId("000000199001010000");
+bean.setId("110101199001010015");
 bean.setName("...");
 bean.setChannelcode("SelfService");
 
@@ -277,28 +296,38 @@ reference. It is maintained on a best-effort basis.
 These are documented on purpose — they are the honest state of the code, and each one
 is a good first contribution.
 
-1. **Private artifact repository.** `pom.xml` files point at internal Nexus hosts. A
-   public build needs the proprietary jars replaced or stubbed.
-2. **Build output is committed.** `target/` directories (128 `.class`, 83 `.jar`) were
-   historically tracked; `.gitignore` now excludes them.
-3. **Credentials in configuration.** The original `config.properties` files contain real
-   database passwords and third-party interface keys. They are being replaced by
-   `config.properties.example`; see [SECURITY.md](SECURITY.md) if you cloned before the
-   scrub.
-4. **Duplicated `common` layer.** Each module re-implements `Result`, `Page`, `CommUtil`,
-   `AESUtil`. Consolidating them into a shared artifact is a desirable refactor.
-5. **No automated tests or CI.** The highest-value next step.
+1. **Three modules need private jars.** `NetworkOfficeService`, `InterfaceFunction` and
+   `NetPortalManagement` depend on an internal framework (`bee`) and an internal AA
+   client that were never published publicly. They are excluded from CI for that
+   reason. The other two modules build against Maven Central alone.
+2. **Credentials are still in the git history.** The `config.properties` / `ds.xml`
+   files are no longer tracked (they were replaced by `.example` templates), but they
+   remain in every commit before that removal. Treat every credential that ever
+   appeared in this repository as compromised and rotate it — see
+   [SECURITY.md](SECURITY.md) for the procedure.
+3. **Duplicated `common` layer.** Each module re-implements `Result`, `Page`,
+   `CommUtil`, `AESUtil`. 54 class names exist in more than one module and none of
+   the copies are identical — they have drifted. Consolidating them into a shared
+   artifact is the single most valuable refactor available here.
+4. **Thin test coverage.** There is no assertion-based test suite. The four classes
+   under `src/test` are manual entry points with `main()` methods; one of them is not
+   even on the test source path.
+5. **No release tags.** The `CHANGELOG.md` is not yet tied to tagged versions.
 
 ## Roadmap
 
 See [docs/ROADMAP.md](docs/ROADMAP.md). Near-term:
 
-- [ ] Make every module build against Maven Central alone
-- [ ] Replace committed credentials with the `.example` templates (done in tree, needs
-      history scrub)
+- [x] Add a root aggregator POM so the workspace builds as one reactor
+- [x] Remove the hard-coded internal Nexus from every POM
+- [x] Replace non-public dependency coordinates with their Maven Central equivalents
+- [x] Stop tracking `target/` and the real `config.properties` files
+- [x] GitHub Actions: compile the buildable modules on JDK 8, plus repository hygiene checks
+- [ ] Make the remaining three modules build against public artifacts
+- [ ] Scrub credentials and personal data from the git history
 - [ ] Add JUnit + H2 tests for the `common` layer and one controller per module
-- [ ] GitHub Actions: `mvn -B verify` on JDK 8
 - [ ] Generate an OpenAPI description from the existing controllers
+- [ ] Tag `v1.0.0`
 
 ## Documentation
 
