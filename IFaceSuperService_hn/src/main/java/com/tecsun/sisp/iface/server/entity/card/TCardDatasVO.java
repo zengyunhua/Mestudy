@@ -4,7 +4,6 @@ import java.util.Date;
 
 /**
  * 制卡数据VO类
- * @author zengyunhua
  *2017年10月13日
  *
  */
@@ -64,7 +63,6 @@ public int getDataid() {
 public void setDataid(int dataid) {
 	this.dataid = dataid;
 }
-
 
  
 public String getIdcardnum() {

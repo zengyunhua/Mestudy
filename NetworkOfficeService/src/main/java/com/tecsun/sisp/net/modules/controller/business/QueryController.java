@@ -23,7 +23,6 @@ import com.tecsun.sisp.net.modules.service.business.QueryService;
  * 查询类业务controller
  * <p><b>如果需要通过险种类型查询出个人编号的,链接形式为/idcard/xz/....</b>
  * <p>实在是不知道业务的具体情况,,,先这样设计着.
- * @author 邓峰峰
  * @since 2018/06/26
  */
 

@@ -4,7 +4,6 @@ import java.util.List;
 
 /**
  * 详情出参
- * @author Administrator
  *
  */
 public class NoticeDetailVO {

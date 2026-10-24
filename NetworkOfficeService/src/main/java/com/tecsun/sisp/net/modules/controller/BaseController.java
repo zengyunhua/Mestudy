@@ -1,16 +1,10 @@
 package com.tecsun.sisp.net.modules.controller;
 
-
 import com.tecsun.sisp.net.common.Constants;
 import com.tecsun.sisp.net.common.JsonResult;
 import com.tecsun.sisp.net.common.Result;
 import com.tecsun.sisp.net.common.vo.faceverify.ResultVerify;
 
-/**
- * 
- * @author 
- *
- */
 public abstract class BaseController {
 
 	public Result result(String result, String message) {

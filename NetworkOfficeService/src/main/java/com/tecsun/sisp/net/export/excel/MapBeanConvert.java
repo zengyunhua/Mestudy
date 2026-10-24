@@ -9,7 +9,6 @@ import java.util.Map;
 
 /**
  * map和javabean互相转换工具类
- * @author 邓峰峰
  *
  */
 public class MapBeanConvert {

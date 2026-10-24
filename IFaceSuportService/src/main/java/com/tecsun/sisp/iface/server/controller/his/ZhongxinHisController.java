@@ -114,7 +114,6 @@ public class ZhongxinHisController extends BaseController {
         return this.result(result, message, list);
     }
 
-
     /**
      * 1.2 获取科室信息
      * GetHospitalList
@@ -452,7 +451,6 @@ public class ZhongxinHisController extends BaseController {
         return this.result(result, message, list);
     }
 
-
     /**
      * 1.8生成挂号订单并申请锁号
      * 新建成功，成功后先检查是是否锁定，如果是锁定状态去更新订单记录，如果不是锁定状态调用取消订单；
@@ -532,7 +530,6 @@ public class ZhongxinHisController extends BaseController {
         }
         return this.result(result, message, list);
     }
-
 
     /**
      * 1.9查询锁号是否成功
@@ -686,7 +683,6 @@ public class ZhongxinHisController extends BaseController {
         return result;
     }
 
-
     /**
      * 1.11提交订单生效
      * GetHospitalList
@@ -729,7 +725,6 @@ public class ZhongxinHisController extends BaseController {
         List<DepartmentPO> list = new ArrayList<DepartmentPO>(0);
         return this.result(result, message, list);
     }
-
 
     /**
      * 1.12取历史订单列表
@@ -963,7 +958,6 @@ public class ZhongxinHisController extends BaseController {
         return this.result(result, message, list);
     }
 
-
     /**
      * 1.15取短信文本
      * GetHospitalList
@@ -1047,7 +1041,6 @@ public class ZhongxinHisController extends BaseController {
         return this.result(result, message, list);
     }
 
-
     /**
      * 1.17 获取退费记录接口
      * GetHospitalList
@@ -1089,7 +1082,6 @@ public class ZhongxinHisController extends BaseController {
         List<DepartmentPO> list = new ArrayList<DepartmentPO>(0);
         return this.result(result, message, list);
     }
-
 
     /**
      * 1.18  提交订单生效（包含支付信息)
@@ -1306,7 +1298,6 @@ public class ZhongxinHisController extends BaseController {
         return statuCode;
     }
 
-
     public BusInfoHTPO copyProperties(HisZxRequstBean bean){
         BusInfoHTPO po = new BusInfoHTPO();
         return po;
@@ -1362,9 +1353,7 @@ public class ZhongxinHisController extends BaseController {
         return this.result(result, message, xmlData);
     }
 
-
     /*
-    @author   fwf
 	@date     2015-7-3
 	@version
 	@parameter

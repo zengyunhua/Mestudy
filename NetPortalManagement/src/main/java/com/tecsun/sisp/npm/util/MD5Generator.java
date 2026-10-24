@@ -9,7 +9,6 @@ import java.security.MessageDigest;
 /**
  * 功能说明：md5加密
  *
- * @author wuzhongliang 2013-9-24
  */
 public class MD5Generator {
 
@@ -19,7 +18,6 @@ public class MD5Generator {
      * 用md5加密字符串
      *
      * @return
-     * @author wuzhongliang 2014年10月9日
      */
     public static String generateValue(String param) {
         try {

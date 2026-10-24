@@ -2,7 +2,6 @@ package com.tecsun.sisp.net.exception;
 
 /**
  * 业务异常类
- * @author 邓峰峰
  *
  */
 public class ServiceException extends RuntimeException{

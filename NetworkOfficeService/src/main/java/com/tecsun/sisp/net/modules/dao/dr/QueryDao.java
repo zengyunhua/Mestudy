@@ -8,10 +8,8 @@ import org.apache.ibatis.annotations.Param;
 import com.tecsun.sisp.net.common.MyBatisDao;
 import com.tecsun.sisp.net.modules.entity.business.QueryVo;
 
-
 /**
  * 各类查询业务接口
- * @author 邓峰峰
  *
  */
 @MyBatisDao

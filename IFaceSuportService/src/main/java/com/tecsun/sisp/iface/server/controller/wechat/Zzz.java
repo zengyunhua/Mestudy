@@ -2,7 +2,6 @@ package com.tecsun.sisp.iface.server.controller.wechat;
 
 /**
  * 职称查询条件 包装类
- * @author 邓峰峰
  *
  */
 public class Zzz {

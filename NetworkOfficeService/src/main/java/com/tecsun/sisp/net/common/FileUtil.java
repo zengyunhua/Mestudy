@@ -17,12 +17,6 @@ import java.util.Properties;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-
-/**
- * 
- * @author 邓峰峰
- *
- */
 public class FileUtil {
     /**
      * log4j实例对象.
@@ -79,7 +73,6 @@ public class FileUtil {
             return null;
         }
     }
-
 
     /**
      * 根据相对路径获取文件.
@@ -144,7 +137,6 @@ public class FileUtil {
         // 如果文件存在,返回文件;否则返回null
         return file != null && file.exists() ? file : null;
     }
-
 
     /**
      * 将源文件的内容复制到目录绝对路径上
@@ -303,7 +295,6 @@ public class FileUtil {
         }
     }
 
-
     /**
      * 根据绝对路径生成空文件
      *
@@ -344,7 +335,6 @@ public class FileUtil {
             return false;
         }
     }
-
 
     /**
      * 根据路径删除指定的目录或文件，无论存在与否

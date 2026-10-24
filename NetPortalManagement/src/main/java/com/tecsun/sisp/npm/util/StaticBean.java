@@ -24,7 +24,6 @@ public class StaticBean {
     /**
      * 2013-08-17
      *
-     * @author 是否有效
      */
     public static enum YES_OR_NO {
         yes {
@@ -41,12 +40,10 @@ public class StaticBean {
         };
     }
 
-
     /**
      * 2013-09-17
      * JDBC连接池代码
      *
-     * @author cowo
      */
     public static enum DB_SOURCE_CODE {
         selfservicesource {
@@ -79,7 +76,6 @@ public class StaticBean {
      * 2013-09-17
      * Parameter取值名称
      *
-     * @author cowo
      */
     public static enum PARAMETER_CODE {
         jsonParam {
@@ -124,7 +120,6 @@ public class StaticBean {
      * 2013-09-17
      * Parameter取值名称
      *
-     * @author cowo
      */
     public static enum CHAR_CODE {
         utf_8 {
@@ -160,7 +155,6 @@ public class StaticBean {
     /**
      * 2013-08-17
      *
-     * @author 机构信息
      */
     public static enum ORG_TYPE {
         edu {// 教育局
@@ -207,11 +201,9 @@ public class StaticBean {
         };
     }
 
-
     /**
      * 2014-06-17
      *
-     * @author 用户状态
      */
     public static enum USER_STATUS {
 
@@ -479,7 +471,6 @@ public class StaticBean {
     /**
      * 2014-06-17
      *
-     * @author 用户状态
      */
     public static enum SHEBAO_STATUS {
         shebao_status_update_password {// 修改密码
@@ -564,7 +555,6 @@ public class StaticBean {
     /**
      * 2014-06-17
      *
-     * @author 用户状态
      */
     public static enum USER_LOG_TYPE {
         user_log_type_import {// 导入
@@ -1283,6 +1273,5 @@ public class StaticBean {
         }*/;
 
     }
-
 
 }

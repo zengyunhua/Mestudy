@@ -8,7 +8,6 @@ import java.io.IOException;
 /**全局消息处理类，系统逻辑
  * ClassName: GlobalResult
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年06月12日 16时:57分
  */
 public class GlobalResult {

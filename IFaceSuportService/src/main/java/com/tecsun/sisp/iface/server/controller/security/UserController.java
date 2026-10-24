@@ -1,7 +1,6 @@
 
 package com.tecsun.sisp.iface.server.controller.security;
 
-
 import com.google.gson.JsonObject;
 import com.tecsun.sisp.iface.common.util.Constants;
 import com.tecsun.sisp.iface.common.util.JsonHelper;
@@ -36,13 +35,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-
-
 /**
  * 登录
  *
- * @author Administrator
  */
 
 @Controller
@@ -53,8 +48,6 @@ public class UserController extends BaseController {
 
     @Autowired
     private NetUserServiceImpl netUserService;
-
-
 
 /**
      * 登录验证
@@ -171,7 +164,6 @@ public class UserController extends BaseController {
         logger.info("token is :"+token+ "============ip is: "+ip);
         return result(result, message, vo);
     }
-
 
 /**
      * 登录验证规则：
@@ -402,8 +394,6 @@ public class UserController extends BaseController {
             }
             return result(result, message, null);
         }
-
-
 
 /**
          * 获取验证码   && 

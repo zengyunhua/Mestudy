@@ -19,13 +19,9 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-
-
-
 /**
  * 解析xml
 * @ClassName: Dom4JUtil 
-* @author po_tan 
 * @date 2015年6月18日 下午9:46:56 
 *
  */

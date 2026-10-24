@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 /**
- * @author
  * @date 2016年12月19日 下午5:33:56
  */
 public class ModifyJobSeekerInfoVo extends JobBasicVo {

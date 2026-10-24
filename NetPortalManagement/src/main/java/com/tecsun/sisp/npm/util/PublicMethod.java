@@ -18,7 +18,6 @@ import redis.clients.jedis.Jedis;
 /**
  * 功能说明：公共类
  *
- * @author wuzhongliang 2014年9月17日
  */
 public class PublicMethod {
     protected PublicMethod() {
@@ -55,7 +54,6 @@ public class PublicMethod {
      * @param unique
      * @param id
      * @return
-     * @author wuzhongliang 2014年7月8日
      */
     public static String getKey(Jedis jedis, String source, String tableName, String unique, String id) {
         String key = "";

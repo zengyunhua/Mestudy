@@ -3,7 +3,6 @@ package com.tecsun.sisp.iface.common.vo.his;
 /**
  * 医院病人消费明细
  * 
- * @author po_tan
  * @date 2015年6月18日 下午5:52:09
  *
  */

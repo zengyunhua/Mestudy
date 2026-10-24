@@ -8,7 +8,6 @@ import redis.clients.jedis.JedisPool;
 /**
  * ClassName: JedisUtil
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年06月07日 16时:00分
  */
 public class JedisUtil {

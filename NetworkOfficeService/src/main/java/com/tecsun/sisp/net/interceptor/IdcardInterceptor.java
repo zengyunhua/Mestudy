@@ -18,7 +18,6 @@ import com.tecsun.sisp.net.modules.service.business.QueryService;
  * <p>因为query业务,基本上都是需要通过身份证号码查询个人编号的,为了号管理,和精简代码,将查询的逻辑放到拦截器中,好统一管理
  * <p>该拦截器只会拦截 /net/query/idcard/xz/**开头的,如有需要,请在springmvc配置文件中添加拦截器拦截地址
  * 
- * @author 邓峰峰
  *
  */
 public class IdcardInterceptor implements HandlerInterceptor{

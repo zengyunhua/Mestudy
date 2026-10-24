@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 /**
- * @author
  * @date 2016年12月20日 下午4:54:47
  */
 public class GetCompanyByZphVo extends JobBasicVo {

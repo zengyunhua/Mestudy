@@ -5,7 +5,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 /**
  * 拼装表头接口
- * @author 邓峰峰
  *
  */
 public interface WirteHeader {

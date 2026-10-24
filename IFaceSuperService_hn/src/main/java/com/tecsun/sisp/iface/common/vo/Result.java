@@ -1,10 +1,5 @@
 package com.tecsun.sisp.iface.common.vo;
 
-/**
- *
- * @author tan
- *
- */
 public class Result {
     private String statusCode;//200 成功；0 失败
     private String message;

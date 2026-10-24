@@ -3,7 +3,6 @@ package com.tecsun.sisp.iface.client;
 /**
  * ClassName: LoginVO
  * Description:
- * @author Zhang Qingjie
  * @since 2015-06-09
  */
 public class LoginVO {

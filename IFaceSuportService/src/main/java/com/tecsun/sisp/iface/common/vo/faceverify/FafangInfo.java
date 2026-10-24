@@ -2,7 +2,6 @@ package com.tecsun.sisp.iface.common.vo.faceverify;
 
 /**
  * 离退休或遗嘱的养老金发放信息
- * @author tan
  *
  */
 public class FafangInfo {

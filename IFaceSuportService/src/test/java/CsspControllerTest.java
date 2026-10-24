@@ -7,7 +7,6 @@ import com.tecsun.sisp.iface.client.WebClient;
 import com.tecsun.sisp.iface.common.util.PicUtil;
 
 /**
- * @author 
  * @date 2016年11月17日 下午3:40:07 
  */
 public class CsspControllerTest {

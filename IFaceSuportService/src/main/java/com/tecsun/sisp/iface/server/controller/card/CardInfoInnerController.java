@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * ClassName: CardInfoInnerController
  * Description:  提供给内部其他子系统调用，已存在的类会拦截所有请求并进行验证
- * Author： 张清洁
  * CreateTime： 2015年06月07日 12时:28分
  */
 @Controller

@@ -2,7 +2,6 @@ package com.tecsun.sisp.iface.common.vo.his.zx;
 
 /**
  * //中心医院--当日挂号、门诊缴费、挂号订单返回对象
- * @author shuming
  *
  */
 public class ZhongxinHisSceRegPO {

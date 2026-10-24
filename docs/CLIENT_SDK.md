@@ -126,7 +126,7 @@ All operations are `static` and return either `Page<T>` or `Result`.
 
 ```java
 SecQueryBean bean = new SecQueryBean();
-bean.setId("420902200802040837");
+bean.setId("000000199001010000");
 bean.setName("...");
 bean.setChannelcode("SelfService");
 

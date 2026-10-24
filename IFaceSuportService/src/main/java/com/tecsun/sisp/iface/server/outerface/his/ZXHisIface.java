@@ -21,7 +21,6 @@ import java.util.Map;
 /**
  * 中心医院接口  -- webservice接口
 * @ClassName: HTHisIface 
-* @author po_tan 
 * @date 2015年6月29日 上午11:32:17 
 *
  */
@@ -68,8 +67,6 @@ public class ZXHisIface {
 		map.put("message", message);
 		return map;
 
-
-
 	}
 
 	/**
@@ -101,8 +98,6 @@ public class ZXHisIface {
 		map.put("message", message);
 		return map;
 	}
-
-
 
 	/**
 	 *  1.3 获取医生信息
@@ -223,8 +218,6 @@ public class ZXHisIface {
 		return map;
 	}
 
-
-
 	/**
 	 *  1.7 取一个日排班的分时信息
 	 * @Title: getDoctorList
@@ -285,8 +278,6 @@ public class ZXHisIface {
 		return map;
 	}
 
-
-
 	/**
 	 *  1.9 查询锁号是否成功
 	 * @Title: getDoctorList
@@ -317,7 +308,6 @@ public class ZXHisIface {
 		return map;
 	}
 
-
 	/**
 	 *  1.10 更新订单信息
 	 * @Title: getDoctorList
@@ -347,7 +337,6 @@ public class ZXHisIface {
 		map.put("message", message);
 		return map;
 	}
-
 
 	/**
 	 *  1.11 提交订单生效
@@ -409,7 +398,6 @@ public class ZXHisIface {
 		return map;
 	}
 
-
 	/**
 	 *  1.13取消订单
 	 * @Title: getDoctorList
@@ -439,7 +427,6 @@ public class ZXHisIface {
 		map.put("message", message);
 		return map;
 	}
-
 
 	/**
 	 *  1.14确定退费
@@ -471,7 +458,6 @@ public class ZXHisIface {
 		return map;
 	}
 
-
 	/**
 	 *  1.15取短信文本
 	 * @Title: getDoctorList
@@ -502,7 +488,6 @@ public class ZXHisIface {
 		return map;
 	}
 
-
 	/**
 	 *  1.16获取指定排班的当前可约状态
 	 * @Title: getDoctorList
@@ -532,7 +517,6 @@ public class ZXHisIface {
 		map.put("message", message);
 		return map;
 	}
-
 
 	/**
 	 @ 1.17   获取退费记录接口
@@ -846,7 +830,6 @@ public class ZXHisIface {
           map.put( "message" , message);
            return map;
     }
-
 
      /**
  	 * 中心医院现场挂号-创建挂号订单

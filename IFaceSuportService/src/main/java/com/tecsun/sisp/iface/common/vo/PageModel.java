@@ -5,7 +5,6 @@ import java.util.List;
 /**
  *  内存分页
 * @ClassName: PageModel 
-* @author po_tan 
 * @date 2015年6月25日 下午12:09:05 
 * 
  */
@@ -72,7 +71,6 @@ public class PageModel<T> {
     	}
         
     }
-
 
     // 判断要不要分页
     public boolean isNext() {
@@ -202,7 +200,6 @@ public class PageModel<T> {
         return hasNextPage;
     }
 
-
     public void setHasNextPage(boolean hasNextPage) {
         this.hasNextPage = hasNextPage;
     }
@@ -219,61 +216,49 @@ public class PageModel<T> {
         return page;
     }
 
-
     public void setPage(int page) {
         this.page = page;
     }
-
 
     public int getPageEndRow() {
         return pageEndRow;
     }
 
-
     public void setPageEndRow(int pageEndRow) {
         this.pageEndRow = pageEndRow;
     }
-
 
     public int getPageRecorders() {
         return pageRecorders;
     }
 
-
     public void setPageRecorders(int pageRecorders) {
         this.pageRecorders = pageRecorders;
     }
-
 
     public int getPageStartRow() {
         return pageStartRow;
     }
 
-
     public void setPageStartRow(int pageStartRow) {
         this.pageStartRow = pageStartRow;
     }
-
 
     public int getTotalPages() {
         return totalPages;
     }
 
-
     public void setTotalPages(int totalPages) {
         this.totalPages = totalPages;
     }
-
 
     public int getTotalRows() {
         return totalRows;
     }
 
-
     public void setTotalRows(int totalRows) {
         this.totalRows = totalRows;
     }
-
 
     public boolean isHasPreviousPage() {
         return hasPreviousPage;

@@ -18,7 +18,6 @@ import java.util.Map;
 /**
  * ClassName: JXLExcelView
  * Description: 业务分析子系统导出
- * Author： 张清洁
  * CreateTime： 2015年08月03日 17时:44分
  */
 public class JXLExcelView {

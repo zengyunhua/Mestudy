@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 public class PerPayDetalVO {
 	/**
 	 * 个人历年缴费明细信息返回字段VO
-	 * @author fuweifeng
 	 *
 	 */
 

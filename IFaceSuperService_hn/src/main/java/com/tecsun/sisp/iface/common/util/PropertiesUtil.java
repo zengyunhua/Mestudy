@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 /**
  * @title
- * @author zengyunhua
  * @2019年1月9日-下午1:05:57
  * @version2019
  */

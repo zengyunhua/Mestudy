@@ -1,13 +1,11 @@
 package com.tecsun.sisp.iface.server.model.dao_cssp;
 
-
 import java.util.List;
 import java.util.Map;
 
 import com.tecsun.sisp.iface.common.vo.*;
 import com.tecsun.sisp.iface.common.vo.cssp.*;
 import com.tecsun.sisp.iface.server.util.MyBatisDao;
-
 
 /**
  * Created by jerry on 2015/5/31.
@@ -49,7 +47,7 @@ public interface CsspQueryDAO {
     
     public Integer updatePhotoUrl(Map map);
 
-    /*********************************************************/
+    
 
    /* ===============================*/
     public ResultLoginvo login(LoginVO bean) throws Exception;
@@ -66,7 +64,6 @@ public interface CsspQueryDAO {
 
     public List<BusRcmBoxVO> queryBox(String orgAddress);
 
-
     public int insertCard(BusRcmCardVO bean);
 
     public int updateBasic(String soCardNum);
@@ -75,15 +72,11 @@ public interface CsspQueryDAO {
 
     public int updateBin(BusRcmBinVO binVO);
 
-
-
     public ResultBusMakeDetal getCardwz(String certNum);
-
 
     public List<ResultBusRcmCardApplyVO> getrcmApply(String certNum);
 
     public int insertApplyPic(BusApplyPicVO bean) throws Exception;
-
 
     public ResultUpVO getboxid(String soCardNum);
 
@@ -91,11 +84,7 @@ public interface CsspQueryDAO {
 
     public int updataRcm(String soCardNum);
 
-
-
-
     public String getrcmWdname(Integer id) throws Exception;
-
 
     //申领记录
     public List<ResultPersonApplyVO> getapplyhistory(String certnum);

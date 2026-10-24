@@ -14,7 +14,6 @@ import org.codehaus.jackson.type.TypeReference;
  * 
  * Jackson json 操作类
  * 
- * @author tan
  * @date 2015-08-19 16:40:33
  */
 

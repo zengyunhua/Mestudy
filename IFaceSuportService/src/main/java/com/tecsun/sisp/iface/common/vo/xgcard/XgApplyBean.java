@@ -3,7 +3,6 @@ package com.tecsun.sisp.iface.common.vo.xgcard;
 import java.util.Date;
 
 /**
-* @author  wunuanchan
 * @version 
 * 创建时间：2017年8月8日 下午4:30:18
 * 说明：孝感补换卡系统申领数据bean

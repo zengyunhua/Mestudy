@@ -14,7 +14,6 @@ import java.util.Map;
 /**
  * 档案查询接口  -- webservice接口
 * @ClassName: ArchiveIface
-* @author yangliu
 * @date 2016年9月13日
 *
  */

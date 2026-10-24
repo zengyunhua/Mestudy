@@ -12,7 +12,6 @@ import java.util.Iterator;
 
 /**
  * 图片转换类
- * @author tan
  *
  */
 public class ImageChangeUtil {

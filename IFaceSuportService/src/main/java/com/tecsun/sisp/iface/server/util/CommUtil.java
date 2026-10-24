@@ -147,7 +147,6 @@ public class CommUtil {
      * 用md5加密字符串
      *
      * @return
-     * @author wuzhongliang 2014年10月9日
      */
     public static String generateValue(String param) {
         try {

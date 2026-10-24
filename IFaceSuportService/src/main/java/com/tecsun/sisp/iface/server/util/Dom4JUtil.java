@@ -19,12 +19,9 @@ import org.dom4j.io.XMLWriter;
 import com.tecsun.sisp.iface.common.util.Constants;
 import com.tecsun.sisp.iface.common.vo.faceverify.KeyValueVO;
 
-
-
 /**
  * 解析xml
 * @ClassName: Dom4JUtil 
-* @author po_tan 
 * @date 2015年6月18日 下午9:46:56 
 *
  */
@@ -149,7 +146,6 @@ public class Dom4JUtil {
 		return its ;
 	}
 
-
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> readXMLToJavaBean_Zx(T t,String xml)
 			throws Exception {
@@ -210,7 +206,6 @@ public class Dom4JUtil {
         }
         return list;
     }
-
 
 	/**
 	 * DMO4J写入XML,获取Document对象
@@ -365,9 +360,6 @@ public class Dom4JUtil {
 		}
 		return its ;
 	}
-
-
-
 
 	/**
 	 * XML转换成JavaBean

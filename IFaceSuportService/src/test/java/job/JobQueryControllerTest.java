@@ -9,7 +9,6 @@ import com.google.gson.JsonObject;
 import com.tecsun.sisp.iface.client.WebClient;
 
 /**
- * @author lwx
  * @date 2016年12月16日 上午11:11:19 
  */
 public class JobQueryControllerTest {

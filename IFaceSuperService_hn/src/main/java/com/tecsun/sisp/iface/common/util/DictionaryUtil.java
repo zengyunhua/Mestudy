@@ -19,7 +19,6 @@ import javax.ws.rs.core.MultivaluedMap;
 /**
  * ClassName: DictionaryUtil
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年06月05日 12时:30分
  */
 public class DictionaryUtil {
@@ -102,7 +101,6 @@ public class DictionaryUtil {
        
         return result;
     }
-
 
     public static String getClient2(Form object,String resourceUrl,String header1,String header2, String pageno, String pagesize) {
 

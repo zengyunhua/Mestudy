@@ -1,7 +1,5 @@
 package com.tecsun.sisp.iface.server.model.service;
 
-
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,7 +155,6 @@ public class CsspQueryServiceImpl  implements CsspQueryService {
         return csspQueryDAO.queryBox(orgAddress);
     }
 
-
    
     public boolean insertCard(BusRcmCardVO bean) {
         return csspQueryDAO.insertCard(bean)>0;
@@ -178,20 +175,15 @@ public class CsspQueryServiceImpl  implements CsspQueryService {
         return csspQueryDAO.updateBin(binVO)>0;
     }
 
-
-
    
     public ResultBusMakeDetal getCardwz(String certNum) {
         return csspQueryDAO.getCardwz(certNum);
     }
 
-
-
    
     public List<ResultBusRcmCardApplyVO> getrcmApply(String certNum) {
         return csspQueryDAO.getrcmApply(certNum);
     }
-
 
     public boolean insertApplyPic(BusApplyPicVO bean) throws Exception {
         return csspQueryDAO.insertApplyPic(bean)>0;
@@ -207,20 +199,14 @@ public class CsspQueryServiceImpl  implements CsspQueryService {
         return csspQueryDAO.updataBox(boxid)>0;
     }
 
-
     public boolean updataRcm(String soCardNum) {
         return csspQueryDAO.updataRcm(soCardNum)>0;
     }
-
-
-
-
 
    
     public String getrcmWdname(Integer id) throws Exception {
         return csspQueryDAO.getrcmWdname(id);
     }
-
 
    
     public List<ResultPersonApplyVO> getapplyhistory(String certnum) {
@@ -253,8 +239,6 @@ public class CsspQueryServiceImpl  implements CsspQueryService {
         return csspQueryDAO.querybyPersonMessage(certNum);
     }
     
-    /******************************************/
-
-
+    
 
 }

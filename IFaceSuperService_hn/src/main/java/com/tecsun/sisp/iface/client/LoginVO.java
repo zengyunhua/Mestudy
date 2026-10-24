@@ -3,7 +3,6 @@ package com.tecsun.sisp.iface.client;
 /**
  * ClassName: LoginVO
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年06月09日 19时:47分
  */
 public class LoginVO {

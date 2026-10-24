@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.card;
 
 /*
-@author   fuweifeng
 @date     2015-7-7
 @version
 @return
@@ -397,7 +396,6 @@ public class TsInsuranceVO {
 	public void setJfjs(String jfjs) {
 		this.jfjs = jfjs;
 	}
-
 
     public String getJfksrq() {
         return jfksrq;

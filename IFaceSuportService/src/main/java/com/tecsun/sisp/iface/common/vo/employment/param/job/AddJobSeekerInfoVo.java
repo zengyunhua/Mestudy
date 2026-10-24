@@ -3,7 +3,6 @@ package com.tecsun.sisp.iface.common.vo.employment.param.job;
 import java.util.Date;
 
 /**
- * @author 
  * @date 2016年12月19日 上午11:42:15
  */
 public class AddJobSeekerInfoVo  extends JobBasicVo{

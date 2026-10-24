@@ -1,6 +1,5 @@
 package com.tecsun.sisp.npm.bean;
 
-
 import java.sql.Timestamp;
 
 import oracle.sql.BLOB;
@@ -12,7 +11,6 @@ import bee.cloud.engine.db.core.Table;
 /**
  * 网办后台公告实体
  *
- * @author Administrator
  */
 @TableName(name = "t_policy", alias = "policy")
 public class PolicyVO extends Table {
@@ -25,7 +23,6 @@ public class PolicyVO extends Table {
     public static final String ID = "id";
     @Column(name = ID, pk = true)
     private long id;
-
 
     public static final String TITLE = "title";
     @Column(name = TITLE)
@@ -111,7 +108,6 @@ public class PolicyVO extends Table {
     public void setContext(String context) {
         this.context = context;
     }
-
 
     public Timestamp getCreateTime() {
         return createTime;

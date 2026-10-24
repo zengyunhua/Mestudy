@@ -568,7 +568,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -602,7 +601,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -633,7 +631,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -673,7 +670,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -743,7 +739,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -782,7 +777,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -822,7 +816,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -862,7 +855,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-8
     @version
     @return
@@ -915,7 +907,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -957,7 +948,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -999,7 +989,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -1040,7 +1029,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -1082,7 +1070,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -1124,7 +1111,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -1160,7 +1146,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -1208,7 +1193,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -1260,7 +1244,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -1283,7 +1266,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -1330,7 +1312,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-    @author   fuweifeng
     @date     2015-7-7
     @version
     @return
@@ -1477,9 +1458,6 @@ public class SecQueryController extends BaseController {
         }
         return result(result, message, data);
     }
-
-
-
 
 //    public Result queryJBXX(@RequestBody SecQueryBean bean) {
 //        String result = Constants.RESULT_MESSAGE_SUCCESS;
@@ -1694,7 +1672,6 @@ public class SecQueryController extends BaseController {
 
 //    20160405新增接口 start
     /*
-    @author   胡丹蒙
     @date     2016-4-5
     @param bean
     @return
@@ -1728,7 +1705,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
  /*
-    @author   胡丹蒙
     @date     2016-4-6
     @param bean
     @return
@@ -1762,7 +1738,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
      /*
-    @author   胡丹蒙
     @date     2016-4-6
     @param bean
     @return
@@ -1797,7 +1772,6 @@ public class SecQueryController extends BaseController {
     }
 
     /*
-     @author   yangliu
      @date     2016-4-6
      @param bean
      @return
@@ -1831,7 +1805,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
     /*
-     @author   hudanmeng
      @date     2016-4-19
      @param bean
      @return
@@ -1865,7 +1838,6 @@ public class SecQueryController extends BaseController {
         return result(result, message, page);
     }
     /*
-   @author   yangliu
    @date     2016-4-18
    @param bean
    @return
@@ -2147,7 +2119,6 @@ public class SecQueryController extends BaseController {
         }
         return result(result, message);
     }
-
 
     /**
      * 省农保-缴费信息查询

@@ -1,12 +1,10 @@
 package com.tecsun.sisp.net.modules.entity.response;
 
-
 import com.tecsun.sisp.net.modules.entity.BaseVO;
 
 /**
  * 查询列表出参
  * 
- * @author Administrator
  *
  */
 public class GovernmentVO extends BaseVO {

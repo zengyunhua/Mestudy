@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 
  * @title
- * @author zengyunhua
  * @2018年12月28日-下午2:27:42
  * @version2018
  */
@@ -290,9 +289,6 @@ public class CardInfoController extends BaseController {
 				return result(Constants.RESULT_MESSAGE_EXCEPTION, Constants.RESULT_MESSAGE_MSG);
 		}
 
-
 	
-
-
 
 }

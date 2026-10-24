@@ -20,7 +20,6 @@ import java.io.InputStreamReader;
  * Description:  拦截器：
  * 1.判断是否合法用户;
  * <p/>
- * Author： 张清洁
  * CreateTime： 2015年06月07日 13时:44分
  */
 public class BusinessFilter implements Filter {

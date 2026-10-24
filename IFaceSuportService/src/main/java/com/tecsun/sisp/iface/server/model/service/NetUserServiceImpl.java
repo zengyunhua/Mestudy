@@ -1,6 +1,5 @@
 package com.tecsun.sisp.iface.server.model.service;
 
-
 import com.tecsun.sisp.iface.common.vo.ApersonVO;
 import com.tecsun.sisp.iface.common.vo.NetUserInfoVO;
 import com.tecsun.sisp.iface.common.vo.PersonVO;
@@ -22,7 +21,6 @@ import java.util.Map;
 /**
  * ClassName: NetUserServiceImpl
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年07月22日 14时:07分
  */
 @Service("netUserService")
@@ -52,7 +50,6 @@ public class NetUserServiceImpl {
     public void updateNetpwd(NetUserInfoVO bean){
         this.sqlSessionTemplate.update("updateNetpwd",bean);
     }
-
 
     public NetUserInfoVO userLogin(NetUserInfoVO netUserInfoVO){
         return this.sqlSessionTemplate.selectOne("userLogin",netUserInfoVO);
@@ -120,6 +117,5 @@ public class NetUserServiceImpl {
    
     
    
-
 
 }

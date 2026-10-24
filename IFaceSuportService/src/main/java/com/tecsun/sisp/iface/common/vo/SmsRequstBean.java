@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo;
  * 短信请求bean
  * 
  * @ClassName:
- * @author po_tan
  * @date 2015年8月5日 
  *
  */

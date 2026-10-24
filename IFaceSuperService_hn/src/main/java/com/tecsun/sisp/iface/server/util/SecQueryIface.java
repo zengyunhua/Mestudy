@@ -31,7 +31,6 @@ public class SecQueryIface {
 	
 	/*@param bean
 	 *@version 20151217
-	 *@author fuweifeng 
 	 * 
 	 * 个人历年缴费基数信息-queryPerPayBase
 	 入参：
@@ -90,7 +89,6 @@ public class SecQueryIface {
 	
 	/*@param bean
 	 *@version 20151217
-	 *@author fuweifeng 
 	 * 
 	 * 医疗住院相关接口-querySiServicePerPayBase
 	 入参：

@@ -77,7 +77,6 @@ import com.tecsun.sisp.iface.server.util.Config;
 import com.tecsun.sisp.iface.server.util.JobUtil;
 
 /**
- * @author 
  * @date 2016年12月16日 上午10:57:42 
  */
 @Service("jobServiceImpl")
@@ -196,96 +195,80 @@ public class JobServiceImpl implements JobService {
 		return commonJobService(url, param);
 	}
 
-
 	@Override
 	public Result queryJobFairs(String url, QueryJobFairVo param) {
 		return commonJobService(url, param);
 	}
-
 
 	@Override
 	public Result getZphInfo(String url, GetZphInfoVo param) {
 		return commonJobService_get(url+"?ZPHID="+param.getZphid());
 	}
 
-
 	@Override
 	public Result queryCompanys(String url, QueryCompanyVo param) {
 		return commonJobService(url, param);
 	}
-
 
 	@Override
 	public Result getCompanyInfo(String url, GetCompanyInfoVo param) {
 		return commonJobService_get(url+"?QYID="+param.getQyid());
 	}
 
-
 	@Override
 	public Result getQzyxByQzz(String url, GetQzyxByQzzVo param) {
 		return commonJobService(url, param);
 	}
-
 
 	@Override
 	public Result addJobDirection(String url, AddJobDirectionVo param) {
 		return commonJobService_simple(url, param);
 	}
 
-
 	@Override
 	public Result dropJobDirection(String url, DropJobDirectionVo param) {
 		return commonJobService_simple(url, param);
 	}
-
 
 	@Override
 	public Result getCompanyByZph(String url, GetCompanyByZphVo param) {
 		return commonJobService(url, param);
 	}
 
-
 	@Override
 	public Result sendJobChoice(String url, SendJobChoiceVo param) {
 		return commonJobService_simple(url, param);
 	}
-
 
 	@Override
 	public Result getAllMajor(String url, GetCompanyByZphVo param) {
 		return commonGetReq(url);
 	}
 
-
 	@Override
 	public Result addIdCardInfo(String url, AddIdCardInfoVo param) {
 		return commonJobService_simple(url, param);
 	}
-
 
 	@Override
 	public Result getPolicyDocuments(String url, GetPolicyDocumentsVo param) {
 		return commonJobService_get(url+"?ID="+param.getId()+"&PTLX="+param.getPtlx());
 	}
 
-
 //	@Override
 //	public Result smsSendCode(String url, SmsSendCodeVo param) {
 //		return commonJobService_simple(url, param);
 //	}
-
 
 	@Override
 	public Result queryPolicyDocument(String url, QueryPolicyDocumentVo param) {
 		return commonJobService(url, param);
 	}
 
-
 	@Override
 	public Result queryAgencyIntroduction(String url, JobBasicVo param) {
 		return commonJobService(url, param);
 	}
-
 
 	@Override
 	public Result querySalaryguidance(String url, QuerySalaryguidanceVo param) {
@@ -330,7 +313,6 @@ public class JobServiceImpl implements JobService {
 //		System.out.println("花费："+(System.currentTimeMillis()-currentTimeMillis));
 		return vo2;
 	}
-
 
 	private String generatePdf(InputStream inputStream) throws FileNotFoundException {
 		String pdf = FileUtils.getTempDirectoryPath()+(int)(Math.random()*10000)+".pdf";
@@ -389,7 +371,6 @@ public class JobServiceImpl implements JobService {
 	public Result addViewInfo(String url, AddViewInfoVo param) {
 		return commonJobService_simple(url, param);
 	}
-
 
 	/**
 	 * 上传照片
@@ -480,7 +461,6 @@ public class JobServiceImpl implements JobService {
 		}
 	}
 
-
 	private Result doStringToJson(JsonMapper mapper, Map jsonMap) {
 		String msg = (String) jsonMap.get("Message");
 		Integer i = (Integer) jsonMap.get("RowCount");
@@ -491,7 +471,6 @@ public class JobServiceImpl implements JobService {
 		
 		return new ResultVerify(Constants.RESULT_MESSAGE_SUCCESS, msg, dz, i);
 	}
-
 
 	@Override
 	public Result lookPicture(String url, LookPictureeVo param) {
@@ -615,7 +594,6 @@ public class JobServiceImpl implements JobService {
 			return new ResultVerify(Constants.RESULT_MESSAGE_EXCEPTION, "抱歉，数据转换出错了",null, 0);
 		}
 	}
-
 
 	private Result convertUserLoginJson(JsonMapper mapper, Map jsonMap) {
 		String msg = (String) jsonMap.get("Message");

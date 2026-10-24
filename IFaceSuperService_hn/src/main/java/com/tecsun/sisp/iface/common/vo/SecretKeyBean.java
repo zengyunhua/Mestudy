@@ -3,7 +3,6 @@ package com.tecsun.sisp.iface.common.vo;
 /**工作秘钥
  * ClassName: SecretKeyBean
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年06月18日 11时:44分
  */
 public class SecretKeyBean {

@@ -1,7 +1,6 @@
 package com.tecsun.sisp.net.modules.entity.response;
 /**
  * 查询二级编码、名字出参
- * @author Administrator
  *
  */
 

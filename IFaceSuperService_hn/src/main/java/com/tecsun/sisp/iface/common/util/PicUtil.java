@@ -12,7 +12,6 @@ import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 /**
  * 
  * @title图片转换
- * @author zengyunhua
  * @2019年1月8日-下午2:13:47
  * @version2019
  */
@@ -39,7 +38,6 @@ public class PicUtil {
    /**
     * 
     * @title base64编码字符串转换为图片
-    * @author zengyunhua
     * @2019年1月8日-下午5:08:30
     *
     */

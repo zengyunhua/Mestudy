@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -31,14 +30,12 @@ import com.tecsun.sisp.net.exception.ServiceException;
 /**
  * 统一异常处理器
  * 必须放在springmvc 扫描的controller包下,否在会返回错误页面,不会返回json
- * @author 邓峰峰
  */
 @ControllerAdvice
 @ResponseBody
 public class CommonExceptionHandler {
 
     private static Logger logger = LogManager.getLogger(CommonExceptionHandler.class.getName());
-
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public Result EmptyResultDataAccessException(EmptyResultDataAccessException ex) {
@@ -49,8 +46,6 @@ public class CommonExceptionHandler {
         return resultMessage;
     }
 
-
-
     @ExceptionHandler(BindException.class)
     public Result BeanPropertyBindingResult(BindException ex) {
         Result resultMessage = new Result(ResponseCode.BUSINESS,"数据绑定错误，请检查传入格式");
@@ -59,7 +54,6 @@ public class CommonExceptionHandler {
         logger.error(ex.getMessage()+"\r\n"+"错误信息："+stringWriter.toString());
         return resultMessage;
     }
-
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public Result HttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
@@ -88,7 +82,6 @@ public class CommonExceptionHandler {
         logger.error(ex.getMessage()+"\r\n"+"错误信息："+stringWriter.toString());
         return resultMessage;
     }
-
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public Result MaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
@@ -204,8 +197,6 @@ public class CommonExceptionHandler {
         
         return resultMessage;
     }
-
-
 
     @ExceptionHandler(ServletRequestBindingException.class)
     public Result ServletRequestBindingException(ServletRequestBindingException ex) {

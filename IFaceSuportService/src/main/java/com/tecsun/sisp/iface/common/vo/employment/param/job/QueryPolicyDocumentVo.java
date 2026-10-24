@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 /**
- * @author
  * @date 2016年12月22日 上午10:48:11
  */
 public class QueryPolicyDocumentVo extends JobBasicVo {

@@ -43,7 +43,6 @@ import com.tecsun.sisp.iface.server.outerface.his.HTHisIface;
 /**
  * 航天医院接口
  *
- * @author po_tan
  * @ClassName: HangTianHisController
  * @date 2015年6月19日 下午12:59:58
  */
@@ -95,7 +94,6 @@ public class HangTianHisController extends BaseController {
                  e1.printStackTrace();
                  logger.error("获取医院门诊科室数据失败");
              }
-
 
              if (result.equals("200") && RESULT.equals("0")) {
                  result = Constants.RESULT_MESSAGE_SUCCESS;
@@ -195,7 +193,6 @@ public class HangTianHisController extends BaseController {
         return this.result(result, message, list);
     }
 
-
     /**
      * 查询余额
      *
@@ -286,7 +283,6 @@ public class HangTianHisController extends BaseController {
         return this.result(result, message, list);
     }
 
-
     /**
      * 获取医院病人消费明细
      *
@@ -307,7 +303,6 @@ public class HangTianHisController extends BaseController {
 
         return this.result(result, message, wsResult);
     }
-
 
     /**
      * 终端缴费
@@ -344,9 +339,7 @@ public class HangTianHisController extends BaseController {
 		result = map.get("result");
 		message = map.get("message");*/
 
-
         List<HospitalRegistPO> list = new ArrayList<HospitalRegistPO>();
-
 
         return this.result(result, message, xml);
     }
@@ -429,7 +422,6 @@ public class HangTianHisController extends BaseController {
     
 
     /*
-   @author   fwf
    @date     2015-6-22
    @version
    @parameter
@@ -463,9 +455,7 @@ public class HangTianHisController extends BaseController {
         return c.getTime();
     }
 
-
     /*
-        @author   fwf
     @date     2015-7-3
     @version
     @parameter
@@ -507,9 +497,7 @@ public class HangTianHisController extends BaseController {
         return value;
     }
 
-
     /*
-        @author   fwf
     @date     2015-7-3
     @version
     @parameter
@@ -542,7 +530,6 @@ public class HangTianHisController extends BaseController {
         }
         return value;
     }
-
 
     /**
      * @param bean
@@ -588,7 +575,6 @@ public class HangTianHisController extends BaseController {
         }
         return this.result(result, message, xmlData);
     }
-
 
     /**
      * 验证参保人是否可挂号（所有的预约挂号前必须先调用此接口）
@@ -1003,7 +989,6 @@ public class HangTianHisController extends BaseController {
         return this.result(statuCode, message, result);
     }
 
-
     public Map getXMLdata(HisRequestBusInfoBean bean, String statuCode, String result, String message) {
         List<HisRequestBusInfoBean> list = new ArrayList<HisRequestBusInfoBean>();
         list.add(bean);
@@ -1184,7 +1169,6 @@ public class HangTianHisController extends BaseController {
             po.setSTATUS(linkMap.get("status").toString());
             po.setACCOUNTTYPE(linkMap.get("accounttype").toString());
 
-
             po.setVISID(linkMap.get("visid").toString());
             //po.setREGTIME(linkMap.get("regtime").toString());// AM PM
 
@@ -1227,7 +1211,6 @@ public class HangTianHisController extends BaseController {
 
         return bean;
     }
-
 
     /**
      * 终端--打印凭证
@@ -1328,7 +1311,6 @@ public class HangTianHisController extends BaseController {
         return this.result(result, message, jsonData);
     }
 
-
     /**
      * @param bean
      * @return Result    返回类型
@@ -1393,7 +1375,6 @@ public class HangTianHisController extends BaseController {
     
     
     /*
-    @author   fwf
     @date     2015-6-22
     @version
     @parameter

@@ -5,7 +5,6 @@ import com.tecsun.sisp.iface.common.vo.Page;
 /**
  * 航天医院挂号实体类
 * @ClassName: BusInfoHTPO 
-* @author po_tan 
 * @date 2015年7月14日 下午10:26:09 
 *
  */
@@ -53,7 +52,6 @@ public class BusInfoHTPO {
 	private String DOCTORMC;//专家名称；
 	private String HOSPITALMC;//医院名称；
 	private String DOCTORTYPE;//挂号类型（专家号、普通号）
-
 
 	public String getDOCTORTYPE() {
 		return DOCTORTYPE;

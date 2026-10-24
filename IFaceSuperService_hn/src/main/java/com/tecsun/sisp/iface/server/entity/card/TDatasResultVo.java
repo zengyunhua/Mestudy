@@ -4,7 +4,6 @@ import java.util.Date;
 
 /**
  * 数据回盘Vo类
- * @author zengyunhua
  *2017年10月14日
  *
  */
@@ -83,6 +82,5 @@ public class TDatasResultVo {
 	}
 	
 	
-
 
 }

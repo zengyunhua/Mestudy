@@ -116,7 +116,6 @@ public class CardIface {
 	
 	   /**
 	    * 修改个人服务密码接口
-	    * @author   fuweifeng
 	      @version   V.1.0.0
 	      @see     getRpcServiceMethod
 	      @param   contextXml-入参；result-返回结果；message-返回信息；method-接口方法；serverNmae--接口服务

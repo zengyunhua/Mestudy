@@ -53,7 +53,6 @@ import com.tecsun.sisp.iface.server.util.JsonHelp;
 
 /**
  * 孝感人脸验证接口管理
- * @author tan
  *
  */
 @Controller
@@ -964,7 +963,7 @@ public class FaceController extends BaseController{
 		return resultVerify(result, message);
 	}
 	
-	 /*@author   fuweifeng
+	 /*@author   zengyunhua
 	   @date     2016-7-26
 	   @param bean 
 	   @return
@@ -1298,7 +1297,6 @@ public class FaceController extends BaseController{
     
     /**
      * TSB采集
-     * @author   fuweifeng
 	   @version   对类的说明 标明该类模块的版本
        @param    RegistBean ：idCard身份证;name姓名
        @return   Result 结果

@@ -5,7 +5,6 @@ import java.util.concurrent.*;
 /**
  * ClassName: ThreadPoolUtil
  * Description:线程池用来处理业务分析子系统数据
- * Author： 张清洁
  * CreateTime： 2015年07月31日 15时:20分
  */
 public class ThreadPoolUtil {

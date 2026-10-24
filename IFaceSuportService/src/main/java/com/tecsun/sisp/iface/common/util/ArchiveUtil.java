@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
 /**
  * Created by Administrator on 2015/8/12.
  */
@@ -22,7 +21,6 @@ public class ArchiveUtil {
     public static final Logger logger = Logger.getLogger(ArchiveUtil.class);
 
     /*
- @author   yangliu
  @date     2015-8-12
  @ 组装报文的开始部分
  */
@@ -47,7 +45,6 @@ public class ArchiveUtil {
     }
 
     /*
-   @author   yangliu
    @date     2015-8-12
    @ 组装报文的结束部分
    */
@@ -57,9 +54,7 @@ public class ArchiveUtil {
         return endXml.toString();
     }
 
-
     /*
-     @author   yangliu
      @date     2016-9-12
      <?xml version=’1.0’ encoding="UTF-8"?>
         <!--type业务类型 -->

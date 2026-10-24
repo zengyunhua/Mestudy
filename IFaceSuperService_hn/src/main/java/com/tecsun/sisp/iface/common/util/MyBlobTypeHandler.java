@@ -10,13 +10,11 @@ import java.sql.*;
 /**
  * ClassName: MyBlobTypeHandler
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年07月31日 10时:04分
  */
 public class MyBlobTypeHandler extends BaseTypeHandler<String> {
     //指定字符集
     private static final String DEFAULT_CHARSET = "GBK";
-
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i,

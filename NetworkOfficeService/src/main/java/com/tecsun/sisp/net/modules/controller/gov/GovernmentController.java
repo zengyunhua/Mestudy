@@ -29,7 +29,6 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @author 作者 E-mail:
  * @version 创建时间：2017年4月21日 上午9:58:55
  * 类说明
  * 政务系统：新闻，通知，动态管理
@@ -125,7 +124,6 @@ public class GovernmentController  extends BaseController {
 		}
 		return resultVerify(statusCode, message,"");
 	}
-
 
 	/**
 	 * 查询详情

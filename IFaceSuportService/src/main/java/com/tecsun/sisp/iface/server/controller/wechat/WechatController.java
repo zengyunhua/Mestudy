@@ -16,11 +16,8 @@ import com.tecsun.sisp.iface.common.vo.Result;
 import com.tecsun.sisp.iface.server.controller.BaseController;
 import com.tecsun.sisp.iface.server.model.service.wechat.WechatService;
 
-
-
 /**
  * @date 2018/06/13
- * @author 邓峰峰
  * <p>微信职称查询</p>
  */
 @RestController

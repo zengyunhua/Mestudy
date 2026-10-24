@@ -9,7 +9,6 @@ import redis.clients.jedis.JedisPoolConfig;
 /**
  * ClassName: DataBase
  * Description: 初始化redis连接池
- * Author： 张清洁
  * CreateTime： 2015年06月07日 13时:59分
  */
 public class DataBase {

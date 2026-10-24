@@ -5,7 +5,6 @@ import java.util.Map;
 
 /**
  * 微信职称查询业务接口
- * @author 邓峰峰
  *
  */
 public interface WechatService {

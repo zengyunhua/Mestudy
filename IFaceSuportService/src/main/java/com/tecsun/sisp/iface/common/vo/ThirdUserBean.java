@@ -2,7 +2,6 @@ package com.tecsun.sisp.iface.common.vo;
 
 /**
  * 第三方登陆返回信息
- * @author yl
  *
  *
  */

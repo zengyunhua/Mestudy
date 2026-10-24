@@ -4,7 +4,6 @@ import com.tecsun.sisp.net.common.Page;
 
 /**
  * query业务查询条件包装对象
- * @author 邓峰峰
  *
  */
 public class QueryVo extends Page<QueryVo>{

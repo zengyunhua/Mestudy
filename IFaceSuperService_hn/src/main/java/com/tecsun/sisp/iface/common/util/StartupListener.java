@@ -12,7 +12,6 @@ import java.sql.SQLException;
  * ClassName: StartupListener
  * Description: 初始化应用程序
  * 1.初始化redis连接池
- * Author： 张清洁
  * CreateTime： 2015年06月07日 13时:50分
  */
 public class StartupListener extends ContextLoader implements ServletContextListener {

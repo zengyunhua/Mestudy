@@ -50,7 +50,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * succeeded now, {@code "01"} means it had already succeeded earlier, anything else is a
  * failure whose text is passed through in {@code message}.
  *
- * @author thl
  */
 @Controller
 @RequestMapping(value = "/iface/cardInfo")
@@ -415,7 +414,6 @@ public class CardInfoController extends BaseController {
      * @param bean request carrying card number, ID number and name — all three required
      * @return {@code data} is the gateway's raw reply when it equals {@code "OK"};
      *         otherwise a failure envelope describing the problem
-     * @author fuweifeng
      * @version V.1.0.0
      */
     @RequestMapping(value = "/getCard", method = RequestMethod.POST, produces = "application/json")

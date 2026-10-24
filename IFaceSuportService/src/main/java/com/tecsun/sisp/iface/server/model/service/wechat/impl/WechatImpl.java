@@ -13,7 +13,6 @@ import com.tecsun.sisp.iface.server.model.service.wechat.WechatService;
 
 /**
  * 微信职称查询业务接口实现
- * @author 邓峰峰
  *
  */
 @Service
@@ -52,7 +51,6 @@ public class WechatImpl implements WechatService{
 		
 		return mapList;
 	}
-
 
 	/**
 	 * 判断传过来的字符串有几个空

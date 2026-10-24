@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 /**
  * ClassName: ThreadPoolTask
  * Description:线程池执行的任务
- * Author： 张清洁
  * CreateTime： 2015年07月31日 15时:34分
  */
 public class ThreadPoolTask implements Runnable {

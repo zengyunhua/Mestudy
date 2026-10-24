@@ -46,7 +46,7 @@ public interface CsspQueryService {
     
     public Integer updatePhotoUrl(String name, String certNum, String photoUrl);
 
-    /******************************************/
+    
 
     public ResultLoginvo login(LoginVO bean) throws Exception;
 
@@ -62,7 +62,6 @@ public interface CsspQueryService {
 
     public List<BusRcmBoxVO> queryBox(String orgAddress);
 
-
     public boolean insertCard(BusRcmCardVO bean);
 
     public boolean updateBasic(String soCardNum);
@@ -71,15 +70,11 @@ public interface CsspQueryService {
 
     public boolean updateBin(BusRcmBinVO binVO);
 
-
-
     public ResultBusMakeDetal getCardwz(String certNum);
-
 
     public List<ResultBusRcmCardApplyVO> getrcmApply(String certNum);
 
     public boolean insertApplyPic(BusApplyPicVO bean) throws Exception;
-
 
     public  ResultUpVO getboxid(String soCardNum);
 
@@ -87,11 +82,7 @@ public interface CsspQueryService {
 
     public boolean updataRcm(String soCardNum);
 
-
-
-
     public String getrcmWdname(Integer id) throws Exception;
-
 
     //申领记录
     public List<ResultPersonApplyVO> getapplyhistory(String certnum);
@@ -100,7 +91,6 @@ public interface CsspQueryService {
     public boolean updatePicStatus(String picName);
 
     //public ResultBasicCardVO getBasicInfo(String soCardNum);
-
 
     public boolean updateCard(ResultUpVO resultUpVO);
 

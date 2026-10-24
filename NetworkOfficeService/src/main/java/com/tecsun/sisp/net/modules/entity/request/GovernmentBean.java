@@ -5,7 +5,6 @@ import com.tecsun.sisp.net.modules.entity.BaseVO;
 
 /**
  * 查询列表入参
- * @author Administrator
  *
  */
 public class GovernmentBean  extends BaseVO {
@@ -24,8 +23,6 @@ public class GovernmentBean  extends BaseVO {
 
 	public String getChannelcode() {return channelcode;}
 	public void setChannelcode(String channelcode) {this.channelcode = channelcode;}
-
-
 
 	public int getPageno() {
 		if(pageno==0)

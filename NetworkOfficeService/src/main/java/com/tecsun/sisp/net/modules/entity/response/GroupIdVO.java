@@ -1,7 +1,6 @@
 package com.tecsun.sisp.net.modules.entity.response;
 /**
  * 查询一级编码出参
- * @author Administrator
  *
  */
 public class GroupIdVO {

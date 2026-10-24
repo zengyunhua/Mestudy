@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo.his;
  * 医院挂号号表
  * 
  * @ClassName: HospitalRegistPO
- * @author po_tan
  * @date 2015年6月18日 下午12:09:43
  *
  */
@@ -62,7 +61,6 @@ public class HospitalRegistPO {
 		HBMC = hBMC;
 	}
 
-
 	public String getSXH() {
 		return SXH;
 	}
@@ -110,7 +108,5 @@ public class HospitalRegistPO {
 	public void setKSBH(String kSBH) {
 		KSBH = kSBH;
 	}
-
-
 
 }

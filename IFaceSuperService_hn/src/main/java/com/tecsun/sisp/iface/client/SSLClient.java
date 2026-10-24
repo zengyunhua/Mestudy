@@ -1,6 +1,5 @@
 package com.tecsun.sisp.iface.client;
 
-
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -9,7 +8,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 /**
  * ClassName: SSLClient
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年06月09日 12时:18分
  */
 public class SSLClient extends DefaultHttpClient {

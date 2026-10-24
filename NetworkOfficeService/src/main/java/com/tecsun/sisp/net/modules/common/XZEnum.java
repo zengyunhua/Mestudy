@@ -2,7 +2,6 @@ package com.tecsun.sisp.net.modules.common;
 
 /**
  * 险种类型枚
- * @author 邓峰峰
  *
  */
 public enum XZEnum {

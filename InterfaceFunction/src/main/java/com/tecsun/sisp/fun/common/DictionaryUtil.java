@@ -17,7 +17,6 @@ import javax.ws.rs.core.MultivaluedMap;
 /**
  * ClassName: DictionaryUtil
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年06月05日 14时:49分
  */
 public class DictionaryUtil {

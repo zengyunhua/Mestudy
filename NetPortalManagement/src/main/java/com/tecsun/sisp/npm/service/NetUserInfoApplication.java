@@ -37,7 +37,6 @@ import com.tecsun.sisp.npm.util.MD5Generator;
 import com.tecsun.sisp.npm.util.PublicMethod;
 import com.tecsun.sisp.npm.util.StaticBean;
 
-
 /**
  * created by fuweifeng on 2015-6-1.
  */
@@ -50,7 +49,6 @@ public class NetUserInfoApplication extends NetSuperApplication {
     }
 
     /*
-     * @author   fuweifeng
      * @date     2015-6-1
        @version
        @parameter
@@ -92,7 +90,6 @@ public class NetUserInfoApplication extends NetSuperApplication {
     }
 
     /*
-     * @author   fuweifeng
      * @date     2015-6-1
        @version
        @parameter
@@ -135,7 +132,6 @@ public class NetUserInfoApplication extends NetSuperApplication {
     }
 
     /*
-     * @author   fuweifeng
      * @date     2015-6-1
        @version
        @parameter
@@ -159,9 +155,7 @@ public class NetUserInfoApplication extends NetSuperApplication {
         }
     }
 
-
     /*
-     * @author   fuweifeng
      * @date     2015-6-1
        @version
        @parameter
@@ -192,7 +186,6 @@ public class NetUserInfoApplication extends NetSuperApplication {
     }
 
     /*
-     * @author   fuweifeng
      * @date     2015-6-1
        @version
        @parameter

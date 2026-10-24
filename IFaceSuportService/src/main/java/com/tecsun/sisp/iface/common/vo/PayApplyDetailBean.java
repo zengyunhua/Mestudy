@@ -2,7 +2,6 @@ package com.tecsun.sisp.iface.common.vo;
 
 /**
  * 地税缴费明细
- * @author Administrator
  *
  */
 public class PayApplyDetailBean {

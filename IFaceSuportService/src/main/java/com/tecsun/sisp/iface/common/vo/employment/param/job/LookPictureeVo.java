@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 /**
- * @author
  * @date 2016年12月27日 上午11:23:13
  */
 public class LookPictureeVo extends JobBasicVo {

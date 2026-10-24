@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo;
  * 医院门诊请求bean
  * 
  * @ClassName: DepartmentBean
- * @author po_tan
  * @date 2015年6月19日 下午1:08:49
  *
  */
@@ -51,7 +50,6 @@ public class HisRequstBean {
 	private String hosid;//医院编号；
 	private String JZH;//就诊号；
 	private String SXH;// 顺序号
-
 
 	public String getSXH() {
 		return SXH;
@@ -105,8 +103,6 @@ public class HisRequstBean {
 	public void setRegdate(String regdate) {
 		this.regdate = regdate;
 	}
-
-
 
 	public String getAccounttype() {
 		return accounttype;

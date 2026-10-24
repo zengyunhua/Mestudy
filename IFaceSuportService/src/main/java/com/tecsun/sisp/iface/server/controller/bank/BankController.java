@@ -33,7 +33,6 @@ import java.util.*;
  * 孝感农商行服务接口
  * ClassName: RCCBankController
  * Description:
- * Author： 张清洁
  * CreateTime： 2015年06月25日 09时:16分
  */
 
@@ -231,8 +230,6 @@ public class BankController extends BaseController {
         }
         return this.result(result,null,keyBean);
     }
-
-
 
     /**
      * 商家模式 余额查询  平台返回银行报文

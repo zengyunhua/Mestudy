@@ -4,7 +4,6 @@ import java.util.Date;
 
 /**
  * 日志信息表VO
- * @author zengyunhua
  *2017年10月13日
  *
  */
@@ -77,7 +76,5 @@ public class TLogsVO {
 	}
 
 	
-
-
 
 }

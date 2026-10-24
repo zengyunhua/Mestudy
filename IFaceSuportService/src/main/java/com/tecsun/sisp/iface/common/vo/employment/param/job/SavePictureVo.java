@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 /**
- * @author
  * @date 2016年12月27日 上午10:58:43
  */
 public class SavePictureVo extends JobBasicVo {

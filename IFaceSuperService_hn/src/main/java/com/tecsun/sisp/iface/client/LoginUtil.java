@@ -9,7 +9,6 @@ import java.security.MessageDigest;
 /**
  * ClassName: LoginUtil
  * Description:  接口鉴权工具类
- * Author： 张清洁
  * CreateTime： 2015年06月09日 20时:30分
  */
 public class LoginUtil {/*

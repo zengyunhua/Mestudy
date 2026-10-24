@@ -1,14 +1,8 @@
 package com.tecsun.sisp.fun.modules.controller;
 
-
 import com.tecsun.sisp.fun.common.Constants;
 import com.tecsun.sisp.fun.common.Result;
 
-/**
- * 
- * @author tanhaili
- *
- */
 public abstract class BaseController {
 
     public Result result(String result,String message,Object obj){

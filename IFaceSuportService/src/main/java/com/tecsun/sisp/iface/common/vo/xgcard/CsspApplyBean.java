@@ -2,10 +2,6 @@ package com.tecsun.sisp.iface.common.vo.xgcard;
 
 import com.tecsun.sisp.iface.common.vo.SecQueryBean;
 
-
-
-/**
- */
 public class CsspApplyBean extends SecQueryBean {
     private long applyId;//
     private long personId;//

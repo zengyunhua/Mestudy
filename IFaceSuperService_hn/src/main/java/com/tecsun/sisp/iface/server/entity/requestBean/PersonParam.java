@@ -1,6 +1,5 @@
 package com.tecsun.sisp.iface.server.entity.requestBean;
 
-
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +7,6 @@ import lombok.ToString;
 
 /**
  * @title
- * @author zengyunhua
  * @2018年12月28日-下午2:31:34
  * @version2018
  */
@@ -28,9 +26,5 @@ public class PersonParam {
 	private String rzyw;//认证业务
 	private Date createtime;//创建时间
 	
-
-
-
-
 
 }

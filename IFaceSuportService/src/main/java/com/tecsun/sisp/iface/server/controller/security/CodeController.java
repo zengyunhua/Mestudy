@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * 生成验证码
- * @author Administrator
  *
  */
 @Controller  

@@ -4,7 +4,6 @@ package com.tecsun.sisp.iface.common.vo.his.zx;
  * 医院挂号号表
  * 
  * @ClassName: HospitalRegistPO
- * @author po_tan
  * @date 2015年6月18日 下午12:09:43
  *
  */
@@ -27,7 +26,6 @@ public class ZxHosInfoRegistPO {
 	private String cityname;//城市名称
 	private String phone;//公司电话
 	private String website;//公司网站
-
 
 	public String getHospitallevel() {
 		return hospitallevel;
@@ -294,8 +292,6 @@ public class ZxHosInfoRegistPO {
 	private String hospitalmiddlepicurl;//>医院图片(中)
 	private String hospitalbigpicurl;//医院图片(大)
 
-
-
 	private String citycode;//'
 	private String zipcode;//
 	private String provcode;//
@@ -319,23 +315,12 @@ public class ZxHosInfoRegistPO {
 		this.provcode = provcode;
 	}
 
-
-
-
-
-
-
-
-
-
 	private String spinputcode;//疾病专长输入码
 	private String doctorsmallpicurl;//医生图片(小)
 	private String doctormiddlepicurl;//医生图片(中
 	private String doctorbigpicurl;//医生图片(大
 
 	//private String scheduleflag;//预约状态
-
-
 
 	private String scheduleid;//日排班 ID
 	private String outpdate;//日期
@@ -344,7 +329,6 @@ public class ZxHosInfoRegistPO {
 	private Double clinicfee;//诊疗费
 	private Double registrationfee;//挂号费
 	private int reserveflag;//预约状态1:可挂 ( 院方门办正式确定了的排班表）2:已满（已经全部挂满或者放给预约的约满了）	3:停号 （院方通知医生停诊了，停止继续预约）	4:可约( 院方门办没有正式确定的排班，只是根据惯例生成的排班表）	5:过期 （已经过了预约时间的排班）	6:未开 （还没到允许预约时间的排班）	7:分时（可挂/可约并且有分时）	备注 选得一个医生后，列出该医生的全部排班时需要这个
-
 
 	private String schedulelist;//坐诊安排  如：周一上午|周二下午|周三下午
 
@@ -399,15 +383,6 @@ public class ZxHosInfoRegistPO {
 		this.reserveflag = reserveflag;
 	}
 
-
-
-
-
-
-
-
-
-
 	public String getSpinputcode() {
 		return spinputcode;
 	}
@@ -432,9 +407,6 @@ public class ZxHosInfoRegistPO {
 	public void setDoctorbigpicurl(String doctorbigpicurl) {
 		this.doctorbigpicurl = doctorbigpicurl;
 	}
-
-
-
 
 	public String getDeptcode() {
 		return deptcode;
@@ -572,8 +544,6 @@ public class ZxHosInfoRegistPO {
 	public void setHospitalname(String hospitalname) {
 		this.hospitalname = hospitalname;
 	}
-
-
 
     private String patientId;//患者ID
     private String cardNo;// 卡号

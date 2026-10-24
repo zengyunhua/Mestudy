@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 /**
- * @author 
  * @date 2016年12月20日 上午10:06:50
  */
 public class RegisterByIdCardVo extends JobBasicVo {

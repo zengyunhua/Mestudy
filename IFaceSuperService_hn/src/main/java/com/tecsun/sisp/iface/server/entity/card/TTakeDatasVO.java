@@ -4,7 +4,6 @@ import java.util.Date;
 
 /**
  * 数据提取记录表VO类
- * @author zengyunhua
  *2017年10月13日
  *
  */
@@ -75,6 +74,5 @@ public class TTakeDatasVO {
 	}
 	
 	
-
 
 }

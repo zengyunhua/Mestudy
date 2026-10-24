@@ -18,7 +18,6 @@ import com.tecsun.sisp.iface.common.vo.Result;
 /**
  * 控制器基类
  *
- * @author tan
  *
  */
 public abstract class BaseController {

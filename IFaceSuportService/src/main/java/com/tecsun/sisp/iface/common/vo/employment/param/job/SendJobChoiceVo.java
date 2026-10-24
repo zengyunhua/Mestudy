@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 /**
- * @author
  * @date 2016年12月21日 上午11:40:30
  */
 public class SendJobChoiceVo extends JobBasicVo {

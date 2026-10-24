@@ -1,11 +1,5 @@
 package com.tecsun.sisp.net.common;
 
-
-/**
- * 
- * @author tan
- *
- */
 public class ResultPage {
     private String statusCode;//200 成功；0 失败
     private String message;

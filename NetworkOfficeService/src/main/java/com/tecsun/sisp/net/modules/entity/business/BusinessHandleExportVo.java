@@ -4,7 +4,6 @@ import com.tecsun.sisp.net.export.excel.ExcelCell;
 
 /**
  * BusinessHandle 导出业务的导出条件包装对象
- * @author 邓峰峰
  *
  */
 public class BusinessHandleExportVo {

@@ -13,7 +13,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 /**
  * 复杂表头对象  最小单元是excel的每个cell
  * 用此对象接收前端传过来的复杂表头属性
- * @author 邓峰峰
  *
  */
 public class ExcelCell implements WirteHeader{
@@ -94,7 +93,6 @@ public class ExcelCell implements WirteHeader{
 	public void setRowspan(int rowspan) {
 		this.rowspan = rowspan;
 	}
-
 
 	public List<ExcelCell> getNextRow() {
 		return nextRow;

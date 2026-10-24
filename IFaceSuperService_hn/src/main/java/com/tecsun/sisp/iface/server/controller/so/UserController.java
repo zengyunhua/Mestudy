@@ -23,7 +23,6 @@ import javax.ws.rs.core.Context;
 /**
  * 登录
  *
- * @author Administrator
  */
 @Controller
 @RequestMapping("/iface/user")

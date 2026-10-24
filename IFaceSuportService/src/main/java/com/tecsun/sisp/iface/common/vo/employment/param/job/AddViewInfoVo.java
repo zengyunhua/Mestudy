@@ -1,7 +1,6 @@
 package com.tecsun.sisp.iface.common.vo.employment.param.job;
 
 /**
- * @author
  * @date 2016年12月22日 下午2:29:23
  */
 public class AddViewInfoVo extends JobBasicVo {

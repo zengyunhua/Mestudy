@@ -19,7 +19,6 @@ import com.tecsun.sisp.iface.server.model.service.faceVerify.impl.PersonInfoServ
 
 /**
  * 人脸验证接口功能--工具类
- * @author tan
  *
  */
 public class FaceVerifyUtil {

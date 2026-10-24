@@ -4,7 +4,6 @@ import java.util.Date;
 
 /**
  * 用户VO类
- * @author zengyunhua
  *2017年10月13日
  *
  */
