@@ -136,10 +136,25 @@ refactor(common): extract shared Result envelope
 
 Body: explain **why**, not what. The diff already says what.
 
+## Branching
+
+`master` is the only long-lived branch, and it is the default branch on GitHub.
+
+- **Small changes** — documentation, typo fixes, comment clarifications, a one-line bug
+  fix — commit straight to `master`.
+- **Anything larger** — a fix touching several files, a refactor, a new feature — work on
+  a short-lived branch (`fix/...`, `feat/...`) and open a pull request against `master`.
+  The branch is deleted after the merge.
+
+There is no `develop` branch. With a single maintainer, a second long-lived branch only
+means the default branch drifts behind the work that is actually happening, so visitors
+see stale code and a stale "last commit" date.
+
 ## Pull requests
 
 A good PR here is small and explains itself.
 
+- **Target `master`.**
 - **One concern per PR.** A bug fix plus a refactor is two PRs.
 - **Describe verification.** "Built with `mvn clean package` on JDK 8, deployed to
   Tomcat 8, called `/iface/user/checkLogin` and got `statusCode: 200`." If you could not
