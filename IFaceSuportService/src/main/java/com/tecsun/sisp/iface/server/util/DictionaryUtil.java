@@ -17,10 +17,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * ClassName: DictionaryUtil
- * Description:
- * Author： 张清洁
- * CreateTime： 2015年06月05日 12时:30分
+ * Dictionary lookups and inter-service POST calls.
+ *
+ * <p>Two responsibilities that share a single reason to exist: both need the internal
+ * proxy address. {@link #getHost(String)} builds an absolute URL from
+ * {@code inner_proxy_ip}, {@code inner_proxy_port} and {@code platform_context_path}, and
+ * the POST helpers use it to reach peer modules.
+ *
+ * <p>The dictionary itself is served by the platform's core module and cached in Redis
+ * under a key derived from the group id. A cache miss triggers an HTTP round trip; a
+ * failure there returns an empty result rather than throwing, so a caller cannot tell
+ * "no entries" from "core module down". Log at the call site if that distinction matters.
+ *
+ * <p>Uses Jersey 1.x. The client is created per call, which is wasteful — a shared
+ * {@code Client} instance would be correct, since Jersey clients are thread-safe and
+ * expensive to build.
  */
 public class DictionaryUtil {
 

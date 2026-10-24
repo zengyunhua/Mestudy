@@ -1,0 +1,114 @@
+# ===========================================================================
+# IFaceSuportService — configuration template
+#
+# Copy to config.properties and replace every CHANGE_ME.
+# config.properties is git-ignored; never commit real credentials.
+# Full key reference: ../../../../docs/CONFIGURATION.md
+# ===========================================================================
+
+# --- Web / context ---------------------------------------------------------
+web.view.prefix=/WEB-INF/views/
+web.view.suffix=.jsp
+# Context path this application is deployed under. Must match the container's
+# deployment name; used to build absolute internal URLs.
+platform_context_path=/sisp
+
+# --- Internal proxy --------------------------------------------------------
+# Used by DictionaryUtil.getHost() to build service-to-service URLs.
+inner_proxy_ip=127.0.0.1
+inner_proxy_port=8080
+
+# --- Redis -----------------------------------------------------------------
+# Format is host_port (underscore separated, not a URL).
+redis_core_database=127.0.0.1_6379
+# Cache / token TTL in MINUTES (JedisUtil multiplies by 60 internally).
+# Keep this at or above the client's tokenTimeOut; 60 = one hour.
+redis_iface_expx=60
+
+# --- JDBC pool (shared by every datasource below) --------------------------
+jdbc.type=oracle
+jdbc.maxIdleTime=3000
+jdbc.minPoolSize=10
+jdbc.maxPoolSize=300
+jdbc.initialPoolSize=10
+
+# --- Datasource: Neusoft (dongruan) five-insurance schema ------------------
+# Bound to bean "dataSource".
+jdbc.dongruan.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.dongruan.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.dongruan.username=CHANGE_ME
+jdbc.dongruan.password=CHANGE_ME
+
+# --- Datasource: core platform schema --------------------------------------
+# Bound to bean "netportalDataSource".
+jdbc.sisp.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.sisp.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.sisp.username=CHANGE_ME
+jdbc.sisp.password=CHANGE_ME
+
+# --- Datasource: public query schema ---------------------------------------
+# Bound to bean "sispPublicDataSource".
+jdbc.sisp_public.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.sisp_public.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.sisp_public.username=CHANGE_ME
+jdbc.sisp_public.password=CHANGE_ME
+
+# --- Datasource: card replacement hub (cssp) -------------------------------
+# Bound to bean "csspDataSource".
+jdbc.cssp.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.cssp.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.cssp.username=CHANGE_ME
+jdbc.cssp.password=CHANGE_ME
+
+# --- Datasource: intermediate / staging schema -----------------------------
+# Bound to bean "zhongjianDataSource".
+jdbc.zhongjian.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.zhongjian.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.zhongjian.username=CHANGE_ME
+jdbc.zhongjian.password=CHANGE_ME
+
+# --- Datasource: Neusoft face-recognition schema ---------------------------
+# Bound to bean "drDataSource".
+jdbc.drface.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.drface.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.drface.username=CHANGE_ME
+jdbc.drface.password=CHANGE_ME
+
+# --- Datasource: face-verification base data -------------------------------
+# Bound to bean "faceDataSource".
+jdbc.face.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.face.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.face.username=CHANGE_ME
+jdbc.face.password=CHANGE_ME
+
+# --- Datasource: pension benefit calculation -------------------------------
+# Bound to bean "dryldyDataSource".
+jdbc.dryldy.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.dryldy.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.dryldy.username=CHANGE_ME
+jdbc.dryldy.password=CHANGE_ME
+
+# --- Internal face-verification service ------------------------------------
+tecsun_verify_ip=127.0.0.1
+tecsun_verify_port=8084
+tecsun_verify_projectName=/Verify
+# Region code used for face data partitioning.
+face_area=xg
+
+# --- Provincial interface credentials --------------------------------------
+# Region code sent to the provincial gateway.
+cityno=000000
+user=CHANGE_ME
+password=CHANGE_ME
+
+# --- External gateways -----------------------------------------------------
+# Provincial card-management SOAP endpoint.
+CARDBUESS_URL=http://127.0.0.1:7001/hbCardService/services/CardService
+# Job-board service base URL.
+public_job_url=http://127.0.0.1:9007
+# Weather XML feed (public endpoint).
+XIAOGANWEATHER=http://flash.weather.com.cn/wmaps/xml/xiaogan.xml
+
+# --- Card box capacity limits ----------------------------------------------
+cardmaxsize=80
+carboxcount=48

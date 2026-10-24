@@ -3,6 +3,27 @@ package com.tecsun.sisp.iface.common.vo;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A single page of results, used as the payload for list endpoints and as the return type
+ * of most client-SDK operations.
+ *
+ * <p>Deliberately <em>not</em> a {@link Result} subclass: a {@code Page} carries no status
+ * code or message. When the client SDK unwraps a response, the envelope is discarded and
+ * only the paging fields and rows survive — so a failed query and an empty result are
+ * indistinguishable at this level. Callers that need the failure reason must inspect the
+ * raw response.
+ *
+ * <p>Sentinel values:
+ * <ul>
+ *   <li>{@code pageSize == -1} — do not paginate, return everything.</li>
+ *   <li>{@code count == -1} — the total was not requested.</li>
+ * </ul>
+ *
+ * <p>{@link #setPageSize(int)} coerces non-positive values to {@code 10}, so you cannot
+ * actually request "no pagination" by passing {@code 0}.
+ *
+ * @param <T> row type
+ */
 public class Page<T>{
     private int pageNo; // 当前页码
     private int pageSize; // 页面大小，设置为“-1”表示不进行分页（分页无效）

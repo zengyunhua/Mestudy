@@ -1,7 +1,7 @@
 package com.tecsun.sisp.net.modules.controller.sign.controller;
 
 import com.tecsun.sisp.net.common.Config;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +12,13 @@ import com.tecsun.sisp.net.common.vo.faceverify.Result;
 import com.tecsun.sisp.net.modules.controller.sign.service.impl.PdfService;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +30,7 @@ import java.util.Map;
 @RequestMapping("/adapter/sign")
 public class SignController {
 
-    private static Logger logger = LoggerFactory.getLogger(SignController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SignController.class);
 
     @Autowired
     private PdfService pdfService;
@@ -65,30 +67,36 @@ public class SignController {
         return new Result(Constants.RESULT_MESSAGE_SUCCESS,"生成签章证明成功",dataMap);
     }
 
-    @RequestMapping(value = "/download/{fileName:.*}")
-    public void downloadFile(@PathVariable String fileName,HttpServletResponse response) throws IOException {
-        // 拼接真实路径
-        String realPath = Config.getInstance().get("signpdf.save.path") + System.getProperty("file.separator") + fileName;
-        // 读取文件
-        File file = new File(realPath);
-        if(file.exists()){
-            OutputStream os = new BufferedOutputStream(response.getOutputStream());
-            try {
-                response.setContentType("application/octet-stream");
-                fileName = URLEncoder.encode(fileName, "UTF-8");
-                response.setHeader("Content-disposition", "attachment; filename="
-                        + new String(fileName.getBytes("utf-8"), "ISO8859-1")); // 指定下载的文件名
-                os.write(FileUtils.readFileToByteArray(file));
-                os.flush();
-            } catch (IOException e) {
-                logger.error("签章PDF下载文件出错：",e);
-            } finally {
-                if(os != null){
-                    os.close();
-                }
-            }
-        }else{
-            logger.error("签章PDF下载文件不存在。" + fileName);
+    /**
+     * Streams a generated PDF from the configured storage directory.
+     *
+     * <p>The canonical-path check prevents callers from escaping the storage
+     * root with relative path segments or platform-specific separators.</p>
+     */
+    @RequestMapping(value = "/download/{fileName:.*}", method = RequestMethod.GET)
+    public void downloadFile(@PathVariable String fileName, HttpServletResponse response) throws IOException {
+        File storageRoot = new File(Config.getInstance().get("signpdf.save.path")).getCanonicalFile();
+        File file = new File(storageRoot, fileName).getCanonicalFile();
+        String storagePrefix = storageRoot.getPath() + File.separator;
+
+        if (!file.getPath().startsWith(storagePrefix) || !file.isFile()) {
+            logger.warn("Rejected invalid signed PDF download request: {}", fileName);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Length", Long.toString(file.length()));
+        String encodedName = URLEncoder.encode(file.getName(), "UTF-8").replace("+", "%20");
+        response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedName);
+
+        try (InputStream input = new BufferedInputStream(new FileInputStream(file));
+             OutputStream output = new BufferedOutputStream(response.getOutputStream())) {
+            IOUtils.copy(input, output);
+            output.flush();
+        } catch (IOException e) {
+            logger.error("Failed to download signed PDF: {}", file.getName(), e);
+            throw e;
         }
     }
 

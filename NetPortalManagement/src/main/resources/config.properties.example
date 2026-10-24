@@ -1,0 +1,17 @@
+# ===========================================================================
+# NetPortalManagement — configuration template
+#
+# Copy to config.properties and replace every CHANGE_ME.
+# config.properties is git-ignored; never commit real credentials.
+#
+# NOTE: datasource settings for this module live in ds.xml, not here.
+#       See ../ds.xml.example
+# ===========================================================================
+
+# Context path this application is deployed under.
+platform_context_path=/sisp
+
+# Internal proxy used by LogUtil and NetUserInfoApplication to build
+# service-to-service URLs.
+inner_proxy_ip=127.0.0.1
+inner_proxy_port=80

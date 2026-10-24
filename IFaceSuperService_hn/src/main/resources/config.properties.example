@@ -1,0 +1,60 @@
+# ===========================================================================
+# IFaceSuperService_hn — configuration template (Henan deployment)
+#
+# Copy to config.properties and replace every CHANGE_ME.
+# config.properties is git-ignored; never commit real credentials.
+# Full key reference: ../../../../docs/CONFIGURATION.md
+# ===========================================================================
+
+# --- Web / context ---------------------------------------------------------
+web.view.prefix=/WEB-INF/views/
+web.view.suffix=.jsp
+platform_context_path=/sisp
+
+# --- Internal proxy --------------------------------------------------------
+inner_proxy_ip=127.0.0.1
+inner_proxy_port=83
+
+# --- Redis -----------------------------------------------------------------
+# Format is host_port (underscore separated, not a URL).
+redis_core_database=127.0.0.1_6379
+# Cache / token TTL in MINUTES (JedisUtil multiplies by 60 internally).
+redis_iface_expx=60
+
+# --- JDBC pool (shared by both datasources) --------------------------------
+jdbc.type=oracle
+jdbc.maxIdleTime=3000
+jdbc.minPoolSize=10
+jdbc.maxPoolSize=300
+jdbc.initialPoolSize=10
+
+# --- Datasource: core platform schema --------------------------------------
+# Bound to bean "dataSource".
+# NOTE: the historical config.properties did not define these keys. Because the
+# context sets ignore-unresolvable="true" and default-lazy-init="true", the
+# placeholder stayed literal and the bean failed only on first use. Define them.
+jdbc.sisp.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.sisp.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.sisp.username=CHANGE_ME
+jdbc.sisp.password=CHANGE_ME
+
+# --- Datasource: provincial collection schema ------------------------------
+# Bound to bean "drDataSource". Note it reads the ncCollect keys, not drface.
+jdbc.ncCollect.driverClassName=oracle.jdbc.driver.OracleDriver
+jdbc.ncCollect.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.ncCollect.username=CHANGE_ME
+jdbc.ncCollect.password=CHANGE_ME
+
+# --- Provincial biometric (face collection) gateway ------------------------
+# WSDL endpoint of the provincial ScrzService.
+biometrics.endpoint=http://127.0.0.1:7001/hnScrzService/services/ScrzService?wsdl
+biometrics.namespace=http://server.wei.com
+biometrics.user=CHANGE_ME
+biometrics.pwd=CHANGE_ME
+biometrics.typeid=C00002
+# Shared secret used to sign requests.
+biometrics.key=CHANGE_ME
+
+# --- Image archive ---------------------------------------------------------
+# Absolute path on the application host. Use a POSIX path on Linux.
+authentication=/data/asc

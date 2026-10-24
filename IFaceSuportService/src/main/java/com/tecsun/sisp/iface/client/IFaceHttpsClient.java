@@ -8,10 +8,53 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ClassName: ClientSecQueryService
- * Description:  调用接口实现类
- * Author： 张清洁
- * CreateTime： 2015年06月09日 10时:57分
+ * Client SDK for the interface service. This is the entry point embedded by downstream
+ * terminals (self-service kiosks, channel gateways) to query social-insurance data and
+ * operate on social-security cards without hand-rolling HTTP, JSON or token handling.
+ *
+ * <h2>Lifecycle</h2>
+ *
+ * <ol>
+ *   <li>Call {@link #ClientInit} exactly once per JVM. It stores the target server in
+ *       static fields and starts a single {@code TokenGetter} thread.</li>
+ *   <li>That thread calls {@code POST {context}/iface/user/checkLogin} every
+ *       {@code tokenTimeOut} minutes and refreshes the static {@link #tokenId}.</li>
+ *   <li>Every operation appends {@code ?tokenId=...} to its URL.</li>
+ * </ol>
+ *
+ * <h2>Constraints you must design around</h2>
+ *
+ * <ul>
+ *   <li><strong>One JVM, one server.</strong> {@code ip}, {@code port} and {@code tokenId}
+ *       are static. A process cannot talk to two interface services.</li>
+ *   <li><strong>Init is one-shot.</strong> A second {@code ClientInit} call throws
+ *       {@code "Error: Do not init again !!!!! "}. Any operation called before
+ *       initialisation throws {@code " Please init   !!!!! "}.</li>
+ *   <li><strong>The first token arrives asynchronously.</strong> A call issued
+ *       immediately after {@code ClientInit} may race the first login.</li>
+ * </ul>
+ *
+ * <h2>Return types and error handling</h2>
+ *
+ * <p>Query operations return {@link com.tecsun.sisp.iface.common.vo.Page}, which carries
+ * only {@code pageNo}, {@code pageSize}, {@code count} and {@code data} — the response
+ * envelope's {@code statusCode} and {@code message} are discarded during conversion. A
+ * rejected query therefore looks exactly like an empty result. Card operations return
+ * {@link com.tecsun.sisp.iface.common.vo.Result}, which preserves the envelope.
+ *
+ * <p>Transport failures (connection refused, timeout, non-200 HTTP) propagate as
+ * exceptions from the underlying Apache HttpClient and are not wrapped.
+ *
+ * <h2>Threading</h2>
+ *
+ * <p>Operation methods are stateless apart from the shared static fields, so they are safe
+ * to call from multiple threads once initialised. The heartbeat thread is a single
+ * instance and is never stopped.
+ *
+ * <p>Full reference: {@code docs/CLIENT_SDK.md} at the repository root.
+ *
+ * @see com.tecsun.sisp.iface.common.vo.Result
+ * @see com.tecsun.sisp.iface.common.vo.Page
  */
 public class IFaceHttpsClient {
 
@@ -31,13 +74,27 @@ public class IFaceHttpsClient {
     }
 
     /**
-     * 初始化定时签到程序
-     * @param ip   访问的服务器ip
-     * @param port 访问的服务器port
-     * @param tokenTimeOut 每次签到的间隔时间(单位：分钟)
-     * @param channelcode  渠道编码
-     * @param platformContext 平台编码 暂定为：sisp
-     * @throws Exception
+     * Initialises the SDK and starts the token heartbeat.
+     *
+     * <p>Must be called exactly once per JVM, before any operation. A second call throws,
+     * because the heartbeat thread reference is already set.
+     *
+     * <p>The first token is fetched asynchronously, so a call issued immediately after this
+     * method returns may race the initial login.
+     *
+     * @param ip              host of the interface service; must not be null or empty
+     * @param port            port of the interface service; must not be 0
+     * @param tokenTimeOut    minutes between token renewals. Values {@code <= 60} are
+     *                        silently raised to {@code 60}, so the effective interval is
+     *                        never shorter than one hour
+     * @param isVerify        {@code true} selects {@code https://}, {@code false} selects
+     *                        {@code http://} for every subsequent call
+     * @param channelcode     channel identity sent on login, e.g. {@code TSB} for a
+     *                        Deshunbao terminal
+     * @param platformContext context path, e.g. {@code sisp}; a leading {@code /} is added
+     *                        if missing
+     * @throws Exception if already initialised, or if {@code ip} is empty or {@code port}
+     *                   is 0
      */
     public static void ClientInit(String ip, int port, int tokenTimeOut,boolean isVerify, String channelcode, String platformContext) throws Exception {
         if (t != null) {

@@ -7,10 +7,21 @@ import com.tecsun.sisp.iface.common.vo.Result;
 import java.security.MessageDigest;
 
 /**
- * ClassName: LoginUtil
- * Description:  接口鉴权工具类
- * Author： 张清洁
- * CreateTime： 2015年06月09日 20时:30分
+ * Acquires the interface token that every subsequent SDK call appends as
+ * {@code ?tokenId=...}.
+ *
+ * <p>{@link #checkLogin} posts to {@code /iface/user/checkLogin} with the channel code as
+ * both username and password, where each value is the MD5 hex digest of the channel code.
+ * The service replies with the standard {@code Result} envelope; on success
+ * {@code data} is the token, returned here as a String.
+ *
+ * <p><strong>Failure is an exception, not a return value.</strong> A non-{@code "200"}
+ * status throws {@code Exception("接口鉴权失败！渠道：" + type)}. A {@code null} or empty
+ * response body also throws — {@code result} is dereferenced without a null check, so an
+ * empty body surfaces as {@code NullPointerException} rather than a clear message.
+ *
+ * <p>Called on a timer by {@code IFaceHttpsClient.TokenGetter}; not intended to be called
+ * by application code directly.
  */
 public class LoginUtil {
 

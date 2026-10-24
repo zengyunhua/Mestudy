@@ -26,9 +26,32 @@ import org.apache.commons.lang3.StringUtils;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Created by zhangqingjie on 15-5-8.
+ * Base class for every controller in this module.
+ *
+ * <p>Provides three things so that controllers do not re-implement them:
+ *
+ * <ol>
+ *   <li><strong>Response construction.</strong> {@link #result}, {@link #resultVerify},
+ *       {@link #ok} and {@link #error} build the uniform envelope. Use these rather than
+ *       instantiating {@code Result} directly — the status codes are easy to get wrong and
+ *       the helpers keep them consistent.</li>
+ *   <li><strong>Token and hashing utilities.</strong> {@link #createToken()} and
+ *       {@link #MD5(String)}.</li>
+ *   <li><strong>Outbound HTTP helpers.</strong> {@link #getWebClient(String, Form, Class)}
+ *       and its JSON sibling, which wrap a Jersey client so subclasses can call peer
+ *       services without duplicating connection setup.</li>
+ * </ol>
+ *
+ * <p><strong>Status codes.</strong> {@code "200"} means success, {@code "0"} means
+ * failure. They are strings; compare with {@code equals}.
+ *
+ * <p><strong>Prefer {@code ok(...)} over {@code result("200", ...)}.</strong> The former
+ * returns {@code ResultVerify}, which carries the {@code total} count that paged clients
+ * expect. Returning a plain {@code Result} from a paged endpoint silently loses the total.
+ *
+ * @see com.tecsun.sisp.iface.common.vo.Result
+ * @see com.tecsun.sisp.iface.common.vo.faceverify.ResultVerify
  */
-
 public abstract class BaseController {
 
     public Result result(String result, String message) {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  NetPortalManagement — datasource template for the Bee framework.
+
+  Copy to ds.xml and replace every CHANGE_ME.
+  ds.xml is git-ignored; never commit real credentials.
+-->
+<ds>
+    <source name="sisp_source" rule="" type="oracle">
+        <store url="jdbc:oracle:thin:@127.0.0.1:1521:orcl"
+               driver="oracle.jdbc.driver.OracleDriver"
+               database="orcl"
+               encode="UTF-8"
+               max="100"
+               min="1"
+               user="CHANGE_ME"
+               pwd="CHANGE_ME"
+               readonly="false"
+               type="oracle">
+        </store>
+
+        <store url="127.0.0.1"
+               port="6379"
+               min="1"
+               max="100"
+               type="redis"
+               readonly="false">
+        </store>
+    </source>
+</ds>

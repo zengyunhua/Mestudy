@@ -7,10 +7,20 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * ClassName: DataBase
- * Description: 初始化redis连接池
- * Author： 张清洁
- * CreateTime： 2015年06月07日 13时:59分
+ * Owns the process-wide Redis connection pool.
+ *
+ * <p>{@link #init()} is called once from {@code StartupListener.contextInitialized()}.
+ * It parses {@code redis_core_database} (format {@code host_port}) and builds a
+ * {@link JedisPool} with 500 max connections, 20 idle, a 5s borrow wait and a 10s
+ * connection timeout. If the key is blank or unparseable the pool stays {@code null} and
+ * every later {@link #getJedisPublicPool()} call fails.
+ *
+ * <p><strong>Fail-fast.</strong> Redis backs the interface token, the session cache and
+ * the dictionary cache. An unreachable Redis aborts deployment rather than degrading —
+ * intentional for a service behind a health check.
+ *
+ * <p>{@link #init()} is guarded by a plain boolean, not a lock, so it is not safe to call
+ * concurrently. In practice it runs once during servlet initialisation.
  */
 public class DataBase {
 

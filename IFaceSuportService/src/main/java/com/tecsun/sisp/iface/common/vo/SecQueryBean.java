@@ -1,5 +1,9 @@
 package com.tecsun.sisp.iface.common.vo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 社保卡请求对象
  * Created by jerry on 2015/5/31.
@@ -116,6 +120,28 @@ public class SecQueryBean extends BaseVO{
 	public void setAae140(String aae140) {
 		this.aae140 = aae140;
 	}
+
+    /**
+     * Converts the legacy comma-separated insurance type expression into
+     * values that MyBatis can bind safely in an IN clause.
+     */
+    public List<String> getInsuranceTypes() {
+        if (aae140 == null || aae140.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<String> insuranceTypes = new ArrayList<String>();
+        for (String value : aae140.split(",")) {
+            String normalized = value.trim();
+            if (normalized.startsWith("'") && normalized.endsWith("'") && normalized.length() >= 2) {
+                normalized = normalized.substring(1, normalized.length() - 1);
+            }
+            if (!normalized.isEmpty()) {
+                insuranceTypes.add(normalized);
+            }
+        }
+        return insuranceTypes;
+    }
 
 	private int pageno;
 

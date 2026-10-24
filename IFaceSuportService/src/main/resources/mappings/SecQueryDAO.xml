@@ -77,7 +77,10 @@
 	and a.aae216 = c.AAA102
 	and c.AAA100='AAE216'
 	and b.aac031!='3'
-	and a.aae140 in(${aae140}) and a.aae114 ='1' and b.aac002=#{aac002} order
+	and a.aae140 in
+	<foreach item="insuranceType" collection="insuranceTypes" open="(" separator="," close=")">
+		#{insuranceType}
+	</foreach> and a.aae114 ='1' and b.aac002=#{aac002} order
 	by a.aae003 desc
     </select>
   
@@ -98,7 +101,10 @@
 	from hbsimis_xgjb.ac20 a, hbsimis_xgjb.ac01 b
 	where a.aac001 = b.aac001
 	<if test="aae140 != null and aae140 != ''">
-		and a.aae140 in(${aae140})
+		and a.aae140 in
+	<foreach item="insuranceType" collection="insuranceTypes" open="(" separator="," close=")">
+		#{insuranceType}
+	</foreach>
 	</if>
 	<if test="aac001 != null and aac001 != ''">
 		and b.aac001=#{aac001}
@@ -114,7 +120,10 @@
 	select nvl(sum(a.aac123),0) as sjje,a.aae210 as kx,a.aae216 as jjly
 	from hbsimis_xgjb.ac20 a, hbsimis_xgjb.ac01 b
 	where a.aac001 = b.aac001
-	and a.aae140 in(${aae140})
+	and a.aae140 in
+	<foreach item="insuranceType" collection="insuranceTypes" open="(" separator="," close=")">
+		#{insuranceType}
+	</foreach>
 	and a.aae114 = '1'
 	and b.aac031!='3'
 	and b.aac002 = #{aac002}
@@ -154,7 +163,7 @@
     </select>
     
       <select id="getylAccountYe" parameterType="com.tecsun.sisp.iface.common.vo.SecQueryBean" resultType="com.tecsun.sisp.iface.common.vo.card.TsInsuranceVO">
-        select nvl(b.akc087,0) as ylye  from hbsimis_xgjb.kc04 b where b.aac001 in(${aac001}) and b.akc095 is not  null order by b.akc095 desc
+        select nvl(b.akc087,0) as ylye from hbsimis_xgjb.kc04 b where b.aac001=#{aac001} and b.akc095 is not null order by b.akc095 desc
     </select>
     
     <!-- 五险：根据身份证号查询出对应的所有个人编号 -->
@@ -227,7 +236,10 @@
     from hbsimis_xgjb.ac02 a
     where a.aac001 =#{aac001}  and a.aac031 != '3'
     <if test="aae140 != null and aae140 != ''">
-        and a.aae140 in(${aae140})
+        and a.aae140 in
+	<foreach item="insuranceType" collection="insuranceTypes" open="(" separator="," close=")">
+		#{insuranceType}
+	</foreach>
     </if>
     and a.aae041 = (select max(aae041) from hbsimis_xgjb.ac02 b where a.aac001 = b.aac001 and a.aae140 = b.aae140)
     order by xzlx
