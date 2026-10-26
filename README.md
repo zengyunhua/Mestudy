@@ -2,7 +2,7 @@
 
 **A reference implementation of a Chinese social-insurance / e-government service platform, built on Spring MVC 4 + MyBatis 3.**
 
-[![Java](https://img.shields.io/badge/Java-8%2B-orange.svg)](#tech-stack)
+[![Java](https://img.shields.io/badge/Java-8-orange.svg)](#tech-stack)
 [![Spring](https://img.shields.io/badge/Spring-4.0.8-6db33f.svg)](#tech-stack)
 [![MyBatis](https://img.shields.io/badge/MyBatis-3.2.4-red.svg)](#tech-stack)
 [![Build](https://img.shields.io/badge/build-Maven-c71a36.svg)](#build-from-source)
@@ -10,6 +10,8 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 ---
+
+For maintainers preparing an open-source programme application, see the [application readiness and independent-reproduction guide](docs/OPEN_SOURCE_APPLICATION_GUIDE.md).
 
 ## What this is
 
@@ -151,8 +153,8 @@ flowchart TB
 git clone https://github.com/zengyunhua/Mestudy.git
 cd Mestudy
 
-# Build the default reactor - the four modules whose dependencies are public
-mvn -B package
+# Build and verify the default reactor - the four modules whose dependencies are public
+mvn -B verify
 
 #   IFaceSuportService/target/IFaceSuportService-V1.0.0.150630.war         -> deploy
 #   IFaceSuportService/target/IFaceSuportService-V1.0.0.150630-client.jar  -> client SDK
@@ -161,7 +163,7 @@ mvn -B package
 #   NetworkOfficeService/target/NetworkOfficeService-V1.0.0.180612.war
 
 # The one module that needs private jars is opt-in, see the table below
-mvn -B -Pprivate-deps package
+mvn -B -Pprivate-deps verify
 ```
 
 The repository root holds an aggregator `pom.xml`, so Maven works from the top of the
@@ -238,16 +240,16 @@ resolves from Maven Central.
 
 ```bash
 # 1. Copy the configuration template and fill in your own values
-cp src/main/resources/config.properties.example src/main/resources/config.properties
+cp IFaceSuportService/src/main/resources/config.properties.example IFaceSuportService/src/main/resources/config.properties
 
 # 2. Deploy the war (context path is /sisp by convention)
-cp target/IFaceSuportService-*.war $CATALINA_HOME/webapps/sisp.war
+cp IFaceSuportService/target/IFaceSuportService-*.war "$CATALINA_HOME/webapps/sisp.war"
 
 # 3. Start the container
 $CATALINA_HOME/bin/startup.sh
 ```
 
-The service is then reachable at `http://localhost:8080/sisp/`.
+Port `8080` is only an example: use the Tomcat HTTP connector port and configure Oracle, Redis and all required data sources before deploying. A successful WAR build does not verify runtime behaviour. See [the deployment guide](docs/GETTING_STARTED.md#5-deploy-and-smoke-test-requires-infrastructure).
 
 ## Using the client SDK
 

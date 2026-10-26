@@ -38,25 +38,30 @@ If you want to contribute but are not sure where to start:
 
 ## Development setup
 
+Use JDK 8 and Maven from a fresh clone:
+
 ```bash
 git clone https://github.com/zengyunhua/Mestudy.git
 cd Mestudy
-
-# Pick the module you are changing
-cd InterfaceFunction
-cp src/main/resources/config.properties.example src/main/resources/config.properties
-mvn clean package
+java -version
+mvn -v
+mvn -B verify
 ```
+
+This verifies the four publicly buildable modules without Oracle, Redis or local
+`config.properties` files. Include the commit SHA, tool versions, command, result and
+redacted error log in a PR when reporting a build problem. For deployment and local
+configuration, follow [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 JDK 8 is the supported runtime. JDK 11+ breaks Axis 1.x — see
 [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md#1-prerequisites).
 
-### Build limitations
+### Build limitation
 
-Some modules declare an internal Nexus repository that is not reachable from the public
-internet, so a clean build fails on those modules. This is a known issue tracked in the
-[roadmap](docs/ROADMAP.md). If your change requires a module that cannot be built
-publicly, say so in the pull request and describe how you verified it.
+`NetPortalManagement` requires the private Bee persistence framework and is excluded
+from the default reactor. Its `-Pprivate-deps` profile works only with legally supplied
+jars installed locally; do not upload proprietary jars to this repository. If your change
+affects that module, explain what could and could not be verified in your PR.
 
 ## Coding conventions
 
@@ -188,8 +193,7 @@ Include:
 1. Module and version.
 2. JDK, Maven and container versions.
 3. The exact command that failed and the full stack trace.
-4. Whether the module builds for you at all (many do not, publicly — that is useful
-   information, not a reason to stay silent).
+4. Whether you used the default four-module reactor or the optional private-deps profile.
 
 ## Security issues
 

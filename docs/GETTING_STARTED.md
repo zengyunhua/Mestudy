@@ -1,12 +1,9 @@
 # Getting started
 
-This guide takes you from a fresh clone to a running service and a working client call.
-It assumes you have a servlet container, an Oracle instance and a Redis instance
-available. If you only want to *read* the code, skip to
-[step 6](#6-optional-explore-without-a-database).
+This guide separates a public build (JDK 8 and Maven, no Oracle or Redis) from an optional deployment (Tomcat, Oracle, Redis, schemas and external services). A successful build is not proof of a runnable deployment.
+For deployment you additionally need Tomcat, Oracle, Redis, and working application configuration. For code exploration without a database, see [step 6](#6-optional-explore-without-a-database).
 
-Estimated time: 15–30 minutes, most of it waiting for Maven and for the container to
-start.
+Start with [the four-module build](#4-build-and-verify-independently) to check that you can contribute independently; skip step 3 unless deploying. Deployment time depends on your external infrastructure.
 
 ---
 
@@ -37,17 +34,16 @@ git clone https://github.com/zengyunhua/Mestudy.git
 cd Mestudy
 ```
 
-## 3. Provide configuration
+## 3. Provide configuration (deployment only)
 
-Every module reads a single `config.properties` from its classpath. A template is
-committed; copy it and fill in your own values:
+For the example IFaceSuportService deployment, copy its template and fill in your own values. No configuration is needed for the public build:
 
 ```bash
 cd IFaceSuportService/src/main/resources
 cp config.properties.example config.properties
 ```
 
-Minimum set to get the application to deploy:
+Illustrative subset of settings (not sufficient by itself to deploy):
 
 ```properties
 platform_context_path=/sisp
@@ -70,25 +66,25 @@ even if you point several of them at the same schema — the context fails to lo
 unresolvable placeholder. The full key list is in
 [CONFIGURATION.md](CONFIGURATION.md).
 
-`config.properties` is git-ignored. Never commit it.
+`config.properties` is git-ignored. Never commit it. If the listed keys or database schema are unavailable, stop after the public build; do not treat placeholders as a deployable environment.
 
-## 4. Build
+## 4. Build and verify independently
 
 From the repository root. The default reactor is the four modules that resolve from
 Maven Central; the remaining one is opt-in:
 
 ```bash
 # Build everything in the default reactor, tests included
-mvn -B package
+mvn -B verify
 
 # Tests only, no database and no deployed service
 mvn -B test
 
-# The one module that needs private jars (see the table below)
-mvn -B -Pprivate-deps package
+# Optional: only after installing legitimately obtained private Bee jars
+mvn -B -Pprivate-deps verify
 ```
 
-Expected artefacts (paths are relative to the module directory):
+Expected artefacts (paths are relative to the repository root; check the exact versions in your checkout):
 
 ```
 IFaceSuportService/target/IFaceSuportService-V1.0.0.150630.war
@@ -97,6 +93,8 @@ IFaceSuperService_hn/target/IFaceSuperService_hn-V1.0.0.190107.war
 InterfaceFunction/target/InterfaceFunction-V1.0.0.150630.war
 NetworkOfficeService/target/NetworkOfficeService-V1.0.0.180612.war
 ```
+
+On Windows, if Surefire cannot fork because `%TEMP%` contains non-ASCII characters, see [Troubleshooting](TROUBLESHOOTING.md). Do not treat `-DforkCount=0` as equivalent test isolation.
 
 The `-client` jar is produced by the `maven-jar-plugin` execution with
 `classifier=client`, and contains only `**/client/**` and `**/common/**` classes. That is
@@ -147,27 +145,23 @@ POM:
 
 ### If the build still fails to resolve dependencies
 
-The remaining failures are the private `bee` framework and
-`com.tecsun.sisp_public:aamanagement-client`, which exist in no public repository.
-Options:
+The default four-module build needs no private jars. Only optional `NetPortalManagement` requires the private Bee framework. Options:
 
-1. **Build only the modules that resolve** — `IFaceSuportService` and
-   `IFaceSuperService_hn`.
-2. **Install the jars you have** into your local repository:
+1. **Use the default reactor** — all four public modules build without Bee.
+2. **Install all required, legally obtained artifacts** into your local repository. The following command illustrates one coordinate, not a complete dependency set:
    ```bash
    mvn install:install-file -Dfile=bee.cloud-1.0.4.jar \
        -DgroupId=bee -DartifactId=bee.cloud -Dversion=1.0.4 -Dpackaging=jar
    ```
-3. **Drop the dependency** if nothing references it. This is how
-   `unieap-dataexchange-client` was removed: it was declared but never imported.
+3. **Do not delete the Bee dependency**: the portal code actually uses it. Do not commit proprietary jars without redistribution rights.
 
 This is a known limitation; see [ROADMAP.md](ROADMAP.md).
 
-## 5. Deploy and smoke-test
+## 5. Deploy and smoke-test (requires infrastructure)
 
 ```bash
 # Tomcat
-cp target/IFaceSuportService-*.war $CATALINA_HOME/webapps/sisp.war
+cp IFaceSuportService/target/IFaceSuportService-*.war "$CATALINA_HOME/webapps/sisp.war"
 $CATALINA_HOME/bin/startup.sh
 ```
 
@@ -187,8 +181,7 @@ Verify the service answers:
 curl -i "http://localhost:8080/sisp/iface/user/checkLogin?channelcode=TSB"
 ```
 
-A JSON body with `statusCode` means the stack is up. The exact payload depends on your
-data; a failure code with a readable `message` is still a healthy deployment.
+A response is only a diagnostic. Confirm Tomcat and Spring start without errors, then test a configured route with non-sensitive test data and verify the expected outcome. An HTTP 500 or a JSON error body does not prove a working business flow. Port 8080 is an example; use the Tomcat HTTP connector port.
 
 ## 6. Optional: explore without a database
 
@@ -201,15 +194,13 @@ less docs/ARCHITECTURE.md
 # Inspect every HTTP endpoint without running anything
 grep -rn "@RequestMapping" --include=*.java . | head -50
 
-# Compile the whole module - no datasource is contacted at build time
-cd IFaceSuportService
-mvn -q compile
+# Verify the four public modules - no datasource is contacted at build time
+mvn -B verify
 ```
 
-`mvn compile` needs the third-party jars on the classpath, so it is subject to the same
-Nexus limitation as the build. Reading and grepping always works.
+The four-module default reactor resolves without private Bee jars. Only `-Pprivate-deps` needs authorised artifacts.
 
-## 7. Call the service from Java
+## 7. Call the service from Java (requires a working deployment)
 
 Add the client jar, then initialise once per JVM:
 
