@@ -7,8 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
@@ -17,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 
 /**
  * 生成验证码
@@ -28,8 +27,6 @@ public class CodeController {
       
     @Autowired  
     private Producer captchaProducer = null;  
-    static BASE64Encoder encoder = new BASE64Encoder();
-    static BASE64Decoder decoder = new BASE64Decoder();
     @RequestMapping(value = "/getKaptchaImage", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public String getKaptchaImage(HttpServletRequest request, HttpServletResponse response) throws Exception {  
@@ -61,7 +58,7 @@ public class CodeController {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();    
         ImageIO.write(bi, "jpg", baos);    
          byte[] bytes = baos.toByteArray();   
-         String pic = encoder.encodeBuffer(bytes).trim();
+         String pic = Base64.getEncoder().encodeToString(bytes);
          return capText+pic;   
     }  
 }

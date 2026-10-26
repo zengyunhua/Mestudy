@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import sun.misc.BASE64Encoder;
-
 import com.google.gson.JsonObject;
 import com.tecsun.sisp.iface.client.HttpClientUtil;
 import com.tecsun.sisp.iface.client.WebClient;
@@ -229,7 +227,6 @@ public class FaceVerifyController extends BaseController {
         String name = bean.getName();
         String aac001 = bean.getAac001();
         String aab001 = bean.getAab001();
-        BASE64Encoder encoder = new BASE64Encoder();//对证件照进行解密
         Map<String,String> map = new HashMap<String, String>();
         map.put("name",name);
         map.put("idCard",idCard);

@@ -65,6 +65,10 @@ this repository is that a reader can move between modules without re-learning th
 
 ### Java
 
+- **Language level**: Java 8. It is declared once in the root `pom.xml`
+  (`maven.compiler.source`/`target` = `1.8`); do not override it in a module POM.
+  Java 8 constructs — lambdas, method references, `java.time`, streams — are fine in
+  new code. Do not rewrite existing classes purely to adopt them.
 - **Indentation**: 4 spaces. No tabs.
 - **Encoding**: UTF-8, no BOM.
 - **Braces**: K&R — opening brace on the same line.

@@ -8,7 +8,9 @@
     were separate deployments and are published here as reference material.
 
     Build prerequisites are documented in docs/GETTING_STARTED.md. In short:
-      * JDK 8 (the sources target Java 7; JDK 12+ refuses source level 7)
+      * JDK 8 - both the build JDK and the language level (source/target 1.8).
+        JDK 9+ builds will warn about the bootstrap classpath; JDK 11+ breaks
+        Axis 1.x at runtime. See docs/TROUBLESHOOTING.md.
       * two dependencies are not on Maven Central - com.oracle:ojdbc6 and the
         private "bee" framework - so a fully green build needs them installed
         into your local repository first. See docs/TROUBLESHOOTING.md.
@@ -49,7 +51,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <!-- Java 8 baseline. This is the single source of truth for the language
+             level: module POMs must not override maven.compiler.source/target. -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 </project>

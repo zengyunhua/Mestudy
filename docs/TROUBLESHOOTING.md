@@ -65,11 +65,24 @@ sed -i '1s/^\xEF\xBB\xBF//' path/to/InvokeUtil.java
 Or in most editors: "Save with encoding → UTF-8" (not "UTF-8 with BOM"). This affected
 `IFaceSuperService_hn` and is fixed in the current tree.
 
-### `mvn` compiles with warnings about source/target 1.7
+### `mvn` warns that source/target 1.8 is obsolete
 
-`maven-compiler-plugin` pins `source`/`target` to `1.7` in some modules. On JDK 9+ the
-build still works but emits a deprecation warning. Leave it alone unless you are
-deliberately modernising the module.
+The root POM sets the language level to Java 8 (`maven.compiler.source`/`target` = `1.8`)
+and every module inherits it. On JDK 9+ the build succeeds but prints:
+
+```
+[WARNING] source value 8 is obsolete and will be removed in a future release
+[WARNING] target value 8 is obsolete and will be removed in a future release
+[WARNING] To suppress warnings about obsolete options, use -Xlint:-options.
+```
+
+This is expected — Java 8 is the supported baseline, not an oversight. Do **not** raise
+the level to silence the warning: the runtime is JDK 8 and Axis 1.x will not load on 11+.
+If you compile on a newer JDK, also expect the "bootstrap classpath not set" warning,
+which is equally harmless for this stack.
+
+Do not re-declare `maven-compiler-plugin` in a module POM. The level lives in one place
+so the five modules cannot drift apart.
 
 ### Java 11+ `IllegalAccessError` from Axis
 

@@ -7,7 +7,6 @@ import com.tecsun.sisp.iface.server.outerface.card.CardInfoBus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import sun.misc.BASE64Decoder;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;

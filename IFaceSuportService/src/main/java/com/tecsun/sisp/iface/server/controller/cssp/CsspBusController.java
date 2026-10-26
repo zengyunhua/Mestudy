@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
@@ -26,9 +27,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import com.tecsun.sisp.iface.common.util.Constants;
 import com.tecsun.sisp.iface.common.util.ImageChangeUtil;
@@ -210,8 +208,7 @@ public class CsspBusController extends BaseController {
             OutputStream os = null;
             try {
                 os = new FileOutputStream(new File(signPhotoPath));
-                BASE64Decoder decoder = new BASE64Decoder();
-                os.write(decoder.decodeBuffer(pic));
+                os.write(Base64.getMimeDecoder().decode(pic));
             } catch (Exception e) {
                 e.printStackTrace();
                 return error("电子签名读取错误", "电子签名读取错误");
@@ -413,8 +410,7 @@ public class CsspBusController extends BaseController {
             OutputStream os = null;
             try {
                 os = new FileOutputStream(new File(PhotoPath2));
-                BASE64Decoder decoder2 = new BASE64Decoder();
-                os.write(decoder2.decodeBuffer(pic));
+                os.write(Base64.getMimeDecoder().decode(pic));
             } catch (Exception e) {
                 e.printStackTrace();
                 return this.result("302", "图片读取错误");
@@ -545,8 +541,7 @@ public class CsspBusController extends BaseController {
                         is = new FileInputStream(file);
                         byte[] buffer = new byte[is.available()];
                         is.read(buffer);
-                        BASE64Encoder encoder = new BASE64Encoder();
-                        photo.setBase64String(encoder.encode(buffer));
+                        photo.setBase64String(Base64.getEncoder().encodeToString(buffer));
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -610,8 +605,7 @@ public class CsspBusController extends BaseController {
             OutputStream os = null;
             try {
                 os = new FileOutputStream(new File(path2));
-                BASE64Decoder decoder2 = new BASE64Decoder();
-                os.write(decoder2.decodeBuffer(base46String));
+                os.write(Base64.getMimeDecoder().decode(base46String));
                 System.out.println("2");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -693,8 +687,7 @@ public class CsspBusController extends BaseController {
             OutputStream os = null;
             try {
                 os = new FileOutputStream(new File(photoPath));
-                BASE64Decoder decoder2 = new BASE64Decoder();
-                os.write(decoder2.decodeBuffer(photo));
+                os.write(Base64.getMimeDecoder().decode(photo));
             } catch (Exception e) {
                 e.printStackTrace();
                 return this.result("302", "图片读取错误");

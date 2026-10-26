@@ -3,14 +3,13 @@ package com.tecsun.sisp.iface.common.util;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.lang3.StringUtils;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 /**
  * 编码工具类
@@ -118,7 +117,7 @@ public class AESUtil {
 	 * @return 编码后的base 64 code
 	 */
 	public static String base64Encode(byte[] bytes){
-		return new BASE64Encoder().encode(bytes);
+		return Base64.getEncoder().encodeToString(bytes);
 	}
 	
 	/**
@@ -128,7 +127,7 @@ public class AESUtil {
 	 * @throws Exception
 	 */
 	public static byte[] base64Decode(String base64Code) throws Exception{
-		return StringUtils.isEmpty(base64Code) ? null : new BASE64Decoder().decodeBuffer(base64Code);
+		return StringUtils.isEmpty(base64Code) ? null : Base64.getMimeDecoder().decode(base64Code);
 	}
 	
 	/**
