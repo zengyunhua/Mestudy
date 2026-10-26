@@ -199,14 +199,14 @@
             <version>3.11</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
-     
+
         <!-- 2007 xlsx支持 -->
 		<dependency>
 		    <groupId>org.apache.poi</groupId>
 		    <artifactId>poi-ooxml</artifactId>
 		    <version>3.11</version>
-		</dependency> 
-        
+		</dependency>
+
 
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -218,44 +218,34 @@
             <artifactId>jedis</artifactId>
             <version>2.6.2</version>
         </dependency>
-        <!--权限验证-->
-        <dependency>
-            <groupId>com.tecsun.sisp_public</groupId>
-            <artifactId>aamanagement-client</artifactId>
-            <version>1.0.5</version>
-        </dependency>
-        <dependency>
-            <groupId>bee</groupId>
-            <artifactId>xx.tool</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        
+
+
       <dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>1.4</version>
 		</dependency>
-		
+
 		<!-- 添加jackson支持,用于复杂对象消息转换 -->
-	 	<dependency>  
-		    <groupId>com.fasterxml.jackson.core</groupId>  
-		    <artifactId>jackson-core</artifactId>  
-		    <version>2.5.2</version>  
-		</dependency>  
-		  
-		<dependency>  
-		    <groupId>com.fasterxml.jackson.core</groupId>  
-		    <artifactId>jackson-databind</artifactId>  
-		    <version>2.5.2</version>  
-		</dependency>  
-		
+	 	<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-core</artifactId>
+		    <version>2.5.2</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>2.5.2</version>
+		</dependency>
+
 		<!-- freemarker支持 -->
-		<dependency>  
-        <groupId>org.freemarker</groupId>  
-		    <artifactId>freemarker</artifactId>  
-		    <version>2.3.23</version>  
-		</dependency>  
-		
+		<dependency>
+        <groupId>org.freemarker</groupId>
+		    <artifactId>freemarker</artifactId>
+		    <version>2.3.23</version>
+		</dependency>
+
 		<dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -267,15 +257,15 @@
             <artifactId>async-http-client</artifactId>
             <version>1.9.40</version>
         </dependency>
-        
-	       
+
+
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>1.2.4</version>
         </dependency>
-        
-        
+
+
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
@@ -301,8 +291,8 @@
             <artifactId>core-renderer</artifactId>
             <version>R8</version>
         </dependency>
-        
-        
+
+
     </dependencies>
 
 </project>
