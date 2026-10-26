@@ -1,13 +1,12 @@
 package com.tecsun.sisp.iface.common.util;
 
 import org.apache.commons.lang.StringUtils;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.io.*;
+import java.util.Base64;
 import java.util.Iterator;
 
 /**
@@ -42,8 +41,7 @@ public class ImageChangeUtil {
 			e.printStackTrace();
 		}
 		// 对字节数组Base64编码
-		BASE64Encoder encoder = new BASE64Encoder();
-		return encoder.encode(data);// 返回Base64编码过的字节数组字符串
+		return Base64.getEncoder().encodeToString(data);// 返回Base64编码过的字节数组字符串
 	}
 
 	/**
@@ -55,11 +53,10 @@ public class ImageChangeUtil {
 	public static boolean generateImage(String imgStr, String path) { // 对字节数组字符串进行Base64解码并生成照片
 		if (StringUtils.isBlank(imgStr)||StringUtils.isBlank(path)) // 照片数据为空
 			return false;
-		BASE64Decoder decoder = new BASE64Decoder();
 		OutputStream out = null;
 		try {
 			// Base64解码
-			byte[] b = decoder.decodeBuffer(imgStr);
+			byte[] b = Base64.getMimeDecoder().decode(imgStr);
 			for (int i = 0; i < b.length; ++i) {
 				if (b[i] < 0) {// 调整异常数据
 					b[i] += 256;

@@ -32,6 +32,8 @@ cloned and built. Everything else is secondary.
 - [ ] Stub the remainder behind an optional Maven profile so `mvn package` succeeds
       without the internal Nexus
 - [ ] Add a parent POM to centralise versions, compiler settings and the repository list
+- [x] Set the language level to Java 8 (`maven.compiler.source`/`target` = `1.8`) once,
+      in the root POM, and drop the per-module overrides
 - [ ] Verify a clean build on JDK 8 in a container with an empty `~/.m2`
 
 ## Phase 3 — Tests and CI

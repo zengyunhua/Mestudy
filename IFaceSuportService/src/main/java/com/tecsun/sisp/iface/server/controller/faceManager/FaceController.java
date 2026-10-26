@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import sun.misc.BASE64Decoder;
 
 import com.google.gson.JsonObject;
 import com.tecsun.sisp.iface.client.WebClient;
@@ -812,9 +811,8 @@ public class FaceController extends BaseController{
     public static boolean GenerateImage(String imgStr,String path) { // 对字节数组字符串进行Base64解码并生成voice
         if (imgStr == null)
             return false;
-        BASE64Decoder decoder = new BASE64Decoder();
         try {
-            byte[] b = decoder.decodeBuffer(imgStr);
+            byte[] b = Base64.getMimeDecoder().decode(imgStr);
             for (int i = 0; i < b.length; ++i) {
                 if (b[i] < 0) {// 调整异常数据
                     b[i] += 256;

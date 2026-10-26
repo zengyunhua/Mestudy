@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
-import sun.misc.BASE64Encoder;
 
 import com.google.gson.JsonObject;
 import com.sun.jersey.api.client.Client;
@@ -507,8 +506,7 @@ public class JobServiceImpl implements JobService {
 			}
 			is.close();
 			byte[] data = outStream.toByteArray();
-			BASE64Encoder encoder = new BASE64Encoder();
-			return encoder.encode(data);
+			return Base64.getEncoder().encodeToString(data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

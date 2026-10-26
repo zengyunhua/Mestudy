@@ -1,10 +1,9 @@
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 
 import javax.ws.rs.core.MediaType;
-
-import sun.misc.BASE64Encoder;
 
 import com.google.gson.JsonObject;
 import com.sun.jersey.api.client.Client;
@@ -47,8 +46,7 @@ public class Test {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        BASE64Encoder encoder = new BASE64Encoder();
-        return encoder.encode(data);// 返回Base64编码过的字节数组字符串
+        return Base64.getEncoder().encodeToString(data);// 返回Base64编码过的字节数组字符串
     }
     
 	@SuppressWarnings({ "unchecked", "rawtypes" })

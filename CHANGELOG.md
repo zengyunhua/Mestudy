@@ -11,7 +11,41 @@ grouped by scope rather than by a single release number.
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- **Java 8 baseline.** `maven.compiler.source` / `maven.compiler.target` raised from
+  `1.7` to `1.8` in the root POM, which is now the single source of truth for the
+  language level. The per-module `maven-compiler-plugin` overrides in
+  `IFaceSuportService` and `NetworkOfficeService` were removed so the five modules
+  cannot drift apart again; the empty `<build>` block that was left in
+  `NetworkOfficeService` is gone too.
+- No source change was needed. The code is Java 7-compatible and compiles unchanged at
+  source/target 1.8; Java 8 constructs (lambdas, method references, `java.time`,
+  streams) are now allowed in new code but existing classes were deliberately left
+  alone.
+- Documentation aligned with the new baseline: README (badge, tech-stack row,
+  prerequisites, roadmap), `docs/GETTING_STARTED.md` (JDK requirement),
+  `docs/TROUBLESHOOTING.md` (the source/target warning entry now describes the 1.8
+  "obsolete option" warning instead of the old 1.7 one), `docs/ROADMAP.md` and
+  `CONTRIBUTING.md` (language level rule).
+
+### Fixed
+
+- **`sun.misc.BASE64Encoder` / `BASE64Decoder` replaced with `java.util.Base64`** in
+  both modules (14 files: 13 main sources plus one test class). The internal `sun.misc`
+  classes were never public API, are unavailable on JDK 9+ without `--add-exports`, and
+  produced a warning on every compile. Behaviour notes:
+  - **Encode** now returns a single line. `BASE64Encoder` wrapped at 76 characters with
+    a line break, so previously an encoded photo or token carried embedded CRLFs; the
+    captcha endpoint even shipped them inside a JSON string. Anything that relied on
+    the old wrapping should now strip/ignore whitespace itself.
+  - **Decode** uses `Base64.getMimeDecoder()`, which ignores line breaks and other
+    non-base64 characters — i.e. it still accepts both wrapped (old) and unwrapped
+    (new) input, so existing stored values keep decoding.
+  - Dead declarations were dropped along the way: an unused `encoder` field in
+    `FaceVerifyController`, unused `encoder`/`decoder` statics in `CodeController`, and
+    unused imports in `ArchiveUtil` and `ZXHisIface`. Commented-out legacy snippets
+    were left untouched.
 
 ## [1.0.0] - 2026-10-24
 

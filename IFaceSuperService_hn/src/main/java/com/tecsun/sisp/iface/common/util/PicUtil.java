@@ -1,10 +1,8 @@
 package com.tecsun.sisp.iface.common.util;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 
 import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
@@ -31,8 +29,7 @@ public class PicUtil {
             e.printStackTrace();
         }
 // 对字节数组Base64编码
-        BASE64Encoder encoder = new BASE64Encoder();
-        return encoder.encode(data);// 返回Base64编码过的字节数组字符串
+        return Base64.getEncoder().encodeToString(data);// 返回Base64编码过的字节数组字符串
     }
 
    /**
@@ -44,10 +41,9 @@ public class PicUtil {
    public static boolean base64StrToImage(String imgStr, String path, String idCard) {
      if (imgStr == null)
      return false;
-     BASE64Decoder decoder = new BASE64Decoder();
      try {
        // 解密
-       byte[] b = decoder.decodeBuffer(imgStr);
+       byte[] b = Base64.getMimeDecoder().decode(imgStr);
        // 处理数据
        for (int i = 0; i < b.length; ++i) {
          if (b[i] < 0) {

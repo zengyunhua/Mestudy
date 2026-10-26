@@ -6,8 +6,6 @@ import com.tecsun.sisp.iface.server.outerface.card.CardInfoBus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -71,7 +69,7 @@ public class ZxHisUtil {
         String strXml ="";
         if(StringUtils.isNotEmpty(xml)){
             try {
-                strXml = new String(new BASE64Decoder().decodeBuffer(xml));
+                strXml = new String(Base64.decodeBase64(xml));
                 strXml = new String(strXml.getBytes(),"UTF8");
             } catch (IOException e) {
                 e.printStackTrace();

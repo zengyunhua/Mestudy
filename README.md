@@ -2,7 +2,7 @@
 
 **A reference implementation of a Chinese social-insurance / e-government service platform, built on Spring MVC 4 + MyBatis 3.**
 
-[![Java](https://img.shields.io/badge/Java-7%2B-orange.svg)](#tech-stack)
+[![Java](https://img.shields.io/badge/Java-8%2B-orange.svg)](#tech-stack)
 [![Spring](https://img.shields.io/badge/Spring-4.0.8-6db33f.svg)](#tech-stack)
 [![MyBatis](https://img.shields.io/badge/MyBatis-3.2.4-red.svg)](#tech-stack)
 [![Build](https://img.shields.io/badge/build-Maven-c71a36.svg)](#build-from-source)
@@ -122,7 +122,7 @@ flowchart TB
 
 | Concern | Choice | Notes |
 | --- | --- | --- |
-| Language / runtime | Java 7 source level (1.7) | `maven-compiler-plugin` pins `source`/`target` to 1.7 |
+| Language / runtime | Java 8 (source/target 1.8) | Level is set once in the root POM via `maven.compiler.source`/`target`; modules must not override it |
 | Web framework | Spring MVC 4.0.8.RELEASE | XML configuration, no Spring Boot |
 | Persistence | MyBatis 3.2.4 | Mapper interfaces + XML, `SqlSessionTemplate` |
 | Connection pool | c3p0 (`ComboPooledDataSource`) | One bean per datasource |
@@ -138,8 +138,9 @@ flowchart TB
 
 ### Prerequisites
 
-- JDK 7 or newer (JDK 8 is the practical target; JDK 11+ will need `--add-opens`
-  workarounds for Axis and c3p0)
+- JDK 8 required — it is both the build JDK and the language level. JDK 9+ compiles
+  the sources but warns that source/target 8 is obsolete; JDK 11+ will need `--add-opens`
+  workarounds for Axis and c3p0
 - Maven 3.2+
 - A servlet container (Tomcat 7/8, or WebLogic 12c)
 - Oracle and Redis instances if you want the application to actually start
@@ -161,7 +162,8 @@ mvn -B -pl IFaceSuportService package
 
 The repository root holds an aggregator `pom.xml`, so Maven works from the top of the
 tree. Each module keeps its own coordinates and version — the root POM supplies only
-the module list, the source encoding and the compiler level.
+the module list, the source encoding and the Java 8 compiler level (1.8), which every
+module inherits.
 
 ### Which modules build publicly
 
@@ -291,7 +293,8 @@ reference. It is maintained on a best-effort basis.
 - **Tests**: thin. Four `src/test` entry points with `main()` methods, no assertions.
   CI compiles the buildable modules and runs hygiene checks, but it runs no tests.
 - **Modernisation**: not planned in-place. The intent is to keep the original
-  Spring 4 / XML style intact so the patterns stay readable.
+  Spring 4 / XML style intact so the patterns stay readable. The language level is
+  Java 8 (raised from 7) and that is as far as it goes — no framework upgrade.
 
 ### Known limitations
 
@@ -328,6 +331,7 @@ See [docs/ROADMAP.md](docs/ROADMAP.md). Near-term:
 - [x] Replace non-public dependency coordinates with their Maven Central equivalents
 - [x] Stop tracking `target/` and the real `config.properties` files
 - [x] GitHub Actions: compile the buildable modules on JDK 8, plus repository hygiene checks
+- [x] Raise the language level to Java 8 (source/target 1.8, set once in the root POM)
 - [x] Tag `v1.0.0`
 - [ ] Make the remaining three modules build against public artifacts
 - [ ] Scrub credentials and personal data from the git history

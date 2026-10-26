@@ -14,7 +14,7 @@ start.
 
 | Tool | Version | Check |
 | --- | --- | --- |
-| JDK | 8 (7 works; 11+ needs extra flags) | `java -version` |
+| JDK | 8 (required; 11+ needs extra flags) | `java -version` |
 | Maven | 3.2+ | `mvn -v` |
 | Servlet container | Tomcat 7/8, or WebLogic 12c | — |
 | Oracle | 10g / 11g | `sqlplus -v` |
@@ -24,6 +24,11 @@ start.
 > assume the pre-module classpath. On JDK 11+ you will hit
 > `IllegalAccessError` from Axis reflection. See
 > [TROUBLESHOOTING.md](TROUBLESHOOTING.md#java-11-illegalaccesserror-from-axis).
+>
+> Java 8 is also the **language level**: the root POM sets `maven.compiler.source` and
+> `target` to `1.8`, and all five modules inherit it. Compiling on JDK 9+ works but
+> prints "source value 8 is obsolete" warnings — see
+> [TROUBLESHOOTING.md](TROUBLESHOOTING.md#mvn-warns-that-sourcetarget-18-is-obsolete).
 
 ## 2. Clone
 
