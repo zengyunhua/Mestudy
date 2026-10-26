@@ -151,21 +151,22 @@ flowchart TB
 git clone https://github.com/zengyunhua/Mestudy.git
 cd Mestudy
 
-# Build the default reactor - the three modules whose dependencies are public
+# Build the default reactor - the four modules whose dependencies are public
 mvn -B package
 
 #   IFaceSuportService/target/IFaceSuportService-V1.0.0.150630.war         -> deploy
 #   IFaceSuportService/target/IFaceSuportService-V1.0.0.150630-client.jar  -> client SDK
 #   IFaceSuperService_hn/target/IFaceSuperService_hn-V1.0.0.190107.war
 #   InterfaceFunction/target/InterfaceFunction-V1.0.0.150630.war
+#   NetworkOfficeService/target/NetworkOfficeService-V1.0.0.180612.war
 
-# The two modules that need private jars are opt-in, see the table below
+# The one module that needs private jars is opt-in, see the table below
 mvn -B -Pprivate-deps package
 ```
 
 The repository root holds an aggregator `pom.xml`, so Maven works from the top of the
 tree. Its default `<modules>` list is deliberately short: only the modules that resolve
-from Maven Central. The other two sit behind the `private-deps` profile so a fresh clone
+from Maven Central. The remaining one sits behind the `private-deps` profile so a fresh clone
 always builds green instead of dying on an unresolvable artifact. Each module keeps its
 own coordinates and version — the root POM supplies the module list, the source encoding
 and the Java 8 compiler level (1.8), which every module inherits.
@@ -189,7 +190,8 @@ account name is Chinese — point the temp directory at an ASCII path:
 `-DforkCount=0` also works but loses per-test isolation. See
 [troubleshooting](docs/TROUBLESHOOTING.md).
 This is a **partial** public build, not a claim that all five modules run without the
-private `bee` framework and AA client.
+private `bee` framework: four of the five compile and package from Maven Central, and
+`NetPortalManagement` does not.
 
 ### Which modules build publicly
 
@@ -198,24 +200,30 @@ private `bee` framework and AA client.
 | `IFaceSuportService` | yes | yes | — |
 | `IFaceSuperService_hn` | yes | yes | — |
 | `InterfaceFunction` | yes | yes | — (the private coordinates it declared were unused and are gone) |
-| `NetworkOfficeService` | no | `-Pprivate-deps` | `bee:xx.tool` |
-| `NetPortalManagement` | no | `-Pprivate-deps` | `bee:cloud*`, `bee:xx.tool` |
+| `NetworkOfficeService` | yes | yes | — (one missing entity class was reconstructed) |
+| `NetPortalManagement` | no | `-Pprivate-deps` | `bee:cloud*` |
 
-`InterfaceFunction` used to declare `com.tecsun.sisp_public:aamanagement-client` and
+Two modules needed work to get here, and they needed different things.
+
+`InterfaceFunction` declared `com.tecsun.sisp_public:aamanagement-client` and
 `bee:xx.tool`, but no source file imports them, no `Class.forName` mentions them and the
 module compiles and packages into a war without them — they were dead declarations
-copied from a sibling POM. Removing them is what moved the module into the default
-reactor.
+copied from a sibling POM.
 
-The remaining two depend on the internal `bee` framework, which the code does use:
-`NetPortalManagement`'s beans are annotated with `@TableName` / `@Column` and extend
-`Doe`, and its service layer queries through `Cnd` / `Select`. That is a persistence
-framework, not a stray utility jar — the dependency cannot be deleted without rewriting
-the data-access layer. `NetworkOfficeService` is closer: it compiles without the private
-jars except for one class, `com.tecsun.sisp.net.modules.entity.response.BanjianVo`, which
-is referenced by four files and by `mappings/draftsDAO.xml` but is not in this
-repository. Reconstructing it from the mapper's `select t.*, m.*, o.*` would probably
-close the gap; it has not been done because the original field set cannot be verified.
+`NetworkOfficeService` was a different case: its declared private jars were genuinely
+unused too, but removing them exposed a missing source file. Four classes and
+`mappings/draftsDAO.xml` refer to
+`com.tecsun.sisp.net.modules.entity.response.BanjianVo`, which was never published. It
+has been reconstructed in
+[`BanjianVo.java`](NetworkOfficeService/src/main/java/com/tecsun/sisp/net/modules/entity/response/BanjianVo.java)
+from the columns the mapper proves exist, with the provenance recorded in its Javadoc.
+That is the one place in this repository where the code is not the original: if you have
+the real schema, diff it against your DDL.
+
+`NetPortalManagement` is the genuine hold-out. Its beans are annotated with `@TableName`
+/ `@Column` and extend `Doe`, and its service layer queries through `Cnd` / `Select`.
+That is a persistence framework, not a stray utility jar — the dependency cannot be
+deleted without rewriting the data-access layer.
 
 Everything else — Spring, MyBatis, Axis, Jersey, kaptcha and the Oracle JDBC driver —
 resolves from Maven Central.
@@ -326,9 +334,9 @@ reference. It is maintained on a best-effort basis.
 
 - **Documentation**: in place — this README, a per-module README each, and the seven
   documents under `docs/`.
-- **Build reproducibility**: partial. `IFaceSuportService`, `IFaceSuperService_hn` and
-  `InterfaceFunction` build from Maven Central alone and are tested on every push; the
-  other two need private jars, see below.
+- **Build reproducibility**: four of five. `IFaceSuportService`, `IFaceSuperService_hn`,
+  `InterfaceFunction` and `NetworkOfficeService` build from Maven Central alone and are
+  tested on every push; `NetPortalManagement` needs private jars, see below.
 - **Tests**: limited. CI runs assertion-based unit tests for the interface client
   and request filter, plus `Page` paging behaviour, alongside compilation and
   repository hygiene checks.
@@ -341,10 +349,10 @@ reference. It is maintained on a best-effort basis.
 These are documented on purpose — they are the honest state of the code, and each one
 is a good first contribution.
 
-1. **Two modules need private jars.** `NetworkOfficeService` and `NetPortalManagement`
-   depend on an internal framework (`bee`) that was never published publicly. They are
-   excluded from CI for that reason. The other three build against Maven Central alone.
-   `NetworkOfficeService` is one missing class away — see the build table above.
+1. **One module needs private jars.** `NetPortalManagement` depends on the internal
+   `bee.cloud` persistence framework, which was never published publicly, so it is
+   excluded from CI. The other four build against Maven Central alone — two of them only
+   after dead dependencies were dropped and one missing entity class was reconstructed.
 2. **Credentials are still in the git history.** The `config.properties` / `ds.xml`
    files are no longer tracked (they were replaced by `.example` templates), but they
    remain in every commit before that removal. Treat every credential that ever
@@ -379,7 +387,7 @@ See [docs/ROADMAP.md](docs/ROADMAP.md). Near-term:
 - [x] Raise the language level to Java 8 (source/target 1.8, set once in the root POM)
 - [x] Tag `v1.0.0`
 - [x] Bring `InterfaceFunction` into the default reactor (its private coordinates were unused)
-- [ ] Reconstruct `BanjianVo` so `NetworkOfficeService` builds publicly
+- [x] Reconstruct `BanjianVo` so `NetworkOfficeService` builds publicly
 - [ ] Make `NetPortalManagement` build against public artifacts
 - [ ] Scrub credentials and personal data from the git history
 - [ ] Add JUnit + H2 tests for the `common` layer and one controller per module

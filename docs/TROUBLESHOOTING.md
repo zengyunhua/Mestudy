@@ -16,22 +16,21 @@ do.
 ### Build fails to resolve dependencies
 
 ```
-Could not resolve dependencies for project com.tecsun.sisp:NetworkOfficeService:...
+Could not resolve dependencies for project com.tecsun.sisp:NetPortalManagement:...
 The following artifacts could not be resolved:
-  bee:xx.tool:jar:1.0.0
+  bee:bee.cloud:jar:1.0.4
 ```
 
-**Cause.** The default reactor no longer contains the two modules that need it, so this
-only appears when you opt in with `-Pprivate-deps`. Those modules depend on artifacts
-that were only ever published to an internal Nexus: the `bee` application framework and,
-for `NetPortalManagement`, its `bee.cloud` persistence layer. Nothing in this repository
-can replace them — the code really does call into them, so deleting the `<dependency>`
-block just moves the failure to compile time.
+**Cause.** The default reactor no longer contains the one module that needs it, so this
+only appears when you opt in with `-Pprivate-deps`. `NetPortalManagement` depends on
+`bee.cloud`, the internal persistence framework, which was only ever published to an
+internal Nexus. Nothing in this repository can replace it — the code really does call
+into it, so deleting the `<dependency>` block just moves the failure to compile time.
 
 **Fix.** Pick one:
 
-1. **Do nothing.** The default reactor already excludes those two modules, so
-   `mvn package` at the root builds and passes. This is what CI does.
+1. **Do nothing.** The default reactor already excludes that module, so `mvn package`
+   at the root builds and passes. This is what CI does.
 2. Install the jars you already have into your local repository, then build with the
    profile:
 
@@ -42,19 +41,20 @@ block just moves the failure to compile time.
    mvn -B -Pprivate-deps package
    ```
 
-   Repeat for `bee:xx.tool` (1.0.0 and 1.0.1), `bee:bee.cloud.service`,
-   `bee:bee.cloud.impl` and `bee:bee.cloud.entity`.
+   Repeat for `bee:bee.cloud.service`, `bee:bee.cloud.impl` and `bee:bee.cloud.entity`.
 3. If nothing in the sources references the artifact, delete the `<dependency>` block.
    That is how `unieap-dataexchange-client` was removed, and how
    `com.tecsun.sisp_public:aamanagement-client` and `bee:xx.tool` were removed from
-   `InterfaceFunction` — that module imports neither, and it now builds in the default
-   reactor. Check before deleting: `NetPortalManagement` really does use `bee.cloud`
-   (`@TableName`, `@Column`, `Doe`, `Cnd`, `Select`).
+   `InterfaceFunction` and `NetworkOfficeService` — neither module imports them, and both
+   now build in the default reactor. Check before deleting: `NetPortalManagement` really
+   does use `bee.cloud` (`@TableName`, `@Column`, `Doe`, `Cnd`, `Select`).
 
-> **One class is still missing.** `NetworkOfficeService` compiles without the private
-> jars except for `com.tecsun.sisp.net.modules.entity.response.BanjianVo`, referenced by
-> four files and by `mappings/draftsDAO.xml` but absent from the repository. Rebuilding
-> it from the mapper's `select t.*, m.*, o.*` is an open roadmap item.
+> **A missing class is not a missing jar.** Removing the unused coordinates from
+> `NetworkOfficeService` exposed `BanjianVo`, which four classes and
+> `mappings/draftsDAO.xml` refer to but which was never published. Deleting a
+> `<dependency>` does not remove a symbol the source uses — it only reveals it. That
+> class has since been reconstructed from the columns the mapper proves exist; see its
+> Javadoc for the provenance before trusting the JSON payload.
 
 > **Historical note.** Earlier revisions of this repository hard-coded the Nexus URLs
 > (`192.168.1.8:8686`, `11.11.11.8:8686`) directly in every POM, which made a public

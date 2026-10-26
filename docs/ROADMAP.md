@@ -27,12 +27,15 @@ cloned and built. Everything else is secondary.
 ## Phase 2 — Make it build
 
 - [x] Audit every dependency against Maven Central; list the ones that are proprietary
-- [~] Replace proprietary artifacts with public equivalents where a behavioural match
+- [x] Replace proprietary artifacts with public equivalents where a behavioural match
       exists (e.g. swap internal utility jars for Guava/Commons) — `InterfaceFunction`
-      needed none of its two private coordinates, so it now builds publicly
+      and `NetworkOfficeService` needed none of their private coordinates, so both now
+      build publicly
 - [x] Stub the remainder behind an optional Maven profile so `mvn package` succeeds
-      without the internal Nexus (`-Pprivate-deps` opts the remaining two back in)
-- [ ] Reconstruct `BanjianVo` so `NetworkOfficeService` leaves the profile too
+      without the internal Nexus (`-Pprivate-deps` opts the remaining one back in)
+- [x] Reconstruct `BanjianVo` so `NetworkOfficeService` leaves the profile too
+- [ ] Diff the reconstructed `BanjianVo` against a real `t_drafts` /
+      `T_ITEM_MESSAGE` / `t_office_detailed` schema and correct any drift
 - [ ] Replace `NetPortalManagement`'s `bee.cloud` persistence layer, or accept that it
       stays out of the default reactor
 - [~] Root POM is the aggregator and parent with shared encoding/compiler settings;

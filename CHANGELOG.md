@@ -18,17 +18,24 @@ grouped by scope rather than by a single release number.
   in the module references either: there is no import of `com.tecsun.sisp_public` or
   `bee.*`, no `Class.forName`, and no matching string in the resources. Removing the two
   declarations lets the module compile and package into a war against Maven Central
-  alone, so `mvn -B package` now builds three modules instead of two. The declarations
-  were dead weight copied from a sibling POM, not a real dependency. This also narrows
-  the `private-deps` profile to `NetworkOfficeService` and `NetPortalManagement`.
-- **What is left, precisely.** `NetPortalManagement` genuinely needs the `bee.cloud`
-  persistence framework — its beans carry `@TableName` / `@Column`, extend `Doe`, and its
-  service layer queries through `Cnd` / `Select` — so it stays behind the profile.
-  `NetworkOfficeService` compiles without any private jar except for one class,
-  `com.tecsun.sisp.net.modules.entity.response.BanjianVo`, which four files and
-  `mappings/draftsDAO.xml` reference but which is not in this repository. Reconstructing
-  it from the mapper's `select t.*, m.*, o.*` would close that gap; it is left as a
-  roadmap item because the original field set cannot be verified.
+  alone. The declarations were dead weight copied from a sibling POM, not a real
+  dependency.
+- **`NetworkOfficeService` moved into the default reactor too, via a reconstructed
+  class.** Its declared private coordinates were equally unused, but removing them
+  exposed something different: four classes and `mappings/draftsDAO.xml` refer to
+  `com.tecsun.sisp.net.modules.entity.response.BanjianVo`, which was never published
+  with the rest of the module. Deleting a `<dependency>` does not remove a symbol the
+  source uses, it only reveals it. `BanjianVo` has been rebuilt with 43 properties
+  derived from evidence rather than guesswork — the sibling query `queryByOfficeStatus`
+  maps the same three tables into `DraftsVo`, and the remaining columns are proven to
+  exist by other statements in the same mapper. The provenance and the residual risk are
+  recorded in the class Javadoc. This is the one place in the repository where the code
+  is not the original.
+- **What is left, precisely.** `NetPortalManagement` is the only hold-out and it is a
+  real one: its beans carry `@TableName` / `@Column` and extend `Doe`, and its service
+  layer queries through `Cnd` / `Select`, so it needs the `bee.cloud` persistence
+  framework and stays behind the profile. `mvn -B package` now builds four modules and
+  runs the test suite green.
 - **The default reactor is now the publicly buildable modules.** `mvn package` at the
   repository root used to walk into `NetworkOfficeService` third and fail on
   `com.tecsun.sisp_public:aamanagement-client:1.0.5` / `bee:xx.tool:1.0.0`, which meant a

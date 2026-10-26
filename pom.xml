@@ -10,10 +10,10 @@
       * JDK 8 - both the build JDK and the language level (source/target 1.8).
         JDK 9+ builds will warn about the bootstrap classpath; JDK 11+ breaks
         Axis 1.x at runtime. See docs/TROUBLESHOOTING.md.
-      * two modules need private bee / AA client artifacts. They are excluded
-        from the default reactor; add them with -Pprivate-deps once those jars
-        are in your local repository. See docs/GETTING_STARTED.md and
-        docs/TROUBLESHOOTING.md.
+      * one module, NetPortalManagement, needs the private "bee.cloud"
+        persistence framework. It is excluded from the default reactor; add it
+        with -Pprivate-deps once those jars are in your local repository. See
+        docs/GETTING_STARTED.md and docs/TROUBLESHOOTING.md.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -41,27 +41,26 @@
     </licenses>
 
     <!-- Modules whose dependencies are all on Maven Central. `mvn package` at the
-         root builds exactly these three, so a fresh clone gets a green build.
+         root builds exactly these four, so a fresh clone gets a green build.
 
-         The other two - NetworkOfficeService and NetPortalManagement - need the
-         private "bee" framework and an internal AA client. They are kept in the
-         tree as reference material but are excluded from the default reactor,
-         because a build that dies on unresolvable artifacts is worse than an
-         explicit opt-in. Add them back with -Pprivate-deps once those jars are in
-         your local repository. -->
+         The remaining one - NetPortalManagement - needs the private "bee.cloud"
+         persistence framework. It is kept in the tree as reference material but is
+         excluded from the default reactor, because a build that dies on an
+         unresolvable artifact is worse than an explicit opt-in. Add it back with
+         -Pprivate-deps once those jars are in your local repository. -->
     <modules>
         <module>IFaceSuportService</module>
         <module>IFaceSuperService_hn</module>
         <module>InterfaceFunction</module>
+        <module>NetworkOfficeService</module>
     </modules>
 
     <profiles>
-        <!-- Opt-in: the two modules that need artifacts you have to supply
-             yourself. See docs/TROUBLESHOOTING.md#build-fails-to-resolve-dependencies. -->
+        <!-- Opt-in: the module that needs artifacts you have to supply yourself.
+             See docs/TROUBLESHOOTING.md#build-fails-to-resolve-dependencies. -->
         <profile>
             <id>private-deps</id>
             <modules>
-                <module>NetworkOfficeService</module>
                 <module>NetPortalManagement</module>
             </modules>
         </profile>

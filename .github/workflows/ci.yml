@@ -13,10 +13,9 @@ permissions:
 jobs:
   # ---------------------------------------------------------------------------
   # Build the default reactor: the modules whose dependencies are all on Maven
-  # Central. NetworkOfficeService and NetPortalManagement depend on the private
-  # "bee" framework, which is not published anywhere public, so they sit behind
-  # the -Pprivate-deps profile and are not built here. See
-  # docs/TROUBLESHOOTING.md.
+  # Central. NetPortalManagement depends on the private "bee.cloud" persistence
+  # framework, which is not published anywhere public, so it sits behind the
+  # -Pprivate-deps profile and is not built here. See docs/TROUBLESHOOTING.md.
   # ---------------------------------------------------------------------------
   build:
     name: Test and package (JDK 8)

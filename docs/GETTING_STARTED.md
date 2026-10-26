@@ -74,8 +74,8 @@ unresolvable placeholder. The full key list is in
 
 ## 4. Build
 
-From the repository root. The default reactor is the three modules that resolve from
-Maven Central; the other two are opt-in:
+From the repository root. The default reactor is the four modules that resolve from
+Maven Central; the remaining one is opt-in:
 
 ```bash
 # Build everything in the default reactor, tests included
@@ -84,7 +84,7 @@ mvn -B package
 # Tests only, no database and no deployed service
 mvn -B test
 
-# The two modules that need private jars (see the table below)
+# The one module that needs private jars (see the table below)
 mvn -B -Pprivate-deps package
 ```
 
@@ -95,6 +95,7 @@ IFaceSuportService/target/IFaceSuportService-V1.0.0.150630.war
 IFaceSuportService/target/IFaceSuportService-V1.0.0.150630-client.jar
 IFaceSuperService_hn/target/IFaceSuperService_hn-V1.0.0.190107.war
 InterfaceFunction/target/InterfaceFunction-V1.0.0.150630.war
+NetworkOfficeService/target/NetworkOfficeService-V1.0.0.180612.war
 ```
 
 The `-client` jar is produced by the `maven-jar-plugin` execution with
@@ -108,19 +109,23 @@ the artefact a downstream terminal embeds.
 | `IFaceSuportService` | yes | default | — |
 | `IFaceSuperService_hn` | yes | default | — |
 | `InterfaceFunction` | yes | default | — |
-| `NetworkOfficeService` | no | `-Pprivate-deps` | `bee:xx.tool`, and one class not in the repo |
-| `NetPortalManagement` | no | `-Pprivate-deps` | `bee:xx.tool`, `bee:cloud*` |
+| `NetworkOfficeService` | yes | default | — |
+| `NetPortalManagement` | no | `-Pprivate-deps` | `bee:cloud*` |
 
-The two blocked modules are kept out of the default reactor on purpose: a build that
-stops on an unresolvable artifact teaches a newcomer nothing. Their dependencies are
-genuinely referenced by the code, so they cannot simply be deleted — install the jars
-into your local repository first, then build with the profile.
+`NetPortalManagement` is kept out of the default reactor on purpose: a build that stops
+on an unresolvable artifact teaches a newcomer nothing. Its dependency is genuinely
+referenced by the code, so it cannot simply be deleted — install the jars into your local
+repository first, then build with the profile.
 
-`InterfaceFunction` was in that group until its two private coordinates turned out to be
-unused: nothing imports `com.tecsun.sisp_public` or `bee.*`, and the module packages into
-a war without them. They are gone, so the module builds publicly now. The one remaining
-gap in `NetworkOfficeService` is a single missing entity class, not a framework —
-`BanjianVo` — which is tracked in [ROADMAP.md](ROADMAP.md).
+Two modules moved into the default reactor during this work, for different reasons.
+`InterfaceFunction` declared two private coordinates that nothing used: no import of
+`com.tecsun.sisp_public` or `bee.*`, no `Class.forName`, no string in the resources.
+`NetworkOfficeService` had the same dead declarations, but removing them exposed a source
+file that was never published — `BanjianVo`, referenced by four classes and by
+`mappings/draftsDAO.xml`. It has been reconstructed from the columns the mapper proves
+exist; the provenance is in the class Javadoc, and it is the one place in this repository
+where the code is not the original. If you have the real schema, diff it against your
+DDL before trusting the JSON payload.
 
 ### Using a Maven mirror
 
