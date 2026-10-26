@@ -47,6 +47,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check tracked sources for sensitive values
+        run: python3 scripts/check_sensitive.py
+
       - name: No build output is tracked
         run: |
           if git ls-files | grep -E '(^|/)target/'; then

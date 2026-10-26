@@ -67,6 +67,10 @@ hs_err_pid*.log
 *.sqlite
 *.mdb
 
+# --- Python tooling ---------------------------------------------------------
+__pycache__/
+*.py[cod]
+
 # --- Tooling / local agent workspace ---------------------------------------
 # Local notes and caches; never part of the published repository.
 .workbuddy-ai/
