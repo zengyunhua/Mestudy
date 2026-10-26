@@ -33,17 +33,16 @@ documented deliberately so nobody mistakes this code for production-ready.
 
 ### 1. Credentials committed to the repository
 
-Twenty-one files that were once tracked carried real values: `config.properties` under
-`src/main/resources` in every module that existed at the time (plus copies under
-`target/`), and `NetPortalManagement/src/main/resources/ds.xml`. Eleven commits in the
-history still contain them.
+Historical revisions contain credential-shaped, non-placeholder values in files such as
+`config.properties` under `src/main/resources` (and historical `target/` copies),
+and `NetPortalManagement/src/main/resources/ds.xml`. Their use with real services is unverified.
 
-An audit of those files found the following classes of secret. Only key names are listed
-— the values are in the history and must be assumed public:
+An audit found the following potentially sensitive categories. Only key names are
+listed; the historical values are public but their operational status is unknown:
 
 | Category | Keys | Why it matters |
 | --- | --- | --- |
-| Payment channel key pair | `zfb.app_private_key` (~1.6 KB), `zfb.alipay_public_key` | An RSA **private key**, not a password. This is the most serious item in the list: it is a signing identity, so requests signed with it look legitimate. Revoking the account password does not revoke the key — the key pair has to be rotated at the channel. |
+| Payment channel key pair | `zfb.app_private_key` (~1.6 KB), `zfb.alipay_public_key` | An RSA private-key-shaped value. If it was provisioned, revoke/rotate it at the channel; an account password change does not revoke a signing key. |
 | WeChat | `wx.api.key` (32 chars) | Merchant API key |
 | Speech / OCR vendors | `sinovoice.asr.appkey`, `sinovoice.asr.devkey`, `sinovoice.csr.appkey`, `ocr.url` | Third-party API credentials |
 | Databases | `jdbc.*.user` / `jdbc.*.password`, `ds.xml` | Oracle accounts for the `sisp`, `sisp_public` and business schemas |
@@ -54,28 +53,25 @@ An audit of those files found the following classes of secret. Only key names ar
 | Signing material | `rzy.privatekey_path`, `rzy.publickey_path` | Paths to a key pair. The key itself is not in the tree, but the paths name where it lives. |
 | Internal topology | ~18 `bank.*.ip` keys, `tecsun_verify_ip`, and about 20 `*_url` keys | Bank and provincial-gateway endpoints, with ports |
 
-**Rotate in the order listed.** The payment key pair comes first because it is the only
-item that impersonates the deployment to a third party; a database password that was
-public for two years is bad, a signing key that was public for two years is worse,
-because nothing about a signed request looks wrong.
+**If any values were ever provisioned to real services, rotate or revoke them.** Prioritize any payment signing key that was actually provisioned: a valid signature can impersonate a deployment even after an account password change.
 
 **Status.** The working tree now ships `config.properties.example` /
 `ds.xml.example` with `CHANGE_ME` placeholders, and `.gitignore` excludes the real files.
 
-**This does not fix the exposure.** The values remain in git history. If you cloned this
-repository, treat every credential in its history as compromised.
+**This does not erase history.** The owner states these values were synthetic. Record provenance or non-provisioning evidence for that assertion; revoke or rotate any value that was actually live.
 
 **Owner action still required.** Removal from the current tree is verified, but
-credential revocation/rotation and historical cleanup have not been verified.
+the origin and usage of each historical value, any required credential rotation, and historical cleanup have not been verified.
 Do not treat this repository as cleared merely because the current checkout has
 placeholders. Do not paste historical secrets into issues, logs or pull requests.
 
 **If you are the repository owner, coordinate the following before claiming remediation:**
 
-1. **Rotate every credential that ever appeared in the tree.** This is the only step that
-   actually matters — history rewriting does not un-leak a password that has been
-   public.
-2. Remove the files from history. With `git-filter-repo`:
+1. **Classify each historical value with its owner.** If it was a synthetic fixture never provisioned to any service, record the provenance. If it was ever provisioned, revoke or rotate it with the provider. History rewriting does not revoke a live credential.
+2. **Decide whether to remove historical files.** If any were real, or if their
+   provenance cannot be established, plan a coordinated history cleanup. This rewrites
+   commit IDs, tags and forks and requires owner approval. For example, with
+   `git-filter-repo` in a fresh mirror clone (do not run in the active checkout):
 
    ```bash
    git filter-repo --path-glob '*/src/main/resources/config.properties' \
@@ -95,24 +91,22 @@ placeholders. Do not paste historical secrets into issues, logs or pull requests
    changes commit IDs and does not revoke already-copied credentials. Ask affected
    clones/forks to re-clone, and review tags, release artifacts and cached copies.
 4. Add a `.gitignore` rule (already present) so it cannot recur.
-5. Consider a secret-scanning hook (`gitleaks`, `trufflehog`) in CI.
+5. Run `python3 scripts/check_sensitive.py` locally; the CI hygiene job runs it too.
+   This heuristic scans tracked sources and templates, not historical commits or
+   remote provider state. Consider dedicated secret scanning as defense in depth.
 
-### 2. Personal identity numbers in the history
+### 2. Identity-number-shaped values in the history
 
-The history also contains **57 distinct values matching the 18-digit PRC resident ID
-pattern**, outside the `110101199001010015` placeholder that the sources now use. Some
-may be synthetic test data, but nothing in the repository distinguishes them from real
-ones, so treat them as real.
+The history also contains values matching the 18-digit PRC resident ID
+pattern, outside the `110101199001010015` placeholder that the sources now use. The owner states that the data is synthetic, but the repository does not independently establish provenance for every value. Do not publish the values while verifying them.
 
 The current tree is clean — the CI `hygiene` job fails the build if an ID number outside
 the placeholder appears in a `.java`, `.xml`, `.properties` or `.txt` file. The exposure
 is historical only.
 
-**Why this is a separate item from §1.** A credential is something you rotate. Personal
-data cannot be rotated: once an ID number has been in a public repository, it is out.
-For a system derived from Chinese social-insurance services this falls under the Personal
-Information Protection Law, and the obligation is to minimise and to stop further
-processing, not merely to change a password.
+**Why this is a separate item from §1.** Unlike credentials, genuine personal
+identifiers cannot be rotated. Whether the historical values identify real people
+requires provenance verification; this repository audit does not establish that fact.
 
 **Owner action.** Decide deliberately whether the history should be rewritten (see §1
 step 2) knowing that rewriting does not retract anything already cloned, and record that
