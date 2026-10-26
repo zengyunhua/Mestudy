@@ -81,16 +81,24 @@ public class PolicyApplication extends NetSuperApplication {
         }
     }
 
+    private static String requiredEnvironment(String key) {
+        String value = System.getenv(key);
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalStateException("Missing required environment variable: " + key);
+        }
+        return value;
+    }
+
     @POST
     @Path("/savePolicy/{userId}/{appId}")
     public String savePolicy(@PathParam("userId") String userId, @PathParam("appId") String appId, @FormParam("id") int id,@FormParam("district") String district, @FormParam("title") String title, @FormParam("context") String context, @FormParam("fileNo") String fileNo,@FormParam("type") String type,@FormParam("publishDate") String publishDate) throws SQLException {
     	PreparedStatement ps = null;
     	Connection conn = null;
     	try{
-    	String url = "jdbc:oracle:thin:@10.132.1.71:1521:orcl";
+            String url = requiredEnvironment("NPM_JDBC_URL");
 			Class.forName("oracle.jdbc.driver.OracleDriver").newInstance();
-			String user="sisp";
-			String pwd="sisp";
+			String user = requiredEnvironment("NPM_JDBC_USERNAME");
+			String pwd = requiredEnvironment("NPM_JDBC_PASSWORD");
 			conn = DriverManager.getConnection(url,user, pwd); //建立连接
 			Statement s = conn.createStatement(); 
 			String saveUrl = request.getContextPath() + "/imgupload/";

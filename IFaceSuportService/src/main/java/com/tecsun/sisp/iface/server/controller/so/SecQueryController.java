@@ -1855,7 +1855,7 @@ public class SecQueryController extends BaseController {
     public String getSignGrbh(String aac003,String aac002) throws Exception {
         String inputData=getXmlGrbh(aac003, aac002);
         String busi_name=Constants.HBNBusername;
-        String busi_pwd=Constants.HBNBpassword;
+        String busi_pwd=Constants.HBNBpassword();
         String sign=  bytes2Hex(AESUtil.md5(URLEncoder.encode(inputData, "utf-8") + time + busi_name + busi_pwd));
         String url="?busi_name=" + busi_name + "&timestamp="+ time +"&sign=" + sign;
         return  url;
@@ -1882,7 +1882,7 @@ public class SecQueryController extends BaseController {
                 "<datetime>" + dateNowStr + "</datetime>" +
                 "<operatorName>si_enterprise</operatorName>" +
                 "<reciver>"+ Constants.HBNBusername +"</reciver>" +
-                "<sender>"+ Constants.HBNBpassword +"</sender>" +
+                "<sender>"+ Constants.HBNBpassword() +"</sender>" +
                 "<ver>1.0</ver>" +
                 "</head>" +
                 "<body>" +
@@ -1928,7 +1928,7 @@ public class SecQueryController extends BaseController {
     public String getSign(String method,long personId) throws UnsupportedEncodingException {
         String inputData=getXml(method,personId);
         String busi_name =Constants.HBNBusername;
-        String busi_pwd=Constants.HBNBpassword;
+        String busi_pwd=Constants.HBNBpassword();
         String sign=BaseController.MD5(URLEncoder.encode(inputData, "utf-8") + time + busi_name + busi_pwd);
         String url="?busi_name=" + busi_name + "&timestamp="+ time +"&sign=" + sign;
         return  url;
@@ -1943,7 +1943,7 @@ public class SecQueryController extends BaseController {
                 "<datetime>" + dateNowStr + "</datetime>" +
                 "<operatorName>si_enterprise</operatorName>" +
                 "<reciver>"+ Constants.HBNBusername +"</reciver>" +
-                "<sender>"+ Constants.HBNBpassword +"</sender>" +
+                "<sender>"+ Constants.HBNBpassword() +"</sender>" +
                 "<ver>1.0</ver>" +
                 "</head>" +
                 "<body>" +

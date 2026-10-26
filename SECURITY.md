@@ -58,7 +58,9 @@ listed; the historical values are public but their operational status is unknown
 **Status.** The working tree now ships `config.properties.example` /
 `ds.xml.example` with `CHANGE_ME` placeholders, and `.gitignore` excludes the real files.
 
-**This does not erase history.** The owner states these values were synthetic. Record provenance or non-provisioning evidence for that assertion; revoke or rotate any value that was actually live.
+**This does not erase history.** The owner states these values were synthetic. Record provenance or non-provisioning
+evidence for that assertion; revoke or rotate any value that was actually live.
+Track the non-sensitive review evidence in [the security review](docs/SECURITY_REVIEW.md).
 
 **Owner action still required.** Removal from the current tree is verified, but
 the origin and usage of each historical value, any required credential rotation, and historical cleanup have not been verified.
@@ -129,6 +131,7 @@ responses separately; do not mistake authorization for XSS prevention.
 uses the JVM default trust store and strict hostname verification. Deployments
 with a private CA must import it into the JVM trust store; do not disable
 certificate or hostname verification to work around trust errors.
+
 ### 5. MD5 password hashing
 
 `NetPortalManagement/src/main/java/com/tecsun/sisp/npm/util/MD5Generator.java` hashes

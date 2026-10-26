@@ -736,7 +736,17 @@ public class Constants {
     // DataExchange服务登录用户名，默认为admin
     public static final String HBNBusername ="xgscx";
     // DataExchange服务登录用户名，默认为1
-    public static final String HBNBpassword ="xgscx";
+    private static String requiredEnvironment(String key) {
+        String value = System.getenv(key);
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalStateException("Missing required environment variable: " + key);
+        }
+        return value;
+    }
+
+    public static String HBNBpassword() {
+        return requiredEnvironment("HBNB_SERVICE_PASSWORD");
+    }
 
     public static final String HBNBJBXXtaskOId ="GGYWDW_HBCXJB_002";//省农保-个人基本参保信息查询
     public static final String HBNBBGXXtaskOId ="GGYWDW_HBCXJB_003";// 省农保-变更信息查询
@@ -753,7 +763,9 @@ public class Constants {
     // DataExchange服务登录用户名，默认为admin
     public static final String SNBusername ="admin";
     // DataExchange服务登录用户名，默认为1
-    public static final String SNBpassword ="123456";
+    public static String SNBpassword() {
+        return requiredEnvironment("SNB_SERVICE_PASSWORD");
+    }
     // 任务OID，定义的数据查询任务业务标识，可以到“任务”页面查看
     public static final String SNBJBXXtaskOId ="QUERY_JBXX_FROM_DB";//省农保-个人基本参保信息查询
     public static final String SNBBGXXtaskOId ="QUERY_BGXX_FROM_DB";// 省农保-变更信息查询

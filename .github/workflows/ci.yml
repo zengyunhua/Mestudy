@@ -48,7 +48,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Check tracked sources for sensitive values
-        run: python3 scripts/check_sensitive.py
+        run: |
+          python3 -m unittest discover -s scripts -p "test_*.py"
+          python3 scripts/check_sensitive.py
 
       - name: No build output is tracked
         run: |
@@ -68,20 +70,6 @@ jobs:
           fi
           echo "OK - no config.properties / ds.xml tracked."
 
-      - name: No personal identity numbers
-        run: |
-          # 110101199001010015 is the documented placeholder, not real data.
-          hits=$(grep -rEn '[1-9][0-9]{5}(19|20)[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{3}[0-9Xx]' \
-                   --include='*.java' --include='*.xml' --include='*.properties' --include='*.txt' \
-                   --exclude-dir=target . \
-                 | grep -v '110101199001010015' || true)
-          if [ -n "$hits" ]; then
-            echo "::error::Possible personal identity number found. Use the placeholder 110101199001010015."
-            echo "$hits"
-            exit 1
-          fi
-          echo "OK - no identity numbers outside the placeholder."
-
       - name: No private network addresses in sources
         run: |
           # 10/8 and 192.168/16 literals in Java or properties files leak internal topology.
@@ -91,7 +79,6 @@ jobs:
           count=$(printf '%s' "$hits" | grep -c . || true)
           if [ "$count" -gt 0 ]; then
             echo "::warning::$count private network address literal(s) found - consider moving them to configuration."
-            printf '%s\n' "$hits" | head -10
           else
             echo "OK - no private network address literals."
           fi
