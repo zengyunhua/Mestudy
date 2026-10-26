@@ -84,6 +84,51 @@ which is equally harmless for this stack.
 Do not re-declare `maven-compiler-plugin` in a module POM. The level lives in one place
 so the five modules cannot drift apart.
 
+### `mvn test` fails with `Connection refused`
+
+```
+com.sun.jersey.api.client.ClientHandlerException: java.net.ConnectException: Connection refused: connect
+	at CsspControllerTest.registerTest(CsspControllerTest.java:61)
+```
+
+**Cause.** `CsspControllerTest` and `job/JobQueryControllerTest` are not unit tests — they
+POST to a deployed instance at `http://127.0.0.1:8081/IFaceSuportService/iface/...`. With
+nothing listening they fail on the first request, all 26 of them.
+
+**Fix.** Nothing to fix: both are excluded from the default surefire run in
+`IFaceSuportService/pom.xml`, so `mvn test` stays green without a server. To run them on
+purpose, deploy the war first, then override the filter:
+
+```bash
+mvn -pl IFaceSuportService test -Dtest=CsspControllerTest,JobQueryControllerTest
+```
+
+`-Dtest` overrides the `excludes` block. If you add a test that needs a live server,
+add it to that list rather than leaving the default build red.
+
+### surefire: `The forked VM terminated without properly saying goodbye` (Windows)
+
+```
+[ERROR] The forked VM terminated without properly saying goodbye. VM crash or System.exit called?
+[ERROR] Error occurred in starting fork, check output in log
+```
+
+**Cause.** Surefire forks a JVM through `cmd.exe` and passes the booter jar path from
+`java.io.tmpdir`. If `%TEMP%` contains non-ASCII characters — which it does for any Windows
+account with a Chinese user name, because the profile directory is used verbatim — the path
+is mangled on the way through the console code page and the fork cannot start. Tests run: 0,
+build fails, and no test report is written.
+
+**Fix.** Point the temp directory at an ASCII path:
+
+```bash
+mvn -Djava.io.tmpdir=D:\mvn-tmp -pl IFaceSuportService test
+```
+
+Creating `D:\mvn-tmp` first is enough. Alternatively add `-DforkCount=0` to run the tests
+inside the Maven JVM; that works but loses per-test isolation. Linux and macOS are
+unaffected, so CI never sees this.
+
 ### Java 11+ `IllegalAccessError` from Axis
 
 ```
