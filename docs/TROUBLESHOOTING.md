@@ -18,14 +18,28 @@ do.
 ```
 Could not resolve dependencies for project com.tecsun.sisp:NetPortalManagement:...
 The following artifacts could not be resolved:
-  bee:bee.cloud:jar:1.0.4
+  bee:bee.cloud:jar:1.0.4, bee:bee.cloud.service:jar:1.0.4,
+  bee:bee.cloud.impl:jar:1.0.0, bee:bee.cloud.entity:jar:1.0.0,
+  bee:xx.tool:jar:1.0.1, com.tecsun.sisp_public:aamanagement-client:jar:1.0.5
 ```
 
-**Cause.** The default reactor no longer contains the one module that needs it, so this
+**Cause.** The default reactor no longer contains the one module that needs them, so this
 only appears when you opt in with `-Pprivate-deps`. `NetPortalManagement` depends on
 `bee.cloud`, the internal persistence framework, which was only ever published to an
 internal Nexus. Nothing in this repository can replace it — the code really does call
 into it, so deleting the `<dependency>` block just moves the failure to compile time.
+
+> **A dependency can be used without a single `import`.** This is the trap that makes
+> these artifacts look dead. `com.tecsun.sisp_public:aamanagement-client` is never
+> imported by a Java file in `NetPortalManagement`, yet the module cannot start without
+> it: `src/main/webapp/WEB-INF/web.xml` names
+> `com.tecsun.sisp_public.aam.client.AAMClient4Jersey` as an active Jersey filter, and
+> the container resolves that class by string. `bee.cloud.service` is referenced the same
+> way through `bee.cloud.service.listener.StartupListener`. Before deleting a
+> `<dependency>`, grep the resources as well as the sources — and check whether the
+> `web.xml` block that mentions it is actually commented out. In `InterfaceFunction` and
+> `NetworkOfficeService` the equivalent filter *is* inside `<!-- -->`, which is the real
+> reason those two could drop the declaration.
 
 **Fix.** Pick one:
 

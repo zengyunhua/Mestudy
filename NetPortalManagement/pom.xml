@@ -81,6 +81,62 @@
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.9.13</version>
         </dependency>
+
+        <!-- Private artifacts. This module cannot be built or run without them,
+             and none of them is on Maven Central, so it sits behind the
+             -Pprivate-deps profile. Install them into your local repository
+             first; see docs/TROUBLESHOOTING.md.
+
+             These three are required at compile time - the source imports them
+             directly:
+               bee.cloud          bee.cloud.engine.db.{DataType,Doe,core.Cnd,
+                                  core.Table,siud.Select,annotation.*,cnd.CndFactory}
+               bee.cloud.service  bee.cloud.service.app.SuperApplication, plus
+                                  listener.StartupListener and service.rest, both
+                                  named in src/main/webapp/WEB-INF/web.xml
+               bee:xx.tool        com.xx.util.property.Config (util/LogUtil.java,
+                                  service/NetUserInfoApplication.java)
+
+             These three are not referenced by name anywhere in the module, but
+             they belong to the same framework and are declared because the
+             engine resolves its implementations reflectively at runtime -
+             CndFactory above is the seam. Dropping them would compile and then
+             fail on the first query:
+               bee.cloud.impl, bee.cloud.entity
+               com.tecsun.sisp_public:aamanagement-client - provides
+                 com.tecsun.sisp_public.aam.client.AAMClient4Jersey, the active
+                 Jersey filter in web.xml. No Java file imports it, which is
+                 exactly why it is easy to delete by mistake. -->
+        <dependency>
+            <groupId>bee</groupId>
+            <artifactId>bee.cloud</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>bee</groupId>
+            <artifactId>bee.cloud.service</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>bee</groupId>
+            <artifactId>bee.cloud.impl</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>bee</groupId>
+            <artifactId>bee.cloud.entity</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>bee</groupId>
+            <artifactId>xx.tool</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tecsun.sisp_public</groupId>
+            <artifactId>aamanagement-client</artifactId>
+            <version>1.0.5</version>
+        </dependency>
 	</dependencies>
 
 	<properties>

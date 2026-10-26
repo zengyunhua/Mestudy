@@ -206,12 +206,13 @@ private `bee` framework: four of the five compile and package from Maven Central
 Two modules needed work to get here, and they needed different things.
 
 `InterfaceFunction` declared `com.tecsun.sisp_public:aamanagement-client` and
-`bee:xx.tool`, but no source file imports them, no `Class.forName` mentions them and the
-module compiles and packages into a war without them — they were dead declarations
-copied from a sibling POM.
+`bee:xx.tool`. No source file imports either, no `Class.forName` mentions them, and the
+one `web.xml` reference to the AA client sits inside a commented-out `<filter>` block —
+so they were dead declarations copied from a sibling POM. `NetworkOfficeService` was the
+same.
 
-`NetworkOfficeService` was a different case: its declared private jars were genuinely
-unused too, but removing them exposed a missing source file. Four classes and
+`NetworkOfficeService` needed a second fix on top of that: removing the declarations
+exposed a missing source file. Four classes and
 `mappings/draftsDAO.xml` refer to
 `com.tecsun.sisp.net.modules.entity.response.BanjianVo`, which was never published. It
 has been reconstructed in

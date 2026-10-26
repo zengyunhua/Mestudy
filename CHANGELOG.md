@@ -63,6 +63,23 @@ grouped by scope rather than by a single release number.
 
 ### Fixed
 
+- **`NetPortalManagement`'s dependencies are declared again.** They had been deleted
+  outright while the module was being brought into line with the others, which left it in
+  a worse state than before: previously it failed to resolve, and the fix was to install
+  the jars; with the declarations gone it failed to compile even with the jars present,
+  and there was no way back. The six coordinates are back in the POM with a comment
+  recording why each one exists, and `-Pprivate-deps` now fails at dependency resolution
+  again — the honest, documented failure mode.
+- **A dependency can be used without a single `import`.** Worth recording because it is
+  what makes these artifacts look dead. `com.tecsun.sisp_public:aamanagement-client` is
+  never imported by a Java file in `NetPortalManagement`, but
+  `src/main/webapp/WEB-INF/web.xml` names
+  `com.tecsun.sisp_public.aam.client.AAMClient4Jersey` as an active Jersey filter and the
+  container resolves that class by string; `bee.cloud.service` is named the same way
+  through `bee.cloud.service.listener.StartupListener`. The reverse is why
+  `InterfaceFunction` and `NetworkOfficeService` could legitimately drop the same
+  declaration: their equivalent filter is inside `<!-- -->`. Grep resources, not just
+  sources, and read the comments.
 - **`sun.misc.BASE64Encoder` / `BASE64Decoder` replaced with `java.util.Base64`** in
   both modules (14 files: 13 main sources plus one test class). The internal `sun.misc`
   classes were never public API, are unavailable on JDK 9+ without `--add-exports`, and
