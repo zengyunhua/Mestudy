@@ -22,8 +22,8 @@ priority.
 
 ## Supported versions
 
-There are no released versions and no maintenance branches. The `master` branch is the
-only supported line. Fixes land there and nowhere else.
+The repository has a `v1.0.0` Git tag but no maintained release branches. The
+`master` branch is the only supported line; fixes land there, not on the tag.
 
 ## Known security issues in this tree
 
@@ -43,7 +43,12 @@ signing key, and internal IP addresses and hostnames.
 **This does not fix the exposure.** The values remain in git history. If you cloned this
 repository, treat every credential in its history as compromised.
 
-**If you are the repository owner, do this before publishing:**
+**Owner action still required.** Removal from the current tree is verified, but
+credential revocation/rotation and historical cleanup have not been verified.
+Do not treat this repository as cleared merely because the current checkout has
+placeholders. Do not paste historical secrets into issues, logs or pull requests.
+
+**If you are the repository owner, coordinate the following before claiming remediation:**
 
 1. **Rotate every credential that ever appeared in the tree.** This is the only step that
    actually matters — history rewriting does not un-leak a password that has been
@@ -64,7 +69,9 @@ repository, treat every credential in its history as compromised.
    git reflog expire --expire=now --all && git gc --prune=now --aggressive
    ```
 
-3. Force-push, and ask anyone with a fork to re-clone.
+3. Coordinate any force-push with contributors and fork owners; history rewriting
+   changes commit IDs and does not revoke already-copied credentials. Ask affected
+   clones/forks to re-clone, and review tags, release artifacts and cached copies.
 4. Add a `.gitignore` rule (already present) so it cannot recur.
 5. Consider a secret-scanning hook (`gitleaks`, `trufflehog`) in CI.
 

@@ -151,35 +151,57 @@ flowchart TB
 git clone https://github.com/zengyunhua/Mestudy.git
 cd Mestudy
 
-# Compile every module whose dependencies are public (see the table below)
-mvn -B -pl IFaceSuportService,IFaceSuperService_hn compile
+# Build the default reactor - the two modules whose dependencies are public
+mvn -B package
 
-# Build one module into a deployable war
-mvn -B -pl IFaceSuportService package
-#   target/IFaceSuportService-V1.0.0.150630.war         -> deploy to the container
-#   target/IFaceSuportService-V1.0.0.150630-client.jar  -> embeddable client SDK
+#   IFaceSuportService/target/IFaceSuportService-V1.0.0.150630.war         -> deploy
+#   IFaceSuportService/target/IFaceSuportService-V1.0.0.150630-client.jar  -> client SDK
+#   IFaceSuperService_hn/target/IFaceSuperService_hn-V1.0.0.190107.war
+
+# The three modules that need private jars are opt-in, see the table below
+mvn -B -Pprivate-deps package
 ```
 
 The repository root holds an aggregator `pom.xml`, so Maven works from the top of the
-tree. Each module keeps its own coordinates and version — the root POM supplies only
-the module list, the source encoding and the Java 8 compiler level (1.8), which every
-module inherits.
+tree. Its default `<modules>` list is deliberately short: only the two modules that
+resolve from Maven Central. The other three sit behind the `private-deps` profile so a
+fresh clone always builds green instead of dying on an unresolvable artifact. Each
+module keeps its own coordinates and version — the root POM supplies the module list,
+the source encoding and the Java 8 compiler level (1.8), which every module inherits.
+
+### Verify without external services
+
+On JDK 8, run the public modules' unit tests without Oracle, Redis, or a deployed
+servlet container:
+
+```bash
+mvn -B test
+```
+
+The assertion-based tests cover the client response envelope, request filter and
+`Page` paging behaviour. The Henan module compiles but has no automated tests yet.
+Legacy HTTP smoke tests are intentionally excluded from this command because they
+require a running deployment and local fixtures. On Windows, if Surefire cannot start
+a forked JVM because `%TEMP%` contains non-ASCII characters, append `-DforkCount=0`
+(less test-process isolation); see [troubleshooting](docs/TROUBLESHOOTING.md).
+This is a **partial** public build, not a claim that all five modules run without the
+private `bee` framework and AA client.
 
 ### Which modules build publicly
 
-| Module | Public build | Blocking dependency |
-| --- | --- | --- |
-| `IFaceSuportService` | yes | — |
-| `IFaceSuperService_hn` | yes | — |
-| `NetworkOfficeService` | no | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
-| `InterfaceFunction` | no | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
-| `NetPortalManagement` | no | `bee:cloud`, `bee.cloud.service`, `bee.cloud.impl`, `bee.cloud.entity` |
+| Module | Public build | In default reactor | Blocking dependency |
+| --- | --- | :---: | --- |
+| `IFaceSuportService` | yes | yes | — |
+| `IFaceSuperService_hn` | yes | yes | — |
+| `NetworkOfficeService` | no | `-Pprivate-deps` | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
+| `InterfaceFunction` | no | `-Pprivate-deps` | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
+| `NetPortalManagement` | no | `-Pprivate-deps` | `bee:xx.tool`, `bee:cloud`, `bee.cloud.service`, `bee.cloud.impl`, `bee.cloud.entity` |
 
 The three blocked modules depend on an internal application framework (`bee`) and an
-internal AA client that were never published to a public repository. Nothing in this
-repository can substitute for them; they must be present in your local repository
-before those modules will build. Everything else — Spring, MyBatis, Axis, Jersey,
-kaptcha and the Oracle JDBC driver — resolves from Maven Central.
+internal AA client that were never published to a public repository — and the code does
+use them, so the dependencies cannot simply be deleted. They must be present in your
+local repository before `-Pprivate-deps` will build. Everything else — Spring, MyBatis,
+Axis, Jersey, kaptcha and the Oracle JDBC driver — resolves from Maven Central.
 
 > **Private mirrors.** The POMs no longer hard-code an internal Nexus. If your
 > organisation proxies Maven Central, declare the mirror in `~/.m2/settings.xml`
@@ -288,10 +310,11 @@ reference. It is maintained on a best-effort basis.
 - **Documentation**: in place — this README, a per-module README each, and the eight
   documents under `docs/`.
 - **Build reproducibility**: partial. `IFaceSuportService` and `IFaceSuperService_hn`
-  build from Maven Central alone and are compiled on every push; the other three need
+  build from Maven Central alone and are tested on every push; the other three need
   private jars, see below.
-- **Tests**: thin. Four `src/test` entry points with `main()` methods, no assertions.
-  CI compiles the buildable modules and runs hygiene checks, but it runs no tests.
+- **Tests**: limited. CI runs assertion-based unit tests for the interface client
+  and request filter, plus `Page` paging behaviour, alongside compilation and
+  repository hygiene checks.
 - **Modernisation**: not planned in-place. The intent is to keep the original
   Spring 4 / XML style intact so the patterns stay readable. The language level is
   Java 8 (raised from 7) and that is as far as it goes — no framework upgrade.
@@ -314,9 +337,9 @@ is a good first contribution.
    `CommUtil`, `AESUtil`. 54 class names exist in more than one module and none of
    the copies are identical — they have drifted. Consolidating them into a shared
    artifact is the single most valuable refactor available here.
-4. **Thin test coverage.** There is no assertion-based test suite. The four classes
-   under `src/test` are manual entry points with `main()` methods; one of them is not
-   even on the test source path.
+4. **Thin test coverage.** The client, filter and `Page` have focused assertion-based tests,
+   but most business flows are not covered. Legacy HTTP smoke tests require a
+   running service and local fixtures, so they are excluded from default tests.
 5. **One release only.** `v1.0.0` is tagged and described in
    [CHANGELOG.md](CHANGELOG.md); the per-module artifact versions in the POMs still
    carry their original internal numbers (`V1.0.0.150630`, `V1.0.0.190107`) and are not

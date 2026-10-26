@@ -13,6 +13,16 @@ grouped by scope rather than by a single release number.
 
 ### Changed
 
+- **The default reactor is now the two publicly buildable modules.** `mvn package` at the
+  repository root used to walk into `NetworkOfficeService` third and fail on
+  `com.tecsun.sisp_public:aamanagement-client:1.0.5` / `bee:xx.tool:1.0.0`, which meant a
+  fresh clone could not complete a build at all. `NetworkOfficeService`,
+  `InterfaceFunction` and `NetPortalManagement` now live behind the `private-deps`
+  profile: `mvn -B package` builds `IFaceSuportService` and `IFaceSuperService_hn` and
+  succeeds, `mvn -B -Pprivate-deps package` restores the old five-module reactor for
+  anyone who has the private jars installed. The dependencies were verified to be real —
+  dropping them moves the failure from resolution to compilation (`BanjianVo` is defined
+  in one of those jars) — so the modules were isolated rather than stripped.
 - **Java 8 baseline.** `maven.compiler.source` / `maven.compiler.target` raised from
   `1.7` to `1.8` in the root POM, which is now the single source of truth for the
   language level. The per-module `maven-compiler-plugin` overrides in

@@ -12,15 +12,15 @@ permissions:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # Compile the modules whose dependencies are all on Maven Central.
-  #
-  # NetworkOfficeService, InterfaceFunction and NetPortalManagement depend on
-  # the private "bee" framework and com.tecsun.sisp_public:aamanagement-client,
-  # which are not published anywhere public. They are therefore not compiled
-  # here; see docs/TROUBLESHOOTING.md.
+  # Build the default reactor: the modules whose dependencies are all on Maven
+  # Central. NetworkOfficeService, InterfaceFunction and NetPortalManagement
+  # depend on the private "bee" framework and
+  # com.tecsun.sisp_public:aamanagement-client, which are not published
+  # anywhere public, so they sit behind the -Pprivate-deps profile and are not
+  # built here. See docs/TROUBLESHOOTING.md.
   # ---------------------------------------------------------------------------
   build:
-    name: Compile (JDK 8)
+    name: Test and package (JDK 8)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,8 +35,8 @@ jobs:
       - name: Show toolchain
         run: mvn -B -v
 
-      - name: Compile and run unit tests
-        run: mvn -B -pl IFaceSuportService,IFaceSuperService_hn test
+      - name: Run unit tests and package
+        run: mvn -B verify
 
   # ---------------------------------------------------------------------------
   # Guard rails. These catch the mistakes that are easiest to make and most

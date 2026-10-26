@@ -20,9 +20,9 @@ cloned and built. Everything else is secondary.
 - [x] Add `.gitignore` covering `target/`, IDE metadata and local configuration
 - [x] Replace committed credentials with `config.properties.example` templates
 - [x] Add `LICENSE`, `CONTRIBUTING`, `CODE_OF_CONDUCT`, `SECURITY`
-- [ ] Stop tracking `target/` in git (`git rm -r --cached */target`)
+- [x] Stop tracking `target/` in git (CI verifies no build outputs are tracked)
 - [ ] Purge credentials from git history (see [SECURITY.md](../SECURITY.md))
-- [ ] Add `CHANGELOG.md` entries going forward
+- [~] Maintain `CHANGELOG.md` entries for future releases (v1.0.0 is documented)
 
 ## Phase 2 — Make it build
 
@@ -31,19 +31,21 @@ cloned and built. Everything else is secondary.
       exists (e.g. swap internal utility jars for Guava/Commons)
 - [ ] Stub the remainder behind an optional Maven profile so `mvn package` succeeds
       without the internal Nexus
-- [ ] Add a parent POM to centralise versions, compiler settings and the repository list
+- [~] Root POM is the aggregator and parent with shared encoding/compiler settings;
+      module versions remain separate and private dependencies are not yet replaced
 - [x] Set the language level to Java 8 (`maven.compiler.source`/`target` = `1.8`) once,
       in the root POM, and drop the per-module overrides
 - [ ] Verify a clean build on JDK 8 in a container with an empty `~/.m2`
 
 ## Phase 3 — Tests and CI
 
-- [ ] Unit tests for the `common` layer (`Page`, `Result`, `AESUtil`, `JsonMapper`,
+- [~] Unit tests for the `common` layer (`Page` covered; `Result`, `AESUtil`, `JsonMapper`,
       date/number helpers) — no database required
 - [ ] One controller test per module using `MockMvc` with mocked services
 - [ ] H2-backed integration test for one mapper per module (Oracle-specific SQL will need
       dialect guards; start with a mapper that uses portable SQL)
-- [ ] GitHub Actions: `mvn -B verify` on JDK 8, matrix over the modules that build
+- [~] GitHub Actions runs `mvn -B -pl IFaceSuportService,IFaceSuperService_hn package`
+      on JDK 8; expand to `verify` and a matrix as coverage matures
 - [ ] Coverage reporting, with a floor that only ratchets upward
 
 ## Phase 4 — Documentation depth

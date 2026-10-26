@@ -74,14 +74,18 @@ unresolvable placeholder. The full key list is in
 
 ## 4. Build
 
-From the repository root — an aggregator POM ties the five modules together:
+From the repository root. The default reactor is the two modules that resolve from
+Maven Central; the other three are opt-in:
 
 ```bash
-# Compile the modules that have public dependencies
-mvn -B -pl IFaceSuportService,IFaceSuperService_hn compile
+# Build everything in the default reactor, tests included
+mvn -B package
 
-# Package one module
-mvn -B -pl IFaceSuportService clean package -DskipTests
+# Tests only, no database and no deployed service
+mvn -B test
+
+# The three modules that need private jars (see the table below)
+mvn -B -Pprivate-deps package
 ```
 
 Expected artefacts (paths are relative to the module directory):
@@ -89,6 +93,7 @@ Expected artefacts (paths are relative to the module directory):
 ```
 IFaceSuportService/target/IFaceSuportService-V1.0.0.150630.war
 IFaceSuportService/target/IFaceSuportService-V1.0.0.150630-client.jar
+IFaceSuperService_hn/target/IFaceSuperService_hn-V1.0.0.190107.war
 ```
 
 The `-client` jar is produced by the `maven-jar-plugin` execution with
@@ -97,13 +102,18 @@ the artefact a downstream terminal embeds.
 
 ### Which modules build
 
-| Module | Builds from Maven Central | Missing |
-| --- | --- | --- |
-| `IFaceSuportService` | yes | — |
-| `IFaceSuperService_hn` | yes | — |
-| `NetworkOfficeService` | no | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
-| `InterfaceFunction` | no | same as above |
-| `NetPortalManagement` | no | `bee:cloud*` |
+| Module | Builds from Maven Central | Reactor | Missing |
+| --- | --- | --- | --- |
+| `IFaceSuportService` | yes | default | — |
+| `IFaceSuperService_hn` | yes | default | — |
+| `NetworkOfficeService` | no | `-Pprivate-deps` | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
+| `InterfaceFunction` | no | `-Pprivate-deps` | same as above |
+| `NetPortalManagement` | no | `-Pprivate-deps` | `bee:xx.tool`, `bee:cloud*` |
+
+The three blocked modules are kept out of the default reactor on purpose: a build that
+stops on an unresolvable artifact teaches a newcomer nothing. Their dependencies are
+genuinely referenced by the code, so they cannot simply be deleted — install the jars
+into your local repository first, then build with the profile.
 
 ### Using a Maven mirror
 
