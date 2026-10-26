@@ -45,70 +45,86 @@ public class BusinessFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
         String ip = CommUtil.getIpAddr(req);
-        String tokenId = req.getParameter("tokenId");
-        String deviceid = req.getParameter("deviceid");
-        String method = req.getParameter("method");
-        System.out.println("========拦截器==========deviceid:"+deviceid);
-        //String boy=getBody(req);
+        String tokenId = req.getHeader("X-Token-Id");
+        if (StringUtils.isBlank(tokenId)) {
+            tokenId = req.getParameter("tokenId"); // Legacy clients; do not log this value.
+        }
+        boolean authorized = false;
         try {
-            String redisIP = StringUtils.isNotEmpty(tokenId) ? JedisUtil.getValue(tokenId) : "";
-            if (StringUtils.isBlank(redisIP)) {
-                String msg = "不存在此token，或超时被删除,tokenId:" + tokenId + ",IP：" + ip;
-                logger.error("IFACE_ERRORCODE:IFAC-EERR-301,"+msg);
-                resp.getWriter().print(GlobalResult.error_301(msg));
-            } else {
-                if (!redisIP.equals(ip)) {
-                    logger.error("IFACE_ERRORCODE:IFAC-EERR-301,拦截非法访问,tokenId：" + tokenId + ",原IP：" + redisIP + ",拦截IP：" + ip);
-                    resp.getWriter().print(GlobalResult.error_301("拦截非法访问，请重新登录"));
-                }else{
-                    if(!StringUtils.isBlank(method)){
-                    //第三方公司拦截
-                            //1.先验证url地址
-                                String uri = req.getRequestURI();
-                                if(!method.equals(uri.substring(uri.lastIndexOf("/")+1))){
-                                    logger.error("IFACE_ERRORCODE:IFAC-EERR-301,拦截非法访问,第三方接口方法method非法,method:"+method+",接口uri:"+uri);
-                                    resp.getWriter().print(GlobalResult.error_301("拦截非法访问，接口方法非法"));
-                                }else{
-                                    //2.验证用户接口权限
-                                    String userkey = Constants.USERKEY + tokenId;
-                                    String userid = JedisUtil.getValue(userkey);
-                                    boolean flag = checkUser(userid, method);
-                                    if(flag){
-                                        JedisUtil.setValue(userkey, userid);
-                                        JedisUtil.setValue(tokenId, ip);
-                                        String userAreaid = Constants.USERAREAID + tokenId;
-                                        String areaid = JedisUtil.getValue(userAreaid);
-                                        JedisUtil.setValue(userAreaid, areaid);
-                                        chain.doFilter(request, response);
-                                    }else{
-                                        String msg="拦截非法访问,该用户没有此接口权限";
-                                        logger.error("IFACE_ERRORCODE:IFAC-EERR-303,"+msg);
-                                        resp.getWriter().print(GlobalResult.error_303(msg));
-                                    }
-                                }
-                        }else{
-                            //如果校验ip通过，则校验设备编码
-                            boolean flag=checkDev(deviceid);
-                            if (flag) {
-                                JedisUtil.setValue(tokenId, ip);
-                                chain.doFilter(request, response);
-                            }else{
-                                String msg="拦截非法访问,deviceid:"+deviceid+",tokenId：" + tokenId + ",拦截IP：" + ip;
-                                logger.error("IFACE_ERRORCODE:IFAC-EERR-303,"+msg);
-                                resp.getWriter().print(GlobalResult.error_303(msg));
-                            }
-                        }
-
-                }
+            String redisIP = StringUtils.isNotBlank(tokenId) ? JedisUtil.getValue(tokenId) : null;
+            if (StringUtils.isBlank(redisIP) || !redisIP.equals(ip)) {
+                logger.warn("Rejected invalid or expired interface session");
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                resp.getWriter().print(GlobalResult.error_301("登录已失效，请重新登录"));
+                return;
             }
+            // The channel is assigned at login. A caller-supplied method/deviceid cannot
+            // select a less restrictive authorization path.
+            String channel = JedisUtil.getValue(Constants.CHANNELKEY + tokenId);
+            if (StringUtils.isBlank(channel)) {
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                resp.getWriter().print(GlobalResult.error_301("登录已失效，请重新登录"));
+                return;
+            }
+            if ("ThirdSystem".equals(channel)) {
+                String uri = req.getRequestURI();
+                String actualMethod = uri.substring(uri.lastIndexOf('/') + 1);
+                if (StringUtils.isBlank(actualMethod) || !actualMethod.matches("[A-Za-z0-9_]+")) {
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    resp.getWriter().print(GlobalResult.error_303("无效接口方法"));
+                    return;
+                }
+                String requestedMethod = req.getParameter("method");
+                if (StringUtils.isNotBlank(requestedMethod) && !actualMethod.equals(requestedMethod)) {
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    resp.getWriter().print(GlobalResult.error_303("接口方法不匹配"));
+                    return;
+                }
+                String userkey = Constants.USERKEY + tokenId;
+                String userid = JedisUtil.getValue(userkey);
+                if (StringUtils.isBlank(userid) || !checkUser(userid, actualMethod)) {
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    resp.getWriter().print(GlobalResult.error_303("没有此接口权限"));
+                    return;
+                }
+                JedisUtil.setValue(userkey, userid);
+                String userAreaid = Constants.USERAREAID + tokenId;
+                String areaid = JedisUtil.getValue(userAreaid);
+                if (StringUtils.isNotBlank(areaid)) {
+                    JedisUtil.setValue(userAreaid, areaid);
+                }
+            } else if (!"TSB".equals(channel) && !"SelfService".equals(channel)
+                    && !"NetPortal".equals(channel) && !"WeChat".equals(channel)) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().print(GlobalResult.error_303("未知登录渠道"));
+                return;
+            } else if (!checkDev(req.getParameter("deviceid"))) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().print(GlobalResult.error_303("设备校验失败"));
+                return;
+            }
+            // Keep the server-assigned channel and token on the same sliding expiry.
+            if ("SelfService".equals(channel)) {
+                JedisUtil.setValue(tokenId, ip, Constants.SELFSERVICETIMEOUT);
+                JedisUtil.setValue(Constants.CHANNELKEY + tokenId, channel, Constants.SELFSERVICETIMEOUT);
+            } else {
+                JedisUtil.setValue(tokenId, ip);
+                JedisUtil.setValue(Constants.CHANNELKEY + tokenId, channel);
+            }
+            authorized = true;
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("IFACE_ERRORCODE:IFAC-EERR-302,BusinessFilter 拦截出错," + e.getMessage());
-            resp.getWriter().print(GlobalResult.error_302("BusinessFilter 拦截出错," + e.getMessage()));
+            logger.error("BusinessFilter failed", e);
+            if (!resp.isCommitted()) {
+                resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                resp.getWriter().print(GlobalResult.error_302("认证服务暂时不可用"));
+            }
+        }
+        if (authorized) {
+            chain.doFilter(request, response);
         }
     }
-
     private boolean checkDev(String deviceid) {
         if (StringUtils.isNotEmpty(deviceid)) {
             String result="";
@@ -124,7 +140,7 @@ public class BusinessFilter implements Filter {
                     }
                 }
             } catch (Exception e) {
-                logger.error("===checkDev:"+deviceid+",result:===" + result);
+                logger.error("Device validation failed");
                 logger.error(e.getMessage());
             }
         } else {
@@ -167,15 +183,20 @@ public class BusinessFilter implements Filter {
     public void destroy() {
 
     }
+    static boolean hasPermission(String response, String method) throws IOException {
+        if (StringUtils.isBlank(response) || StringUtils.isBlank(method)) return false;
+        Map map = JsonMapper.buildNormalMapper().fromJson(response, Map.class);
+        if (map == null || !"200".equals(map.get("statusCode"))
+                || !(map.get("result") instanceof Map)) return false;
+        return method.equals(((Map) map.get("result")).get("funCode"));
+    }
     private boolean checkUser(String userid , String method) throws IOException{
         try{
-            String url = DictionaryUtil.getHost(Constants.INTERFACE_CHECKUSER)+"?userid="+userid+"&method="+method;
+            String url = DictionaryUtil.getHost(Constants.INTERFACE_CHECKUSER)+"?userid="+java.net.URLEncoder.encode(userid, "UTF-8")+"&method="+java.net.URLEncoder.encode(method, "UTF-8");
             String result = DictionaryUtil.getClientRequest( url);
-            Map map = JsonMapper.buildNormalMapper().fromJson(result, Map.class);
-            Map data = (Map) map.get("result");
-            if(data == null) return false;else return true;
+            return hasPermission(result, method);
         }catch(Exception e){
-            logger.error("===userid:"+userid+",method:===" + method);
+            logger.error("Permission validation failed for method {}", method);
             logger.error(e.getMessage());
             return false;
         }

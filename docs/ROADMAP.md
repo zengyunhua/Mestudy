@@ -63,8 +63,8 @@ cloned and built. Everything else is secondary.
 - [ ] Fix `ResultVerify` field shadowing
 - [ ] Replace `static` state in `IFaceHttpsClient` with an instance-based client
 - [ ] Inject gateway clients instead of instantiating SOAP stubs at call sites
-- [ ] Re-enable and repair `BusinessFilter` (XSS)
-- [ ] Replace the permissive `SSLClient` trust manager with a truststore-based context
+- [x] Re-enable `BusinessFilter` session authorization on selected interface routes (not XSS sanitization)
+- [x] Use the JVM default trust store and strict hostname verification in `SSLClient`
 - [ ] Move credentials out of properties files into environment variables or a secret
       store
 - [ ] Rename `iinner_proxy_ip` and add a startup validation pass for required keys

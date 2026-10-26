@@ -211,8 +211,8 @@ public class Demo {
 }
 ```
 
-`ClientInit` starts a background thread that calls `/iface/user/checkLogin` every
-`tokenTimeOut` minutes and refreshes the static `tokenId`. It throws if called twice in
+`ClientInit` fetches a token synchronously, then starts a background renewal thread every
+`tokenTimeOut` minutes. Set `SISP_TSB_SECRET` in both the server and SDK processes before starting, and call `IFaceHttpsClient.shutdown()` on shutdown. It throws if called twice in
 the same JVM. Full reference: [CLIENT_SDK.md](CLIENT_SDK.md).
 
 ## 8. Where to go next

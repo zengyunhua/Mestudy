@@ -17,7 +17,7 @@
  * <ul>
  *   <li>{@code LoginUtil} — obtains and refreshes the {@code tokenId}</li>
  *   <li>{@code HttpClientUtil} — executes requests, marshals JSON</li>
- *   <li>{@code SSLClient} — permissive HTTPS client; replace before public deployment</li>
+ *   <li>{@code SSLClient} — HTTPS client using the default trust store and strict hostname verification</li>
  *   <li>{@code WebClient} — low-level HTTP helper</li>
  * </ul>
  *

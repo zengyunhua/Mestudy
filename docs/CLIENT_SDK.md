@@ -97,15 +97,7 @@ IFaceHttpsClient.ClientInit(
 
 ### What initialisation actually does
 
-`ClientInit` stores the parameters in **static fields** and starts a single daemon-less
-`TokenGetter` thread:
-
-```
-while (true) {
-    tokenId = LoginUtil.checkLogin(port, url, channelcode);
-    Thread.sleep(tokenTimeOut * 60 * 1000);
-}
-```
+`ClientInit` logs in synchronously, then starts a daemon `TokenGetter` thread that renews the token every `tokenTimeOut` minutes. Call `IFaceHttpsClient.shutdown()` on application shutdown.
 
 Two consequences you must plan for:
 
@@ -116,9 +108,7 @@ Two consequences you must plan for:
    cannot target two interface services. If you need that, run two JVMs or fork the
    class into a non-static client.
 
-The first token is fetched asynchronously, so an immediate call after `ClientInit` may
-race with the first login. In practice the login completes in milliseconds; if you need
-a hard guarantee, poll a cheap endpoint until it stops returning an auth failure.
+The first token is available when `ClientInit` returns successfully. A failed initial login throws; fix the channel secret before retrying initialization.
 
 ## 3. Call an operation
 
@@ -136,10 +126,7 @@ for (TsgrjfxxVO row : page.getData()) {
 }
 ```
 
-> **Note the asymmetry.** `Page<T>` carries only `pageNo`, `pageSize`, `count` and
-> `data` — it does **not** extend `Result`, and the SDK discards the envelope's
-> `statusCode` and `message` when building it. Only the card operations, which return
-> `Result`, expose a status code. See [error handling](#4-error-handling).
+> **Note the asymmetry.** `Page<T>` does not extend `Result`. The SDK now checks the envelope status and throws on failure before returning a page. Card operations return a `Result`; callers must check its status code.
 
 ### Available operations
 
@@ -179,48 +166,21 @@ for (TsgrjfxxVO row : page.getData()) {
 
 ## 4. Error handling
 
-The SDK does not throw for business failures, and it does not give you a uniform way to
-detect them. This is the most surprising part of the API:
-
-| Return type | How failure surfaces |
-| --- | --- |
-| `Page<T>` (queries) | The envelope is unwrapped and `statusCode`/`message` are **dropped**. On failure the server returns `data: null`, so you get a `Page` with an empty `data` list and `count == 0`. |
-| `Result` (card ops) | The envelope is returned intact — check `statusCode`. |
-
-So a paged query cannot distinguish "no records" from "server rejected the request"
-through the return value alone. Options:
-
-- Log the raw response in your HTTP layer if you need the reason.
-- Call the underlying endpoint directly for diagnostics.
-- Treat empty results as "no data or failure" and confirm with a second call.
-
-Transport failures (connection refused, timeout, non-200 HTTP) surface as exceptions
-from the underlying Apache HttpClient and are **not** wrapped. Calling any operation
-before `ClientInit` throws `Exception(" Please init   !!!!! ")`.
+Paged queries reject a non-`200` response envelope with an exception instead of silently returning an empty page. Card operations return `Result`; check `statusCode` explicitly. Transport failures and non-2xx HTTP responses also throw. A call before `ClientInit` fails.
 
 ```java
 try {
     Page<TsgrjfxxVO> page = IFaceHttpsClient.getPersonPesionPay(bean);
-    if (page.getData().isEmpty()) {
-        log.warn("no pension rows returned (empty result or rejected request)");
-    }
+    // A successful empty page means no records, not an authorization failure.
 } catch (Exception e) {
-    log.error("transport failure or SDK not initialised", e);
-}
-
-// Card operations do expose the envelope
-Result r = IFaceHttpsClient.getCardStatus(bean);
-if (!"200".equals(r.getStatusCode())) {
-    log.warn("card query failed: {}", r.getMessage());
+    log.error("query failed", e);
 }
 ```
 
 ## 5. HTTPS
 
 Passing `useHttps = true` switches the scheme. The SDK ships `SSLClient`, which
-installs a permissive trust manager. **That is acceptable for an internal network and
-unacceptable for anything crossing the public internet.** If you deploy over HTTPS
-publicly, replace `SSLClient` with a truststore-based `SSLContext` before relying on it.
+uses the JVM default trust store and strict hostname verification. Import private CA certificates into the JVM trust store; do not disable certificate checks.
 
 ## 6. Thread safety
 

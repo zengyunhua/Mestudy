@@ -192,7 +192,7 @@ is intentional: the token and dictionary caches are load-bearing.
 | Response envelope | `Result`, `ResultVerify` | `statusCode` `"200"` / `"0"` |
 | Caching | Redis via `JedisUtil`; dictionary cache in `DictionaryUtil` | TTL from `redis_iface_expx` |
 | Logging | SLF4J + Log4j 1.2 | Per-module `log4j.properties` / `log4j.xml` |
-| XSS | `BusinessFilter` | Present but **disabled** in `web.xml` — see [SECURITY.md](../SECURITY.md) |
+| API session authorization | `BusinessFilter` | Enabled on selected `/iface/*` routes; not an XSS sanitizer — see [SECURITY.md](../SECURITY.md) |
 | Captcha | Kaptcha `DefaultCaptcha` | Configured in `applicationContext.xml` |
 | Excel export | `ExcelUtil` (`NetworkOfficeService`), EasyExcel/EasyPOI in older branches | Streams to the response |
 
@@ -209,8 +209,8 @@ Three integration styles coexist:
    (`XMLType.XSD_STRING`), so a typo fails at runtime rather than compile time.
 3. **HTTP/JSON via Jersey or Apache HttpClient.** Face verification, job board,
    electronic licence library, weather. Wrapped by `HttpClientUtil` / `WebClient` /
-   `SSLClient` (the last one trusts a specific certificate — replace it with a proper
-   truststore before production use).
+   `SSLClient` (the last one uses the JVM default trust store and strict
+   hostname verification; install a private CA in the JVM trust store if required).
 
 Every outbound call is expected to be wrapped so that a downstream failure produces a
 `Result` with a failure code instead of an unhandled exception. That contract is not

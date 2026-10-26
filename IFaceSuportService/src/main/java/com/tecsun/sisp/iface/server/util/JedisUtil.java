@@ -15,17 +15,7 @@ import redis.clients.jedis.JedisPool;
  * <p>Values are stored as {@code String}. There is no serialisation layer; callers convert
  * to and from JSON themselves.
  *
- * <p><strong>Known defect — double return.</strong> Every method calls
- * {@code returnBrokenResource(jedis)} in its {@code catch} block and then
- * {@code returnResource(jedis)} on the same instance in {@code finally}. Jedis 2.x throws
- * {@code IllegalStateException("Returned object not currently part of this pool")} on the
- * second return, and the pool can end up holding a connection it considers broken. If the
- * pool reference itself is {@code null} — because {@code DataBase.init()} never ran — the
- * {@code catch} block throws {@code NullPointerException} and hides the original failure.
- *
- * <p>Until this is fixed, treat Redis errors as noisy rather than precise: read the first
- * exception in the chain, not the last. See
- * {@code docs/TROUBLESHOOTING.md#redis-errors-mask-themselves}.
+ * <p>Broken connections are returned once; error messages do not expose keys or values.
  */
 public class JedisUtil {
 
@@ -38,15 +28,20 @@ public class JedisUtil {
     public static void setValue(String key, String value, Integer outTime) throws Exception {
         JedisPool publicJedisPool = null;
         Jedis publicJedis = null;
+        boolean broken = false;
         try {
             publicJedisPool = DataBase.getJedisPublicPool();
             publicJedis = publicJedisPool.getResource();
             publicJedis.setex(key, 60 * outTime, value);
         } catch (Exception e) {
-            publicJedisPool.returnBrokenResource(publicJedis);
-            throw new Exception("设置redis失败: key:" + key + ",value:" + value, e);
+            broken = true;
+            if (publicJedisPool != null && publicJedis != null) {
+                try { publicJedisPool.returnBrokenResource(publicJedis); }
+                catch (Exception releaseError) { logger.warn("Redis broken resource release failed", releaseError); }
+            }
+            throw new Exception("设置redis失败", e);
         } finally {
-            if (publicJedis != null) {
+            if (publicJedis != null && !broken) {
                 publicJedisPool.returnResource(publicJedis);
             }
         }
@@ -55,16 +50,21 @@ public class JedisUtil {
     public static String getValue(String key) throws Exception {
         JedisPool publicJedisPool = null;
         Jedis publicJedis = null;
+        boolean broken = false;
         String value="";
         try {
             publicJedisPool = DataBase.getJedisPublicPool();
             publicJedis = publicJedisPool.getResource();
             value = publicJedis.get(key);
         } catch (Exception e) {
-            publicJedisPool.returnBrokenResource(publicJedis);
-            throw new Exception("获取reids失败，key:" + key, e);
+            broken = true;
+            if (publicJedisPool != null && publicJedis != null) {
+                try { publicJedisPool.returnBrokenResource(publicJedis); }
+                catch (Exception releaseError) { logger.warn("Redis broken resource release failed", releaseError); }
+            }
+            throw new Exception("获取redis失败", e);
         } finally {
-            if (publicJedis != null) {
+            if (publicJedis != null && !broken) {
                 publicJedisPool.returnResource(publicJedis);
             }
         }
@@ -80,15 +80,20 @@ public class JedisUtil {
     public static void delValue(String key) throws Exception {
         JedisPool publicJedisPool = null;
         Jedis publicJedis = null;
+        boolean broken = false;
         try {
             publicJedisPool = DataBase.getJedisPublicPool();
             publicJedis = publicJedisPool.getResource();
             publicJedis.del(key);
         } catch (Exception e) {
-            publicJedisPool.returnBrokenResource(publicJedis);
-            throw new Exception("删除reids失败，key:" + key, e);
+            broken = true;
+            if (publicJedisPool != null && publicJedis != null) {
+                try { publicJedisPool.returnBrokenResource(publicJedis); }
+                catch (Exception releaseError) { logger.warn("Redis broken resource release failed", releaseError); }
+            }
+            throw new Exception("删除redis失败", e);
         } finally {
-            if (publicJedis != null) {
+            if (publicJedis != null && !broken) {
                 publicJedisPool.returnResource(publicJedis);
             }
         }

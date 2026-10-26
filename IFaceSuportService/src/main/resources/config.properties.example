@@ -22,8 +22,8 @@ inner_proxy_port=8080
 # Format is host_port (underscore separated, not a URL).
 redis_core_database=127.0.0.1_6379
 # Cache / token TTL in MINUTES (JedisUtil multiplies by 60 internally).
-# Keep this at or above the client's tokenTimeOut; 60 = one hour.
-redis_iface_expx=60
+# Keep this strictly above the client's tokenTimeOut (minimum 60 minutes).
+redis_iface_expx=120
 
 # --- JDBC pool (shared by every datasource below) --------------------------
 jdbc.type=oracle

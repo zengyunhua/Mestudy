@@ -63,30 +63,30 @@
         <servlet-name>springMVC3</servlet-name>
     </filter-mapping>
 
-    <!-- <filter>
-        <filter-name>XssEscape</filter-name>
+    <filter>
+        <filter-name>BusinessFilter</filter-name>
         <filter-class>com.tecsun.sisp.iface.server.util.BusinessFilter</filter-class>
     </filter>
     <filter-mapping>
-        <filter-name>XssEscape</filter-name>
+        <filter-name>BusinessFilter</filter-name>
         <url-pattern>/iface/rest/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>XssEscape</filter-name>
+        <filter-name>BusinessFilter</filter-name>
         <url-pattern>/iface/cardInfo/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>XssEscape</filter-name>
+        <filter-name>BusinessFilter</filter-name>
         <url-pattern>/iface/bank/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>XssEscape</filter-name>
+        <filter-name>BusinessFilter</filter-name>
         <url-pattern>/iface/job/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>XssEscape</filter-name>
+        <filter-name>BusinessFilter</filter-name>
         <url-pattern>/iface/his/hangtianhis/*</url-pattern>
-    </filter-mapping> -->
+    </filter-mapping>
 
     <welcome-file-list>
         <welcome-file>/WEB-INF/views/index.html</welcome-file>

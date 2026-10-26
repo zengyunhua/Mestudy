@@ -64,20 +64,21 @@ public class CommUtil {
      * @return String
      */
     public static String getIpAddr(HttpServletRequest request) {
-        String ip = request.getHeader("X-Real-IP");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("x-forwarded-for");
+        String remote = request.getRemoteAddr();
+        // Forwarded headers are untrusted unless the immediate peer is an explicitly configured proxy.
+        String configured = System.getenv("SISP_TRUSTED_PROXIES");
+        if (configured == null || remote == null) return remote;
+        boolean trusted = false;
+        for (String proxy : configured.split(",")) {
+            if (remote.equals(proxy.trim())) { trusted = true; break; }
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
+        if (!trusted) return remote;
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded == null || forwarded.trim().isEmpty()) forwarded = request.getHeader("X-Real-IP");
+        if (forwarded == null) return remote;
+        String first = forwarded.split(",", 2)[0].trim();
+        if (first.matches("[0-9a-fA-F:.]+") && first.length() <= 45) return first;
+        return remote;
     }
 
     /**

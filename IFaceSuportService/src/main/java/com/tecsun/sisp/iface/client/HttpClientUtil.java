@@ -3,6 +3,8 @@ package com.tecsun.sisp.iface.client;
 import com.tecsun.sisp.iface.common.util.JsonMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import java.io.IOException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -21,49 +23,32 @@ public class HttpClientUtil {
     private static final String APPLICATION_JSON = "application/json";
 
     public static final String getData(int port, String url, Object bean, boolean isPost) throws Exception {
-        String result = null;
-        HttpResponse response = null;
-        String json = JsonMapper.buildNonEmptyMapper().toJson(bean);
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        if (IFaceHttpsClient.isVerify) {
-            httpClient = new SSLClient(port);
-        }
-        if (isPost) {
-            response = httpClient.execute(doPost(url, json));
-        } else {
-            response = httpClient.execute(doGet(url));
-        }
-        if (response != null) {
-            HttpEntity resEntity = response.getEntity();
-            if (resEntity != null) {
-                result = EntityUtils.toString(resEntity, HTTP.UTF_8);
-            }
-        }
-        return result;
+        return getData(url, bean, isPost, IFaceHttpsClient.isVerify, port);
     }
 
-    public static final String getData(String url, Object bean, boolean isPost,boolean isVerify,int port) throws Exception {
-        String result = null;
-        HttpResponse response = null;
-        String json = JsonMapper.buildNonEmptyMapper().toJson(bean);
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        if (isVerify) {
-            httpClient = new SSLClient(port);
-        }
-        if (isPost) {
-            response = httpClient.execute(doPost(url, json));
-        } else {
-            response = httpClient.execute(doGet(url));
-        }
-        if (response != null) {
-            HttpEntity resEntity = response.getEntity();
-            if (resEntity != null) {
-                result = EntityUtils.toString(resEntity, HTTP.UTF_8);
+    public static final String getData(String url, Object bean, boolean isPost, boolean isVerify, int port) throws Exception {
+        DefaultHttpClient httpClient = isVerify ? new SSLClient(port) : new DefaultHttpClient();
+        httpClient.getParams().setIntParameter("http.connection.timeout", 10000);
+        httpClient.getParams().setIntParameter("http.socket.timeout", 30000);
+        try {
+            org.apache.http.client.methods.HttpRequestBase req = isPost
+                    ? doPost(url, JsonMapper.buildNonEmptyMapper().toJson(bean)) : doGet(url);
+            String token = IFaceHttpsClient.currentToken();
+            if (token != null && !token.isEmpty() && !url.endsWith("/checkLogin")) {
+                req.setHeader("X-Token-Id", token);
             }
+            HttpResponse response = httpClient.execute(req);
+            HttpEntity entity = response.getEntity();
+            int status = response.getStatusLine().getStatusCode();
+            String result = entity == null ? null : EntityUtils.toString(entity, HTTP.UTF_8);
+            if (status < HttpStatus.SC_OK || status >= HttpStatus.SC_MULTIPLE_CHOICES) {
+                throw new IOException("Interface HTTP request failed with status " + status);
+            }
+            return result;
+        } finally {
+            httpClient.getConnectionManager().shutdown();
         }
-        return result;
     }
-
     static HttpPost doPost(String url, String encoderJson) throws Exception {
         StringEntity se = new StringEntity(encoderJson, "UTF-8");
         se.setContentType(APPLICATION_JSON);

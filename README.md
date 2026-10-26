@@ -228,7 +228,7 @@ System.out.println(page.getData().size());
 ```
 
 The heartbeat calls `POST {context}/iface/user/checkLogin` and stores the returned
-`tokenId`; every subsequent request appends `?tokenId=...`. Because the token is held
+`tokenId`; subsequent SDK requests send `X-Token-Id` as a header. Because the token is held
 in a `static` field and the heartbeat thread is a singleton, **the SDK is bound to a
 single target server per JVM**. See [docs/CLIENT_SDK.md](docs/CLIENT_SDK.md) for the
 full reference.

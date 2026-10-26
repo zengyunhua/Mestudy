@@ -872,6 +872,7 @@ public class Constants {
     public static final String INTERFACE_CHECKUSER = "/interfacefunction/user/checkInterfaceUserRoleFunc";
 
     public static String USERKEY = "userkey:";
+    public static final String CHANNELKEY = "channelkey:";
 
     public static String USERAREAID = "userAreaid:";
     //根据区域id获取区域信息

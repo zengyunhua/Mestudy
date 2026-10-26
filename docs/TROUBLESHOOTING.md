@@ -177,40 +177,12 @@ values `<= 60` are silently raised to `60` by `ClientInit`, so the effective ren
 interval is at least one hour — `redis_iface_expx=60` matches that exactly and leaves no
 margin. Give it headroom.
 
-### Redis errors mask themselves
+### Redis failures during session access
 
-`JedisUtil` calls `returnBrokenResource(jedis)` in its `catch` block and then
-`returnResource(jedis)` on the same instance in `finally`. Jedis 2.x rejects the second
-return with `IllegalStateException("Returned object not currently part of this pool")`,
-which is thrown from `finally` and **replaces** the real exception.
-
-Worse, if `DataBase.init()` never ran, the pool reference is `null` and the `catch` block
-throws `NullPointerException` before the original exception can propagate.
-
-**How to diagnose.** Look at the first exception in the `cause` chain, not the one in the
-stack trace header. If you see `NullPointerException` from `JedisUtil`, check whether
-`StartupListener` completed.
-
-**Fix.** Restructure the try/catch/finally so exactly one return happens, and guard the
-pool reference:
-
-```java
-JedisPool pool = DataBase.getJedisPublicPool();
-Jedis jedis = null;
-boolean broken = false;
-try {
-    jedis = pool.getResource();
-    jedis.setex(key, 60 * outTime, value);
-} catch (Exception e) {
-    broken = true;
-    throw new Exception("redis set failed: key=" + key, e);
-} finally {
-    if (jedis != null) {
-        if (broken) { pool.returnBrokenResource(jedis); }
-        else        { pool.returnResource(jedis); }
-    }
-}
-```
+JedisUtil now returns each Redis connection exactly once and preserves the original
+exception as the cause. If session operations fail, check the cause and confirm
+StartupListener initialized the pool and Redis is reachable. Do not expose the
+exception details in the HTTP response.
 
 ### `redis_iface_expx` missing causes a `NumberFormatException` on first write
 
@@ -323,7 +295,7 @@ git rm -r --cached */target
 git commit -m "chore: stop tracking build output"
 ```
 
-### XSS filter is disabled
+### BusinessFilter is not an XSS sanitizer
 
-`BusinessFilter` is declared in `web.xml` but the whole block is commented out. Do not
-assume input is escaped. See [SECURITY.md](../SECURITY.md).
+`BusinessFilter` is enabled for selected interface routes to enforce session authorization. It does not
+escape input. Controllers rendering HTML must still apply context-appropriate output encoding. See [SECURITY.md](../SECURITY.md).

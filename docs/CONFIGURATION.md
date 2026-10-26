@@ -47,7 +47,7 @@ Used to build URLs for calls between platform modules (`DictionaryUtil.getHost`)
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `redis_core_database` | `127.0.0.1_6379` | Redis endpoint in `host_port` form. Parsed by splitting on `_`. |
-| `redis_iface_expx` | `60` | Cache / token TTL in **minutes**. `JedisUtil` calls `setex(key, 60 * redis_iface_expx, value)`, so `60` means one hour. |
+| `redis_iface_expx` | `120` | Cache / token TTL in **minutes**. `JedisUtil` calls `setex(key, 60 * redis_iface_expx, value)`. Keep it strictly greater than the SDK refresh interval (minimum 60 minutes). |
 
 > The key name suggests a unit that it does not use. It is minutes, not seconds. Also
 > note `JedisUtil.setValue` does `Integer.parseInt(Config.get("redis_iface_expx"))` with
@@ -169,3 +169,11 @@ Both are framework-specific; the connection settings live in `ds.xml`.
 3. Add the key to `config.properties.example` in the same commit.
 4. Document it in this table.
 5. Never put a real credential in the example file — use `CHANGE_ME`.
+
+## Interface authentication rollout
+
+- Configure independent high-entropy values (at least 32 characters) for `SISP_SELFSERVICE_SECRET` and `SISP_TSB_SECRET` in the **IFaceSuportService process and each corresponding SDK process**. Do not put these values in Git or Java source. An unset/short secret fails login closed; the old MD5-of-channel login is intentionally no longer accepted.
+- Coordinate deployment of the server and SDK; replace older SDK clients with a version that sends the secret at login. Existing tokens lack a server-side channel marker and must log in again after deployment. Do not expose the service publicly until the clients have been migrated.
+- By default the server uses the immediate peer `getRemoteAddr()` for the token/IP binding. If behind a trusted reverse proxy, set `SISP_TRUSTED_PROXIES` to a comma-separated list of **exact IP addresses** of immediate proxy peers and ensure those proxies overwrite `X-Forwarded-For`. Never trust a client-supplied forwarded header. Keep the list unset if the service is directly exposed.
+- For ThirdSystem, permission is checked server-side against the actual endpoint method; absent/invalid permission rejects the request. The filter covers `/iface/rest/*`, `/iface/cardInfo/*`, `/iface/bank/*`, `/iface/job/*`, and `/iface/his/hangtianhis/*`. Validate real channel use cases in staging before enabling traffic.
+- Auth failures now use HTTP 401/403 (upstream unavailable: 503); SDK calls fail on non-2xx HTTP and paged business errors throw. Legacy query-string tokens remain accepted temporarily but may leak in proxy access logs; move callers to `X-Token-Id`.

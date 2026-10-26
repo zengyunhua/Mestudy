@@ -101,9 +101,8 @@ workspace is not consistent.
 
 1. The client calls `POST /iface/user/checkLogin` with a channel code.
 2. The service returns a `tokenId`.
-3. Every subsequent request appends `?tokenId=...`.
-4. The token expires after `redis_iface_expx` seconds; the client SDK renews it on a
-   timer (`tokenTimeOut` minutes, minimum 60).
+3. The SDK sends `X-Token-Id` in the request header; legacy callers may still use `?tokenId=...`.
+4. The token expires after `redis_iface_expx` **minutes** of inactivity; the SDK renews it on a timer (`tokenTimeOut` minutes, minimum 60).
 
 The `IFaceHttpsClient` SDK implements all four steps. See [CLIENT_SDK.md](CLIENT_SDK.md).
 

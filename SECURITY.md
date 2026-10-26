@@ -68,27 +68,22 @@ repository, treat every credential in its history as compromised.
 4. Add a `.gitignore` rule (already present) so it cannot recur.
 5. Consider a secret-scanning hook (`gitleaks`, `trufflehog`) in CI.
 
-### 2. XSS filter is disabled
+### 2. Session filter does not sanitize XSS
 
-`BusinessFilter` is declared in `IFaceSuportService/src/main/webapp/WEB-INF/web.xml` but
-the entire filter and its mappings are commented out. Nothing sanitises request input
-before it reaches a controller or is reflected into a response.
+`BusinessFilter` is enabled on selected `/iface/*` paths and validates sessions,
+channels, and third-party permissions. It does **not** escape or sanitize request
+input. Other paths are not covered by this filter.
 
-**Impact.** Any endpoint that echoes user input into HTML or JSON consumed by a browser
-is exposed. Assume no escaping.
+**Impact.** HTML endpoints that echo untrusted input remain vulnerable unless they
+use context-appropriate output encoding. Audit template rendering and browser-facing
+responses separately; do not mistake authorization for XSS prevention.
 
-**Remediation.** Re-enable the filter and test it against a real payload before trusting
-it; the implementation has not been exercised in years.
+### 3. TLS trust configuration
 
-### 3. Permissive TLS trust manager
-
-`IFaceSuportService/src/main/java/com/tecsun/sisp/iface/client/SSLClient.java` installs a
-trust manager that accepts any certificate. This is appropriate for an internal network
-with self-signed certificates and **unacceptable for anything crossing the public
-internet** — it disables the only defence against a man-in-the-middle.
-
-**Remediation.** Replace with a `TrustManagerFactory` loaded from a truststore.
-
+`IFaceSuportService/src/main/java/com/tecsun/sisp/iface/client/SSLClient.java`
+uses the JVM default trust store and strict hostname verification. Deployments
+with a private CA must import it into the JVM trust store; do not disable
+certificate or hostname verification to work around trust errors.
 ### 4. MD5 password hashing
 
 `NetPortalManagement/src/main/java/com/tecsun/sisp/npm/util/MD5Generator.java` hashes

@@ -38,6 +38,9 @@ jobs:
       - name: Compile buildable modules
         run: mvn -B -pl IFaceSuportService,IFaceSuperService_hn compile
 
+      - name: Focused interface authentication regression tests
+        run: mvn -B -pl IFaceSuportService '-Dtest=BusinessFilterTest,IFaceHttpsClientTest' test
+
   # ---------------------------------------------------------------------------
   # Guard rails. These catch the mistakes that are easiest to make and most
   # expensive to undo once they are in the history: committed build output,

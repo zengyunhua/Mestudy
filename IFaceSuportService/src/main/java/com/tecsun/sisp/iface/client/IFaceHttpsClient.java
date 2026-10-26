@@ -17,9 +17,9 @@ import java.util.Map;
  * <ol>
  *   <li>Call {@link #ClientInit} exactly once per JVM. It stores the target server in
  *       static fields and starts a single {@code TokenGetter} thread.</li>
- *   <li>That thread calls {@code POST {context}/iface/user/checkLogin} every
+ *   <li>Initialisation logs in synchronously; the thread calls {@code POST {context}/iface/user/checkLogin} every
  *       {@code tokenTimeOut} minutes and refreshes the static {@link #tokenId}.</li>
- *   <li>Every operation appends {@code ?tokenId=...} to its URL.</li>
+ *   <li>Every operation sends the token via the {@code X-Token-Id} header.</li>
  * </ol>
  *
  * <h2>Constraints you must design around</h2>
@@ -30,16 +30,13 @@ import java.util.Map;
  *   <li><strong>Init is one-shot.</strong> A second {@code ClientInit} call throws
  *       {@code "Error: Do not init again !!!!! "}. Any operation called before
  *       initialisation throws {@code " Please init   !!!!! "}.</li>
- *   <li><strong>The first token arrives asynchronously.</strong> A call issued
- *       immediately after {@code ClientInit} may race the first login.</li>
+ *   <li><strong>The first token is fetched before ClientInit returns.</strong></li>
  * </ul>
  *
  * <h2>Return types and error handling</h2>
  *
- * <p>Query operations return {@link com.tecsun.sisp.iface.common.vo.Page}, which carries
- * only {@code pageNo}, {@code pageSize}, {@code count} and {@code data} — the response
- * envelope's {@code statusCode} and {@code message} are discarded during conversion. A
- * rejected query therefore looks exactly like an empty result. Card operations return
+ * <p>Query operations check the response status before conversion to
+ * {@link com.tecsun.sisp.iface.common.vo.Page}; rejected queries raise an exception. Card operations return
  * {@link com.tecsun.sisp.iface.common.vo.Result}, which preserves the envelope.
  *
  * <p>Transport failures (connection refused, timeout, non-200 HTTP) propagate as
@@ -49,7 +46,7 @@ import java.util.Map;
  *
  * <p>Operation methods are stateless apart from the shared static fields, so they are safe
  * to call from multiple threads once initialised. The heartbeat thread is a single
- * instance and is never stopped.
+ * instance; call {@link #shutdown()} at application shutdown.
  *
  * <p>Full reference: {@code docs/CLIENT_SDK.md} at the repository root.
  *
@@ -61,13 +58,13 @@ public class IFaceHttpsClient {
     private final static String restUri = "/iface/rest/";
     private final static String cardUri = "/iface/cardInfo/";
 
-    private static String tokenId = "";
+    private static volatile String tokenId = "";
     private static String ip;
     private static int port;
     private static int tokenTimeOut;
     private static String channelcode;
     private static String platformContext;
-    private static Thread t;
+    private static volatile Thread t;
     public static boolean isVerify;
 
     private IFaceHttpsClient() {
@@ -79,8 +76,8 @@ public class IFaceHttpsClient {
      * <p>Must be called exactly once per JVM, before any operation. A second call throws,
      * because the heartbeat thread reference is already set.
      *
-     * <p>The first token is fetched asynchronously, so a call issued immediately after this
-     * method returns may race the initial login.
+     * <p>The first token is fetched synchronously, so a call issued immediately after this
+     * method returns can use the initial login token.
      *
      * @param ip              host of the interface service; must not be null or empty
      * @param port            port of the interface service; must not be 0
@@ -96,7 +93,7 @@ public class IFaceHttpsClient {
      * @throws Exception if already initialised, or if {@code ip} is empty or {@code port}
      *                   is 0
      */
-    public static void ClientInit(String ip, int port, int tokenTimeOut,boolean isVerify, String channelcode, String platformContext) throws Exception {
+    public static synchronized void ClientInit(String ip, int port, int tokenTimeOut,boolean isVerify, String channelcode, String platformContext) throws Exception {
         if (t != null) {
             throw new Exception("Error: Do not init again !!!!! ");
         }
@@ -115,12 +112,28 @@ public class IFaceHttpsClient {
         IFaceHttpsClient.tokenTimeOut = tokenTimeOut;
         IFaceHttpsClient.channelcode = channelcode;
         IFaceHttpsClient.platformContext = platformContext.contains("/") ? platformContext : "/" + platformContext;
-        t = new Thread(new TokenGetter());
+        String loginUrl = (isVerify ? "https://" : "http://") + ip + ":" + port + IFaceHttpsClient.platformContext + "/iface/user/checkLogin";
+        tokenId = LoginUtil.checkLogin(port, loginUrl, channelcode);
+        t = new Thread(new TokenGetter(), "iface-token-renewal");
+        t.setDaemon(true);
         t.start();
     }
 
     private static String getUrl(String classUrl, String funcName) {
-        return isVerify?"https://" + ip + ":" + port + "" + platformContext + classUrl + funcName + "?tokenId=" + tokenId:"http://" + ip + ":" + port + "" + platformContext + classUrl + funcName + "?tokenId=" + tokenId;
+        return (isVerify ? "https://" : "http://") + ip + ":" + port + platformContext + classUrl + funcName;
+    }
+
+    static String currentToken() {
+        return tokenId;
+    }
+
+    static Result requireSuccessfulPage(String data) throws Exception {
+        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        if (result == null || !com.tecsun.sisp.iface.common.util.Constants.RESULT_MESSAGE_SUCCESS.equals(result.getStatusCode())) {
+            throw new IllegalStateException("Interface query failed: "
+                    + (result == null ? "empty response" : result.getStatusCode()));
+        }
+        return result;
     }
 
     private static void setData(Map map, Page page) throws Exception {
@@ -155,7 +168,7 @@ public class IFaceHttpsClient {
         }
         String requestUrl = getUrl(restUri, "getPersonSureInfo");
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsgrcbxxVO> page = new Page<TsgrcbxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -180,7 +193,7 @@ public class IFaceHttpsClient {
         }
         String requestUrl = getUrl(restUri, "getPersonPay");
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsgrjfjsxxVO> page = new Page<TsgrjfjsxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -205,7 +218,7 @@ public class IFaceHttpsClient {
         }
         String requestUrl = getUrl(restUri, "getPersonPesionPay");
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsgrjfxxVO> page = new Page<TsgrjfxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -231,7 +244,7 @@ public class IFaceHttpsClient {
         }
         String requestUrl = getUrl(restUri, "getLoseFee");
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TslybxjbxxVO> page = new Page<TslybxjbxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -257,7 +270,7 @@ public class IFaceHttpsClient {
         }
         String requestUrl = getUrl(restUri, "getLosePay");
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TssydyffxxVO> page = new Page<TssydyffxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -283,7 +296,7 @@ public class IFaceHttpsClient {
         }
         String requestUrl = getUrl(restUri, "getHealthFee");
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsmtbxfyjsxxVO> page = new Page<TsmtbxfyjsxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -310,7 +323,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getHealthAccount");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsmtbxgrjbxxVO> page = new Page<TsmtbxgrjbxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -337,7 +350,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getHealthPay");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsmtbxgrjfmxVO> page = new Page<TsmtbxgrjfmxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -364,7 +377,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getBirthInfo");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TssybxjbxxVO> page = new Page<TssybxjbxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -392,7 +405,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getPesionMouthAccount");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsylyzhxxVO> page = new Page<TsylyzhxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -420,7 +433,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getPesionYearAccount");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsylgrzhxxVO> page = new Page<TsylgrzhxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -447,7 +460,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getPesionTreatment");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsylbxgrjfmxVO> page = new Page<TsylbxgrjfmxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -475,7 +488,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getPesionPay");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsyldyffxxVO> page = new Page<TsyldyffxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -502,7 +515,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getPesionInfo");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsylbxjbxxVO> page = new Page<TsylbxjbxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -529,7 +542,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getQuitPay");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsylbxltxrydyxxVO> page = new Page<TsylbxltxrydyxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -555,7 +568,7 @@ public class IFaceHttpsClient {
         String requestUrl = getUrl(restUri, "getHurtInfo");
 
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsgsbxjbxxVO> page = new Page<TsgsbxjbxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -580,7 +593,7 @@ public class IFaceHttpsClient {
         }
         String requestUrl = getUrl(restUri, "getSelfInfo");
         String data = HttpClientUtil.getData(port, requestUrl, bean, true);
-        Result result = JsonMapper.buildNormalMapper().fromJson(data, Result.class);
+        Result result = requireSuccessfulPage(data);
         Page<TsjbxxVO> page = new Page<TsjbxxVO>();
         if (result.getData() != null) {
             Map map = (Map) result.getData();
@@ -719,20 +732,37 @@ public class IFaceHttpsClient {
     /**
      * Renews the token on a fixed interval.
      */
+    public static synchronized void shutdown() {
+        if (t != null) {
+            t.interrupt();
+            t = null;
+        }
+        tokenId = "";
+    }
+
     private static class TokenGetter implements Runnable {
         public void run() {
-            String url = isVerify ? "https://" + ip + ":" + port + platformContext + "/iface/user/checkLogin" : "http://" + ip + ":" + port + platformContext + "/iface/user/checkLogin";
-            while (true) {
+            String url = (isVerify ? "https://" : "http://") + ip + ":" + port + platformContext + "/iface/user/checkLogin";
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    IFaceHttpsClient.tokenId = LoginUtil.checkLogin(port, url, channelcode);
-                    Thread.sleep(tokenTimeOut * 60 * 1000);
+                    Thread.sleep((long) tokenTimeOut * 60L * 1000L);
+                    String refreshed = LoginUtil.checkLogin(port, url, channelcode);
+                    synchronized (IFaceHttpsClient.class) {
+                        if (t == Thread.currentThread() && !Thread.currentThread().isInterrupted()) {
+                            tokenId = refreshed;
+                        }
+                    }
                 } catch (InterruptedException e) {
-
+                    Thread.currentThread().interrupt();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // Retain the previous token, but back off rather than retrying in a tight loop.
+                    try {
+                        Thread.sleep(60000L);
+                    } catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         }
     }
-
 }

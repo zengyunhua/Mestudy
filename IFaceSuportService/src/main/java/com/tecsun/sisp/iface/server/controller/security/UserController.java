@@ -3,7 +3,6 @@ package com.tecsun.sisp.iface.server.controller.security;
 
 import com.google.gson.JsonObject;
 import com.tecsun.sisp.iface.common.util.Constants;
-import com.tecsun.sisp.iface.common.util.JsonHelper;
 import com.tecsun.sisp.iface.common.util.JsonMapper;
 import com.tecsun.sisp.iface.common.vo.*;
 import com.tecsun.sisp.iface.common.vo.card.CardAllInfo;
@@ -57,6 +56,15 @@ public class UserController extends BaseController {
      * @return
      */
 
+    private static boolean channelSecretMatches(String channel, String provided) {
+        String expected = System.getenv("SISP_" + channel.toUpperCase(java.util.Locale.ROOT) + "_SECRET");
+        if (expected == null || expected.length() < 32 || provided == null) {
+            return false; // Fail closed until an independent, high-entropy secret is configured.
+        }
+        return java.security.MessageDigest.isEqual(
+                expected.getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                provided.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
     @RequestMapping(value = "/checkLogin", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public Result checkLogin(@RequestBody NetUserInfoVO bean, @Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -84,38 +92,37 @@ public class UserController extends BaseController {
                     result = Constants.RESULT_MESSAGE_SUCCESS;
                     token = Constants.TOKENNAME + CommUtil.getUUID();
                     JedisUtil.setValue(token, ip);
+                    JedisUtil.setValue(Constants.CHANNELKEY + token, "NetPortal");
                     vo = (NetUserInfoVO)result2.getData();
                     vo.setToken(token);
                     message = type + " 登陆成功!";
                     return result2;
                 } else {
-                    logger.info("token is :"+token+ "============ip is: "+ip);
-                    logger.info("入参 is :"+ JsonHelper.javaBeanToJson(bean));
                     logger.error("网办登录：用户名或密码错误！");
                     return result2;
                 }
             } else if (type.equals("SelfService")) {//由于无用户登录操作，需前台定义定时更新任务
-                if (userName.equals(CommUtil.generateValue("SelfService")) && pwd.equals(CommUtil.generateValue("SelfService"))) {
+                if ("SelfService".equals(userName) && channelSecretMatches("SelfService", pwd)) {
                     token = Constants.TOKENNAME + CommUtil.getUUID();
                     ip = CommUtil.getIpAddr(request);
                     JedisUtil.setValue(token, ip, Constants.SELFSERVICETIMEOUT);
+                    JedisUtil.setValue(Constants.CHANNELKEY + token, "SelfService", Constants.SELFSERVICETIMEOUT);
                     result = Constants.RESULT_MESSAGE_SUCCESS;
                     message = type + " 登陆成功!";
                     return result(result, message, token);
                 } else {
-                    logger.info("token is :"+token+ "============ip is: "+ip);
                     logger.error("自助终端登录：用户名或密码错误！");
                 }
             } else if (type.equals("TSB")) {
-                if (userName.equals(CommUtil.generateValue("TSB")) && pwd.equals(CommUtil.generateValue("TSB"))) {
+                if ("TSB".equals(userName) && channelSecretMatches("TSB", pwd)) {
                     token = Constants.TOKENNAME + CommUtil.getUUID();
                     ip = CommUtil.getIpAddr(request);
                     JedisUtil.setValue(token,ip);
+                    JedisUtil.setValue(Constants.CHANNELKEY + token, "TSB");
                     result = Constants.RESULT_MESSAGE_SUCCESS;
                     message = type + " 登陆成功!";
                     return result(result, message, token);
                 } else {
-                    logger.info("token is :"+token+ "============ip is: "+ip);
                     logger.error("德生宝登录：用户名或密码错误！");
                 }
             } else if (type.equals("WeChat")) {
@@ -125,13 +132,12 @@ public class UserController extends BaseController {
                     result = Constants.RESULT_MESSAGE_SUCCESS;
                     token = Constants.TOKENNAME + CommUtil.getUUID();
                     JedisUtil.setValue(token, ip);
+                    JedisUtil.setValue(Constants.CHANNELKEY + token, "WeChat");
                     vo = (NetUserInfoVO)result2.getData();
                     vo.setToken(token);
                     message = type + " 登陆成功!";
                     return result2;
                 } else {
-                    logger.info("token is :"+token+ "============ip is: "+ip);
-                    logger.info("入参 is :"+ JsonHelper.javaBeanToJson(bean));
                     logger.error("微信登录：用户名或密码错误！");
                     return result2;
                 }
@@ -145,6 +151,7 @@ public class UserController extends BaseController {
                     token = Constants.TOKENNAME + CommUtil.getUUID();
                     ip = CommUtil.getIpAddr(request);
                     JedisUtil.setValue(token,ip);
+                    JedisUtil.setValue(Constants.CHANNELKEY + token, "ThirdSystem");
                     //向缓存中添加用户id，以及区域
                     String userkey = Constants.USERKEY + token;
                     String userAreaid = Constants.USERAREAID + token;
@@ -156,12 +163,9 @@ public class UserController extends BaseController {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("token is :"+token+ "============ip is: "+ip);
-            logger.error(type + " 登录失败！ /n 异常信息："+e.getMessage());
+            logger.error("登录失败，渠道：" + type, e);
         }
         logger.info(message);
-        logger.info("token is :"+token+ "============ip is: "+ip);
         return result(result, message, vo);
     }
 
@@ -338,7 +342,6 @@ public class UserController extends BaseController {
                         netUserService.insertUser(netUserInfoVO1);
                     } catch (Exception e) {
                         logger.error("登录异常： " + e.getMessage());
-                        logger.error("登录异常： " + JsonHelper.javaBeanToJson(netUserInfoVO1));
                         result = Constants.RESULT_MESSAGE_ERROR;
                         message = "登录异常---将省厅用户数据同步到本地时出错";
                         return result(result, message, netUserInfoVO1);
