@@ -45,10 +45,10 @@ when a Java system has to talk to a dozen heterogeneous government backends.
 
 | Module | Artifact | What it does | Size |
 | --- | --- | --- | :---: |
-| [`IFaceSuportService`](IFaceSuportService/README.md) | `sisp_IFaceSuportService` | Core interface service. Social-insurance queries, card services, employment, hospital, face verification, SMS, WeChat, bank/fee channels. Also ships the reusable **client SDK** jar (`classifier=client`). | 285 Java files |
-| [`NetworkOfficeService`](NetworkOfficeService/README.md) | `sisp_NetworkOfficeService` | Online government-service portal. Application drafts, submission, audit trail, electronic signature (PDF stamping), area/administrative division data. | 127 Java files |
-| [`IFaceSuperService_hn`](IFaceSuperService_hn/README.md) | `sisp_IFaceSuportService` (HN build) | Province-specific (Henan) variant of the interface service: card + social-insurance controllers against the provincial gateway. | 61 Java files |
-| [`InterfaceFunction`](InterfaceFunction/README.md) | `sisp_InterfaceFunction` | Platform security administration: users, roles, function/permission trees, login. | 48 Java files |
+| [`IFaceSuportService`](IFaceSuportService/README.md) | `sisp_IFaceSuportService` | Core interface service. Social-insurance queries, card services, employment, hospital, face verification, SMS, WeChat, bank/fee channels. Also ships the reusable **client SDK** jar (`classifier=client`). | 286 Java files |
+| [`NetworkOfficeService`](NetworkOfficeService/README.md) | `sisp_NetworkOfficeService` | Online government-service portal. Application drafts, submission, audit trail, electronic signature (PDF stamping), area/administrative division data. | 128 Java files |
+| [`IFaceSuperService_hn`](IFaceSuperService_hn/README.md) | `sisp_IFaceSuportService` (HN build) | Province-specific (Henan) variant of the interface service: card + social-insurance controllers against the provincial gateway. | 60 Java files |
+| [`InterfaceFunction`](InterfaceFunction/README.md) | `sisp_InterfaceFunction` | Platform security administration: users, roles, function/permission trees, login. | 49 Java files |
 | [`NetPortalManagement`](NetPortalManagement/README.md) | `sisp_NetPortalManagement` | Lightweight portal administration: portal users, policy documents, external web-connection registry. Uses the internal *Bee* persistence framework. | 11 Java files |
 
 All modules share the group id `com.tecsun.sisp` and are packaged as `war` for
@@ -324,7 +324,7 @@ domain prefix (`/iface/rest/`, `/iface/cardInfo/`, `/iface/user/`, ...). The
 This repository is a **curated archive of production-derived modules**, published for
 reference. It is maintained on a best-effort basis.
 
-- **Documentation**: in place — this README, a per-module README each, and the eight
+- **Documentation**: in place — this README, a per-module README each, and the seven
   documents under `docs/`.
 - **Build reproducibility**: partial. `IFaceSuportService`, `IFaceSuperService_hn` and
   `InterfaceFunction` build from Maven Central alone and are tested on every push; the
@@ -351,9 +351,14 @@ is a good first contribution.
    appeared in this repository as compromised and rotate it — see
    [SECURITY.md](SECURITY.md) for the procedure.
 3. **Duplicated `common` layer.** Each module re-implements `Result`, `Page`,
-   `CommUtil`, `AESUtil`. 54 class names exist in more than one module and none of
-   the copies are identical — they have drifted. Consolidating them into a shared
-   artifact is the single most valuable refactor available here.
+   `CommUtil`, `AESUtil`. 53 class names exist in more than one module, and 51 of those
+   53 have drifted apart — only `DevBean` and `SecretKeyBean` are still byte-identical
+   (between `IFaceSuportService` and `IFaceSuperService_hn`). The spread is wide:
+   `Constants` exists in four copies of 895, 69, 31 and 30 lines; `BaseController` in
+   five. Consolidating them into a shared artifact is the single most valuable refactor
+   available here, but it is not a mechanical merge — the smallest copy is usually the
+   only one a given module actually calls, so every divergence has to be resolved by
+   reading its callers.
 4. **Thin test coverage.** The client, filter and `Page` have focused assertion-based tests,
    but most business flows are not covered. Legacy HTTP smoke tests require a
    running service and local fixtures, so they are excluded from default tests.

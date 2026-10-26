@@ -11,7 +11,7 @@ and read. If you want to understand the conventions used everywhere else, start 
 | Artifact | `com.tecsun.sisp:InterfaceFunction` |
 | Packaging | `war` |
 | Version | `V1.0.0.150630` |
-| Java files | 48 |
+| Java files | 49 |
 | Endpoints | 27 |
 | Datasources | 1 |
 

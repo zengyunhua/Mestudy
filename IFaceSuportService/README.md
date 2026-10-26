@@ -9,7 +9,7 @@ the WeChat channel, and it also publishes the **client SDK** that terminals embe
 | Artifact | `com.tecsun.sisp:IFaceSuportService` |
 | Packaging | `war` (plus a `client`-classified jar) |
 | Version | `V1.0.0.150630` |
-| Java files | 285 |
+| Java files | 286 |
 | Endpoints | 251 |
 | Datasources | 8 |
 

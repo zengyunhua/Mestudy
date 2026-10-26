@@ -9,7 +9,7 @@ into PDFs by an external signature service.
 | Artifact | `com.tecsun.sisp:NetworkOfficeService` |
 | Packaging | `war` |
 | Version | `V1.0.0.180612` |
-| Java files | 127 |
+| Java files | 128 |
 | Endpoints | 72 |
 | Datasources | 5 |
 

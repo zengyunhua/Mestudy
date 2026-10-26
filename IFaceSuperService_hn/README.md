@@ -9,7 +9,7 @@ login/token only, with a different datasource and a newer version string.
 | Artifact | `com.tecsun.sisp:IFaceSuperService_hn` |
 | Packaging | `war` |
 | Version | `V1.0.0.190107` |
-| Java files | 61 |
+| Java files | 60 |
 | Endpoints | 8 |
 | Datasources | 2 |
 
