@@ -182,8 +182,11 @@ The assertion-based tests cover the client response envelope, request filter and
 `Page` paging behaviour. The Henan module compiles but has no automated tests yet.
 Legacy HTTP smoke tests are intentionally excluded from this command because they
 require a running deployment and local fixtures. On Windows, if Surefire cannot start
-a forked JVM because `%TEMP%` contains non-ASCII characters, append `-DforkCount=0`
-(less test-process isolation); see [troubleshooting](docs/TROUBLESHOOTING.md).
+a forked JVM because `%TEMP%` contains non-ASCII characters — the usual case when the
+account name is Chinese — point the temp directory at an ASCII path:
+`mvn -B -Djava.io.tmpdir=D:\mvn-tmp package` (create the directory first).
+`-DforkCount=0` also works but loses per-test isolation. See
+[troubleshooting](docs/TROUBLESHOOTING.md).
 This is a **partial** public build, not a claim that all five modules run without the
 private `bee` framework and AA client.
 

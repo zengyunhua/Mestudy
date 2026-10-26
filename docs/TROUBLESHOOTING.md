@@ -137,6 +137,15 @@ Creating `D:\mvn-tmp` first is enough. Alternatively add `-DforkCount=0` to run 
 inside the Maven JVM; that works but loses per-test isolation. Linux and macOS are
 unaffected, so CI never sees this.
 
+Two things worth knowing before you spend time on this:
+
+- Upgrading surefire does not help. Version 3.2.5 fails identically; the temp directory
+  has to be fixed on the JVM that runs Maven, which is why the flag goes on the command
+  line rather than into the POM.
+- It breaks `mvn package` and `mvn verify` too, not just `mvn test`, because both run the
+  test phase. On an account whose name is not ASCII, a fresh clone is red until you pass
+  the flag.
+
 ### Java 11+ `IllegalAccessError` from Axis
 
 ```
