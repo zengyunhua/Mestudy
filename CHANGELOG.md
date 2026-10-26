@@ -13,16 +13,31 @@ grouped by scope rather than by a single release number.
 
 ### Changed
 
-- **The default reactor is now the two publicly buildable modules.** `mvn package` at the
+- **`InterfaceFunction` moved into the default reactor.** It declared
+  `com.tecsun.sisp_public:aamanagement-client:1.0.5` and `bee:xx.tool:1.0.0`, but nothing
+  in the module references either: there is no import of `com.tecsun.sisp_public` or
+  `bee.*`, no `Class.forName`, and no matching string in the resources. Removing the two
+  declarations lets the module compile and package into a war against Maven Central
+  alone, so `mvn -B package` now builds three modules instead of two. The declarations
+  were dead weight copied from a sibling POM, not a real dependency. This also narrows
+  the `private-deps` profile to `NetworkOfficeService` and `NetPortalManagement`.
+- **What is left, precisely.** `NetPortalManagement` genuinely needs the `bee.cloud`
+  persistence framework — its beans carry `@TableName` / `@Column`, extend `Doe`, and its
+  service layer queries through `Cnd` / `Select` — so it stays behind the profile.
+  `NetworkOfficeService` compiles without any private jar except for one class,
+  `com.tecsun.sisp.net.modules.entity.response.BanjianVo`, which four files and
+  `mappings/draftsDAO.xml` reference but which is not in this repository. Reconstructing
+  it from the mapper's `select t.*, m.*, o.*` would close that gap; it is left as a
+  roadmap item because the original field set cannot be verified.
+- **The default reactor is now the publicly buildable modules.** `mvn package` at the
   repository root used to walk into `NetworkOfficeService` third and fail on
   `com.tecsun.sisp_public:aamanagement-client:1.0.5` / `bee:xx.tool:1.0.0`, which meant a
-  fresh clone could not complete a build at all. `NetworkOfficeService`,
-  `InterfaceFunction` and `NetPortalManagement` now live behind the `private-deps`
-  profile: `mvn -B package` builds `IFaceSuportService` and `IFaceSuperService_hn` and
-  succeeds, `mvn -B -Pprivate-deps package` restores the old five-module reactor for
-  anyone who has the private jars installed. The dependencies were verified to be real —
-  dropping them moves the failure from resolution to compilation (`BanjianVo` is defined
-  in one of those jars) — so the modules were isolated rather than stripped.
+  fresh clone could not complete a build at all. The modules that need those jars now
+  live behind the `private-deps` profile: `mvn -B package` builds the public modules and
+  succeeds, `mvn -B -Pprivate-deps package` restores the five-module reactor for anyone
+  who has the private jars installed. The modules were isolated rather than stripped,
+  because the dependencies were assumed to be real — that assumption later turned out to
+  be wrong for `InterfaceFunction`, see above.
 - **Java 8 baseline.** `maven.compiler.source` / `maven.compiler.target` raised from
   `1.7` to `1.8` in the root POM, which is now the single source of truth for the
   language level. The per-module `maven-compiler-plugin` overrides in

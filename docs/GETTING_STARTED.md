@@ -74,8 +74,8 @@ unresolvable placeholder. The full key list is in
 
 ## 4. Build
 
-From the repository root. The default reactor is the two modules that resolve from
-Maven Central; the other three are opt-in:
+From the repository root. The default reactor is the three modules that resolve from
+Maven Central; the other two are opt-in:
 
 ```bash
 # Build everything in the default reactor, tests included
@@ -84,7 +84,7 @@ mvn -B package
 # Tests only, no database and no deployed service
 mvn -B test
 
-# The three modules that need private jars (see the table below)
+# The two modules that need private jars (see the table below)
 mvn -B -Pprivate-deps package
 ```
 
@@ -94,6 +94,7 @@ Expected artefacts (paths are relative to the module directory):
 IFaceSuportService/target/IFaceSuportService-V1.0.0.150630.war
 IFaceSuportService/target/IFaceSuportService-V1.0.0.150630-client.jar
 IFaceSuperService_hn/target/IFaceSuperService_hn-V1.0.0.190107.war
+InterfaceFunction/target/InterfaceFunction-V1.0.0.150630.war
 ```
 
 The `-client` jar is produced by the `maven-jar-plugin` execution with
@@ -106,14 +107,20 @@ the artefact a downstream terminal embeds.
 | --- | --- | --- | --- |
 | `IFaceSuportService` | yes | default | — |
 | `IFaceSuperService_hn` | yes | default | — |
-| `NetworkOfficeService` | no | `-Pprivate-deps` | `bee:xx.tool`, `com.tecsun.sisp_public:aamanagement-client` |
-| `InterfaceFunction` | no | `-Pprivate-deps` | same as above |
+| `InterfaceFunction` | yes | default | — |
+| `NetworkOfficeService` | no | `-Pprivate-deps` | `bee:xx.tool`, and one class not in the repo |
 | `NetPortalManagement` | no | `-Pprivate-deps` | `bee:xx.tool`, `bee:cloud*` |
 
-The three blocked modules are kept out of the default reactor on purpose: a build that
+The two blocked modules are kept out of the default reactor on purpose: a build that
 stops on an unresolvable artifact teaches a newcomer nothing. Their dependencies are
 genuinely referenced by the code, so they cannot simply be deleted — install the jars
 into your local repository first, then build with the profile.
+
+`InterfaceFunction` was in that group until its two private coordinates turned out to be
+unused: nothing imports `com.tecsun.sisp_public` or `bee.*`, and the module packages into
+a war without them. They are gone, so the module builds publicly now. The one remaining
+gap in `NetworkOfficeService` is a single missing entity class, not a framework —
+`BanjianVo` — which is tracked in [ROADMAP.md](ROADMAP.md).
 
 ### Using a Maven mirror
 

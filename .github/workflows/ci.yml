@@ -13,11 +13,10 @@ permissions:
 jobs:
   # ---------------------------------------------------------------------------
   # Build the default reactor: the modules whose dependencies are all on Maven
-  # Central. NetworkOfficeService, InterfaceFunction and NetPortalManagement
-  # depend on the private "bee" framework and
-  # com.tecsun.sisp_public:aamanagement-client, which are not published
-  # anywhere public, so they sit behind the -Pprivate-deps profile and are not
-  # built here. See docs/TROUBLESHOOTING.md.
+  # Central. NetworkOfficeService and NetPortalManagement depend on the private
+  # "bee" framework, which is not published anywhere public, so they sit behind
+  # the -Pprivate-deps profile and are not built here. See
+  # docs/TROUBLESHOOTING.md.
   # ---------------------------------------------------------------------------
   build:
     name: Test and package (JDK 8)

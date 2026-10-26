@@ -26,11 +26,15 @@ cloned and built. Everything else is secondary.
 
 ## Phase 2 — Make it build
 
-- [ ] Audit every dependency against Maven Central; list the ones that are proprietary
-- [ ] Replace proprietary artifacts with public equivalents where a behavioural match
-      exists (e.g. swap internal utility jars for Guava/Commons)
-- [ ] Stub the remainder behind an optional Maven profile so `mvn package` succeeds
-      without the internal Nexus
+- [x] Audit every dependency against Maven Central; list the ones that are proprietary
+- [~] Replace proprietary artifacts with public equivalents where a behavioural match
+      exists (e.g. swap internal utility jars for Guava/Commons) — `InterfaceFunction`
+      needed none of its two private coordinates, so it now builds publicly
+- [x] Stub the remainder behind an optional Maven profile so `mvn package` succeeds
+      without the internal Nexus (`-Pprivate-deps` opts the remaining two back in)
+- [ ] Reconstruct `BanjianVo` so `NetworkOfficeService` leaves the profile too
+- [ ] Replace `NetPortalManagement`'s `bee.cloud` persistence layer, or accept that it
+      stays out of the default reactor
 - [~] Root POM is the aggregator and parent with shared encoding/compiler settings;
       module versions remain separate and private dependencies are not yet replaced
 - [x] Set the language level to Java 8 (`maven.compiler.source`/`target` = `1.8`) once,
@@ -44,8 +48,8 @@ cloned and built. Everything else is secondary.
 - [ ] One controller test per module using `MockMvc` with mocked services
 - [ ] H2-backed integration test for one mapper per module (Oracle-specific SQL will need
       dialect guards; start with a mapper that uses portable SQL)
-- [~] GitHub Actions runs `mvn -B -pl IFaceSuportService,IFaceSuperService_hn package`
-      on JDK 8; expand to `verify` and a matrix as coverage matures
+- [~] GitHub Actions runs `mvn -B verify` on the default reactor on JDK 8; expand to a
+      JDK matrix and add coverage reporting as the suite matures
 - [ ] Coverage reporting, with a floor that only ratchets upward
 
 ## Phase 4 — Documentation depth
