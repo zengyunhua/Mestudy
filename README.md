@@ -354,11 +354,16 @@ is a good first contribution.
    `bee.cloud` persistence framework, which was never published publicly, so it is
    excluded from CI. The other four build against Maven Central alone — two of them only
    after dead dependencies were dropped and one missing entity class was reconstructed.
-2. **Credentials are still in the git history.** The `config.properties` / `ds.xml`
-   files are no longer tracked (they were replaced by `.example` templates), but they
-   remain in every commit before that removal. Treat every credential that ever
-   appeared in this repository as compromised and rotate it — see
-   [SECURITY.md](SECURITY.md) for the procedure.
+2. **Credentials and personal data are still in the git history.** The
+   `config.properties` / `ds.xml` files are no longer tracked (they were replaced by
+   `.example` templates) and the current tree is clean, but 21 files across 11 commits
+   still carry their old contents. An audit of those commits is in
+   [SECURITY.md](SECURITY.md#1-credentials-committed-to-the-repository) and it is worth
+   reading before you clone this anywhere near a real deployment: the worst item is not a
+   password but an RSA **private key** for the payment-channel integration
+   (`zfb.app_private_key`), and the history also holds 57 values matching the 18-digit
+   resident ID pattern. Rotate the payment key pair first — see
+   [SECURITY.md](SECURITY.md) for the order and the procedure.
 3. **Duplicated `common` layer.** Each module re-implements `Result`, `Page`,
    `CommUtil`, `AESUtil`. 53 class names exist in more than one module, and 51 of those
    53 have drifted apart — only `DevBean` and `SecretKeyBean` are still byte-identical

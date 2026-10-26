@@ -63,6 +63,16 @@ grouped by scope rather than by a single release number.
 
 ### Fixed
 
+- **The credential exposure is now inventoried instead of asserted.** `SECURITY.md` used
+  to say the history held "database passwords, provincial interface accounts, a shared
+  signing key" — accurate but misleading by omission. An audit of the 21 files and 11
+  commits that still carry them found ten distinct classes of secret, of which the worst
+  is `zfb.app_private_key`: a ~1.6 KB RSA **private key** for the payment-channel
+  integration, which is a signing identity rather than a password and therefore cannot be
+  neutralised by changing a password. The history also holds 57 values matching the
+  18-digit resident ID pattern, which `SECURITY.md` did not mention at all — that is a
+  separate problem from credentials, because personal data cannot be rotated. Both are
+  documented with a rotation order; no values are reproduced.
 - **`NetPortalManagement`'s dependencies are declared again.** They had been deleted
   outright while the module was being brought into line with the others, which left it in
   a worse state than before: previously it failed to resolve, and the fix was to install
