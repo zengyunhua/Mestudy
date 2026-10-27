@@ -247,5 +247,6 @@ reverse chronological order:
 | `6e964a3` | MyBatis reverse engineering, partial Netty |
 | `f504bdd` | Dubbox 2.8.4 projects |
 
-[Unreleased]: https://github.com/zengyunhua/Mestudy/compare/v1.0.0...master
+[Unreleased]: https://github.com/zengyunhua/Mestudy/compare/v1.1.0...master
+[1.1.0]: https://github.com/zengyunhua/Mestudy/releases/tag/v1.1.0
 [1.0.0]: https://github.com/zengyunhua/Mestudy/releases/tag/v1.0.0
