@@ -1,7 +1,5 @@
 package com.tecsun.sisp.iface.common.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,29 +26,18 @@ public class Config {
 	    }
 
 	    private void init() {
-	        InputStream in = null;
-	        try {
-	            in = Config.class.getResourceAsStream(CONIFG_FILE);
+	        try (InputStream in = Config.class.getResourceAsStream(CONIFG_FILE)) {
+	            if (in == null) {
+	                throw new IllegalStateException("Missing /config.properties");
+	            }
 	            this.props.load(in);
-	            if(props==null&&props.isEmpty())
-	                logger.error("config.properties  without content. ");
-	            else
-	            logger.info("config.properties :"+JsonMapper.buildNormalMapper().toJson(props));
-	        } catch (IOException var11) {
-	            if (this.logger.isErrorEnabled()) {
-	                this.logger.error("loading /config.properties fail!", var11);
+	            if (this.props.isEmpty()) {
+	                throw new IllegalStateException("Empty /config.properties");
 	            }
-	        } finally {
-	            if (in != null) {
-	                try {
-	                    in.close();
-	                } catch (IOException var10) {
-	                    this.logger.error("Config close fail!", var10);
-	                }
-	            }
+	        } catch (IOException e) {
+	            throw new IllegalStateException("Unable to load /config.properties", e);
 	        }
 	    }
-
 	    public static Config getInstance() {
 	        if (instance == null) {
 	            instance = new Config();

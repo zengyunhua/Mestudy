@@ -21,16 +21,21 @@ public class JedisUtil {
     public static void setValue(String key, String value, Integer outTime) throws Exception {
         JedisPool publicJedisPool = null;
         Jedis publicJedis = null;
+        boolean broken = false;
         try {
             publicJedisPool = DataBase.getJedisPublicPool();
             publicJedis = publicJedisPool.getResource();
             publicJedis.setex(key, 60 * outTime, value);
         } catch (Exception e) {
-            publicJedisPool.returnBrokenResource(publicJedis);
-            throw new Exception("设置redis失败: key:" + key + ",value:" + value, e);
+            broken = true;
+            throw new Exception("设置redis失败", e);
         } finally {
             if (publicJedis != null) {
-                publicJedisPool.returnResource(publicJedis);
+                if (broken) {
+                    publicJedisPool.returnBrokenResource(publicJedis);
+                } else {
+                    publicJedisPool.returnResource(publicJedis);
+                }
             }
         }
     }
@@ -38,17 +43,22 @@ public class JedisUtil {
     public static String getValue(String key) throws Exception {
         JedisPool publicJedisPool = null;
         Jedis publicJedis = null;
+        boolean broken = false;
         String value="";
         try {
             publicJedisPool = DataBase.getJedisPublicPool();
             publicJedis = publicJedisPool.getResource();
             value = publicJedis.get(key);
         } catch (Exception e) {
-            publicJedisPool.returnBrokenResource(publicJedis);
-            throw new Exception("获取reids失败，key:" + key, e);
+            broken = true;
+            throw new Exception("获取redis失败", e);
         } finally {
             if (publicJedis != null) {
-                publicJedisPool.returnResource(publicJedis);
+                if (broken) {
+                    publicJedisPool.returnBrokenResource(publicJedis);
+                } else {
+                    publicJedisPool.returnResource(publicJedis);
+                }
             }
         }
         return value;
@@ -63,16 +73,21 @@ public class JedisUtil {
     public static void delValue(String key) throws Exception {
         JedisPool publicJedisPool = null;
         Jedis publicJedis = null;
+        boolean broken = false;
         try {
             publicJedisPool = DataBase.getJedisPublicPool();
             publicJedis = publicJedisPool.getResource();
             publicJedis.del(key);
         } catch (Exception e) {
-            publicJedisPool.returnBrokenResource(publicJedis);
-            throw new Exception("删除reids失败，key:" + key, e);
+            broken = true;
+            throw new Exception("删除redis失败", e);
         } finally {
             if (publicJedis != null) {
-                publicJedisPool.returnResource(publicJedis);
+                if (broken) {
+                    publicJedisPool.returnBrokenResource(publicJedis);
+                } else {
+                    publicJedisPool.returnResource(publicJedis);
+                }
             }
         }
     }

@@ -44,38 +44,46 @@ public class BusinessFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         resp.setCharacterEncoding("UTF-8");
-        String ip = CommUtil.getIpAddr(req);
-        String tokenId = req.getParameter("tokenId");
+        String ip = req.getRemoteAddr();
+        String tokenId = req.getHeader("X-Interface-Token");
+        if (StringUtils.isBlank(tokenId)) {
+            tokenId = req.getParameter("tokenId"); // legacy clients
+        }
         String deviceid = req.getParameter("deviceid");
-        System.out.println("========拦截器==========deviceid:"+deviceid);
+
         //String boy=getBody(req);
+        boolean authorized = false;
         try {
-            String redisIP = StringUtils.isNotEmpty(tokenId) ? JedisUtil.getValue(tokenId) : "";
+            String redisIP = StringUtils.startsWith(tokenId, Constants.TOKENNAME)
+                    ? JedisUtil.getValue(tokenId) : "";
             if (StringUtils.isBlank(redisIP)) {
-                String msg = "不存在此token，或超时被删除,tokenId:" + tokenId + ",IP：" + ip;
+                String msg = "认证失败，请重新登录";
                 logger.error("IFACE_ERRORCODE:IFAC-EERR-301,"+msg);
                 resp.getWriter().print(GlobalResult.error_301(msg));
             } else {
                 if (!redisIP.equals(ip)) {
-                    logger.error("IFACE_ERRORCODE:IFAC-EERR-301,拦截非法访问,tokenId：" + tokenId + ",原IP：" + redisIP + ",拦截IP：" + ip);
+                    logger.warn("IFACE_ERRORCODE:IFAC-EERR-301, token IP mismatch");
                     resp.getWriter().print(GlobalResult.error_301("拦截非法访问，请重新登录"));
                 }else{
                     //如果校验ip通过，则校验设备编码
+                    // Device id is optional for query endpoints; authentication requires it in the JSON body.
                     boolean flag=checkDev(deviceid);
                     if (flag) {
-                        JedisUtil.setValue(tokenId, ip);
-                        chain.doFilter(request, response);
+                        authorized = true;
                     }else{
-                        String msg="拦截非法访问,deviceid:"+deviceid+",tokenId：" + tokenId + ",拦截IP：" + ip;
+                        String msg="设备校验失败";
                         logger.error("IFACE_ERRORCODE:IFAC-EERR-303,"+msg);
                         resp.getWriter().print(GlobalResult.error_303(msg));
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("IFACE_ERRORCODE:IFAC-EERR-302,BusinessFilter 拦截出错," + e.getMessage());
-            resp.getWriter().print(GlobalResult.error_302("BusinessFilter 拦截出错," + e.getMessage()));
+            logger.error("IFACE_ERRORCODE:IFAC-EERR-302, token validation failed", e);
+            resp.getWriter().print(GlobalResult.error_302("认证服务不可用"));
+            return;
+        }
+        if (authorized) {
+            chain.doFilter(request, response);
         }
     }
 
@@ -84,7 +92,7 @@ public class BusinessFilter implements Filter {
             try {
                 String dev_uri = DictionaryUtil.getHost(Constants.DEV_URI) + "/" + deviceid;
                 String result = DictionaryUtil.getClientRequest(dev_uri);
-                System.out.println("==" + result);
+
                 if (!"".equals(result)) {
                     DevBean devBean = JsonMapper.buildNormalMapper().fromJson(result, DevBean.class);
                     if (devBean != null) {
@@ -94,7 +102,7 @@ public class BusinessFilter implements Filter {
                     }
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.warn("Device validation failed", e);
             }
         } else {
             return true;

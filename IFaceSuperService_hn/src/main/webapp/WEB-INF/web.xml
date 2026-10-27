@@ -52,6 +52,15 @@
     <filter-name>HiddenHttpMethodFilter</filter-name>
     <servlet-name>springMVC3</servlet-name>
   </filter-mapping>
+  <!-- Protect card endpoints; /iface/user/checkLogin must remain reachable without a token. -->
+  <filter>
+    <filter-name>businessFilter</filter-name>
+    <filter-class>com.tecsun.sisp.iface.common.util.BusinessFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>businessFilter</filter-name>
+    <url-pattern>/iface/card/*</url-pattern>
+  </filter-mapping>
   <welcome-file-list>
     <welcome-file>/WEB-INF/views/index.html</welcome-file>
   </welcome-file-list>

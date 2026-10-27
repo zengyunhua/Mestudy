@@ -7,7 +7,6 @@ import com.tecsun.sisp.iface.common.util.Config;
 import com.tecsun.sisp.iface.common.util.Constants;
 import com.tecsun.sisp.iface.common.util.Dom4JUtil;
 import com.tecsun.sisp.iface.common.util.InvokeUtil;
-import com.tecsun.sisp.iface.common.util.JsonHelper;
 import com.tecsun.sisp.iface.common.util.PicUtil;
 import com.tecsun.sisp.iface.common.vo.Result;
 import com.tecsun.sisp.iface.server.controller.BaseController;
@@ -46,7 +45,6 @@ public class CardInfoController extends BaseController {
 	@RequestMapping(value = "/queryPersonnel", method = RequestMethod.POST, produces = "application/json")
 	public Result queryPersonnel(@RequestBody PersonParam bean) throws Exception {
 		 logger.info("---------------CardInfoController: queryPersonnel---------------");
-	     logger.info("---------------bean:\t" + JsonHelper.javaBeanToJson(bean));
 		String statusCode = Constants.RESULT_MESSAGE_SUCCESS;
 		String message = "操作成功";
 		try {
@@ -65,7 +63,6 @@ public class CardInfoController extends BaseController {
 				// 调用生物检测接口
 				  Map<String, String> res = InvokeUtil.invoke("allJK",
 						new String[] { val });
-				System.out.println(res);
 				if(Constants.RETURN_SUCCESS_00.equals(res.get("ERROR"))){
 				//接收r域的值
 				String str=res.get("r");
@@ -94,7 +91,6 @@ public class CardInfoController extends BaseController {
 		@RequestMapping(value = "/authentication", method = RequestMethod.POST, produces = "application/json")
 		public Result authentication(@RequestBody PersonParam bean) throws Exception {
 			 logger.info("---------------CardInfoController: authentication---------------");
-		     logger.info("---------------bean:\t" + JsonHelper.javaBeanToJson(bean));
 			String statusCode = Constants.RESULT_MESSAGE_SUCCESS;
 			String message = "认证成功";
 			try {
@@ -118,7 +114,6 @@ public class CardInfoController extends BaseController {
 							+"<SIGN>"+Constants.SIGN+"</SIGN>";
 							
 					//加密		
-					System.out.println("222222222"+Config.getInstance().get("biometrics.key"));
 					byte[] aesValue  = AESUtil.aesEncryptToBytes(m, Config.getInstance().get("biometrics.key"));
 					String strValue = AESUtil.byteArrayToHexString(aesValue);
 					//调用生物检测入参
@@ -126,13 +121,14 @@ public class CardInfoController extends BaseController {
 					// 生物检测接口Method
 					  Map<String, String> res = InvokeUtil.invoke("allJK",
 							new String[] { val });
-					  logger.info("res"+res);
-					System.out.println(res);
 					if(Constants.RETURN_SUCCESS_00.equals(res.get("ERROR"))){
 						String path = Config.getInstance().get("authentication");
 						//此处最好需要捕获异常 判断authen
-						boolean authen = PicUtil.base64StrToImage(bean.getAuthen(), path,bean.getAac002());
-						bean.setAuthen(path+bean.getAac002()+".jpg");
+						boolean authen = PicUtil.base64StrToImage(bean.getAuthen(), path, bean.getAac002());
+                        if (!authen) {
+                            return result(Constants.RESULT_MESSAGE_ERROR, "认证图片保存失败");
+                        }
+						bean.setAuthen(new java.io.File(path, bean.getAac002() + ".jpg").getPath());
 						authenticationService.saveAuthenticationDatas(bean);
 						
 						return result(statusCode, message);
@@ -154,7 +150,6 @@ public class CardInfoController extends BaseController {
 	@RequestMapping(value = "/queryAuthentication", method = RequestMethod.POST, produces = "application/json")
 	public Result queryAuthentication(@RequestBody PersonParam bean) throws Exception {
 		 logger.info("---------------CardInfoController: queryPersonnel---------------");
-	     logger.info("---------------bean:\t" + JsonHelper.javaBeanToJson(bean));
 		String statusCode = Constants.RESULT_MESSAGE_SUCCESS;
 		String message = "操作成功";
 		try {
@@ -201,7 +196,6 @@ public class CardInfoController extends BaseController {
 		@RequestMapping(value = "/batchQuery", method = RequestMethod.POST, produces = "application/json")
 		public Result batchQuery(@RequestBody PersonParam bean) throws Exception {
 			 logger.info("---------------CardInfoController: batchQuery---------------");
-		     logger.info("---------------bean:\t" + JsonHelper.javaBeanToJson(bean));
 			String statusCode = Constants.RESULT_MESSAGE_SUCCESS;
 			String message = "操作成功";
 			try {
@@ -247,7 +241,6 @@ public class CardInfoController extends BaseController {
 		@RequestMapping(value = "/flowAuthentication", method = RequestMethod.POST, produces = "application/json")
 		public Result flowAuthentication(@RequestBody PersonParam bean) throws Exception {
 			 logger.info("---------------CardInfoController: flowAuthentication---------------");
-		     logger.info("---------------bean:\t" + JsonHelper.javaBeanToJson(bean));
 			String statusCode = Constants.RESULT_MESSAGE_SUCCESS;
 			String message = "操作成功";
 			try {

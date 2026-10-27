@@ -21,6 +21,15 @@ redis_core_database=127.0.0.1_6379
 # Cache / token TTL in MINUTES (JedisUtil multiplies by 60 internally).
 redis_iface_expx=60
 
+# --- Interface login (required before deploying this version) -------------
+# Set distinct high-entropy values for each active channel; do not use MD5(type).
+# Absent credentials reject login. Deliver over HTTPS only; rotate old tokens.
+auth.SelfService.username=CHANGE_ME
+auth.SelfService.password=CHANGE_ME
+auth.TSB.username=CHANGE_ME
+auth.TSB.password=CHANGE_ME
+auth.WeChat.username=CHANGE_ME
+auth.WeChat.password=CHANGE_ME
 # --- JDBC pool (shared by both datasources) --------------------------------
 jdbc.type=oracle
 jdbc.maxIdleTime=3000

@@ -114,3 +114,26 @@ cp target/IFaceSuperService_hn-V1.0.0.190107.war $CATALINA_HOME/webapps/sisp.war
   path. Normalise to a POSIX path if you deploy on Linux.
 - **Keep it small.** The point of this module is the reduced surface. Adding a domain
   here that already exists upstream should be a conscious decision, not a copy-paste.
+
+## Security changes (deployment action required)
+
+- Set distinct, high-entropy `auth.<channel>.username` and `auth.<channel>.password`
+  values in `config.properties` for SelfService, TSB and WeChat. The former
+  `MD5(channel)` credentials no longer work; `CHANGE_ME` and absent credentials
+  fail closed. Keep the configuration file private and rotate previously issued
+  credentials before deployment.
+- `/iface/card/*` now requires a Redis-backed token from
+  `POST /iface/user/checkLogin`; pass it as `X-Interface-Token` (legacy
+  `tokenId` query/form parameter remains accepted). Login is deliberately not
+  filtered. The token is tied to the direct peer IP, so gateways with different
+  outbound addresses for login and card requests need a stable routing policy.
+  Configure trusted reverse proxies explicitly before changing this IP policy.
+- An optional `deviceid` query parameter invokes the existing device lookup;
+  the authentication JSON body already requires `deviceid` but is not checked
+  against the device registry by the filter. Add a dedicated authorization rule
+  for that body field if the deployment requires device registration.
+- Configure `authentication` as an existing writable directory. Images are
+  bounded to 5 MiB, JPEG-framed, and named from a restricted identifier.
+- Deploy behind HTTPS and replace/invalidate existing Redis tokens during rollout.
+  Smoke-test login, each card endpoint, missing/expired token, peer-IP mismatch,
+  device validation, image storage and datasource access in staging.

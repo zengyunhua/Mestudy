@@ -1,79 +1,59 @@
 package com.tecsun.sisp.iface.common.util;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Base64;
-import java.util.Date;
 
-import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
-
-/**
- * 
- * @title图片转换
- * @2019年1月8日-下午2:13:47
- * @version2019
- */
+/** Validates and stores authentication images inside the configured directory. */
 public class PicUtil {
-    // 照片转化成base64字符串 path为照片路径
+    private static final int MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
     public static String GetImageStr(String path) {
-        String imgFile = path;// 待处理的voice
-        InputStream in = null;
-        byte[] data = null;
-// 读取照片字节数组
         try {
-            in = new FileInputStream(imgFile);
-            data = new byte[in.available()];
-            in.read(data);
-            in.close();
+            return Base64.getEncoder().encodeToString(Files.readAllBytes(new File(path).toPath()));
         } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
-// 对字节数组Base64编码
-        return Base64.getEncoder().encodeToString(data);// 返回Base64编码过的字节数组字符串
     }
 
-   /**
-    * 
-    * @title base64编码字符串转换为图片
-    * @2019年1月8日-下午5:08:30
-    *
-    */
-   public static boolean base64StrToImage(String imgStr, String path, String idCard) {
-     if (imgStr == null)
-     return false;
-     try {
-       // 解密
-       byte[] b = Base64.getMimeDecoder().decode(imgStr);
-       // 处理数据
-       for (int i = 0; i < b.length; ++i) {
-         if (b[i] < 0) {
-           b[i] += 256;
-         }
-       }
-      
-      //getNowTime()+
-       OutputStream out = new FileOutputStream(path+idCard+".jpg");
-       out.write(b);
-       out.flush();
-       out.close();
-       return true;
-     } catch (Exception e) {
-       return false;
-     }
-   }
-   	
-   /**
-    * 获取一个随机数
-    */
-   	private static final SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyyMMddHHmmss"); // 时间格式化的格式
-	public static  String getNowTime(){
-		//String rannum = String.valueOf((int)((Math.random()*9000)+1000)); // 获取随机数
-		String nowTimeStr = sDateFormat.format(new Date()).toString(); // 当前时间
-		return nowTimeStr;
-	}
-//    public static void main(String[] args) {
-//        System.out.println(GetImageStr("D:\\test1\\44.jpg"));
-//        GenerateImage(GetImageStr("D:\\test1\\44.jpg") , "D://111.jpg");
-//
-//    }
+    public static boolean base64StrToImage(String imgStr, String path, String idCard) {
+        if (imgStr == null || path == null || idCard == null
+                || !idCard.matches("[A-Za-z0-9_-]{1,32}")
+                || imgStr.length() > (MAX_IMAGE_BYTES * 4L / 3L + 4096)) {
+            return false;
+        }
+        byte[] image;
+        try {
+            image = Base64.getMimeDecoder().decode(imgStr);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+        if (image.length < 4 || image.length > MAX_IMAGE_BYTES
+                || (image[0] & 0xff) != 0xff || (image[1] & 0xff) != 0xd8
+                || (image[image.length - 2] & 0xff) != 0xff
+                || (image[image.length - 1] & 0xff) != 0xd9) {
+            return false;
+        }
+        Path temporary = null;
+        try {
+            Path directory = new File(path).getCanonicalFile().toPath();
+            if (!Files.isDirectory(directory)) {
+                return false;
+            }
+            Path destination = directory.resolve(idCard + ".jpg");
+            temporary = Files.createTempFile(directory, "auth-", ".tmp");
+            Files.write(temporary, image);
+            Files.move(temporary, destination, StandardCopyOption.REPLACE_EXISTING);
+            return true;
+        } catch (IOException e) {
+            return false;
+        } finally {
+            if (temporary != null) {
+                try { Files.deleteIfExists(temporary); } catch (IOException ignored) { /* best effort */ }
+            }
+        }
+    }
 }
