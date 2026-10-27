@@ -25,10 +25,11 @@
     <version>1.1.0</version>
     <packaging>pom</packaging>
 
-    <name>Mestudy</name>
+    <name>Mestudy - social-insurance / e-government backend reference</name>
     <description>
-        Backend interface services for a Chinese social-insurance / human-resources
-        public service platform. Published for reference and educational use.
+        Reference implementation of a Chinese social-insurance / e-government backend:
+        5 Spring MVC + MyBatis modules, 358 HTTP endpoints, Oracle multi-schema, Axis SOAP.
+        Published for reference and educational use.
     </description>
     <url>https://github.com/zengyunhua/Mestudy</url>
 

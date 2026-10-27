@@ -1,6 +1,6 @@
 # Mestudy
 
-**A reference implementation of a Chinese social-insurance / e-government service platform, built on Spring MVC 4 + MyBatis 3.**
+**A reference implementation of a Chinese social-insurance / e-government backend.**
 
 [![Java](https://img.shields.io/badge/Java-8-orange.svg)](#tech-stack)
 [![Spring](https://img.shields.io/badge/Spring-4.0.8-6db33f.svg)](#tech-stack)
