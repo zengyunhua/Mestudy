@@ -189,8 +189,11 @@ mvn -B test
 On October 28, 2026, `mvn -B -ntp -DforkCount=0 verify` passed 19 tests
 (8/4/4/3 across the four default modules) and produced four WARs on a maintainer
 workstation. These include client, filter, paging, utility, controller and Spring
-context checks; they do not prove deployment or cover most business flows. CI uses
-forked tests and an isolated Maven repository; confirm the run for your commit.
+context checks; they do not prove deployment or cover most business flows. CI runs the
+same command with forked tests against an isolated Maven repository, then applies
+`scripts/verify_public_build.py` to the WARs and Surefire reports: run #27 on `352fbe8`
+passed both jobs. Confirm the run for the commit you are citing — a later commit can
+regress it, as run #26 did.
 Legacy HTTP smoke tests are intentionally excluded from this command because they
 require a running deployment and local fixtures. On Windows, if Surefire cannot start
 a forked JVM because `%TEMP%` contains non-ASCII characters — the usual case when the
@@ -372,7 +375,8 @@ reference. It is maintained on a best-effort basis.
   specifying its module scope; fifth-module deployment is not independently verified.
 - **Tests**: limited. The four public modules have 19 tests in the October 28
   maintainer-workstation run; CI verifies a nonempty WAR and passing tests for each
-  public module, alongside repository hygiene checks. Confirm CI on the actual commit.
+  public module, alongside repository hygiene checks. Run #27 on `352fbe8` is green;
+  confirm CI on the commit you are citing.
 - **Modernisation**: not planned in-place. The intent is to keep the original
   Spring 4 / XML style intact so the patterns stay readable. The language level is
   Java 8 (raised from 7) and that is as far as it goes — no framework upgrade.

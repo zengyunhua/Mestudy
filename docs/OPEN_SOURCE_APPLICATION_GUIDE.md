@@ -18,9 +18,14 @@ packaged all four public modules and ran 19 tests (8 in `IFaceSuportService`, 4 
 `IFaceSuperService_hn`, 4 in `InterfaceFunction`, and 3 in `NetworkOfficeService`).
 `python scripts/verify_public_build.py` checked the four WARs and Surefire reports.
 This still used a populated local Maven cache and disabled forking: it is **not**
-independent reproduction. The CI workflow now asks for an isolated Maven repository
-and enforces a test/artefact check per module; confirm a green run for the submitted
-commit before citing it as evidence.
+independent reproduction. The CI workflow asks for an isolated Maven repository and
+enforces a test/artefact check per module. Run #27 on `352fbe8` (October 28, 2026)
+passed both jobs. That run is the first green one after the artefact gate was wired
+into `ci.yml` one commit ahead of the script it calls, which is why run #26 failed with
+the Maven build already green — the gate itself was the only red. The green run proves
+the gate executes; it is not evidence of deployment, of Oracle/Redis/gateway behaviour,
+or of a clean-room resolution on your network. Confirm the run for the commit you are
+citing.
 
 The maintainer reports that the fifth module, `NetPortalManagement`, has also been
 modified and can compile and deploy in their environment. That report does not change

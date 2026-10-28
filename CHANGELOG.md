@@ -100,7 +100,9 @@ grouped by scope rather than by a single release number.
   statement to the Spring MVC modules and point at the module guide for the exception.
   Test counts and the fifth-module build are attributed to the run and the reporter that
   produced them rather than asserted flatly, because neither has been reproduced from a
-  clean clone.
+  clean clone. The CI claims now cite a specific run — #27 on `352fbe8`, the first green
+  one after the artefact gate was wired in ahead of the script it calls — instead of
+  asking the reader to go and check.
 - **The `NetPortalManagement` dependency boundary is an inventory, not a sentence.**
   `NetPortalManagement/README.md` lists all six private coordinates with the evidence
   that keeps each one — Java imports for the compile-time ones, `web.xml` registrations
