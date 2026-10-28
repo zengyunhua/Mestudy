@@ -84,6 +84,19 @@ mvn -B test
 mvn -B -Pprivate-deps verify
 ```
 
+For a clean dependency-resolution check on a fresh machine, point Maven at a new,
+empty local repository (do not copy the maintainer's `~/.m2/repository`):
+
+```bash
+mvn -B -ntp -Dmaven.repo.local=/tmp/mestudy-m2 verify
+python3 scripts/verify_public_build.py
+```
+
+On Windows use an empty writable directory such as `D:\temp\mestudy-m2` instead of
+`/tmp/mestudy-m2`. The checker requires one nonempty WAR and at least one executed,
+passing Surefire test per public module; it does **not** prove a deployed application
+works. GitHub Actions uses an isolated Maven repository on each run; its actual
+status must still be checked on the relevant commit.
 Expected artefacts (paths are relative to the repository root; check the exact versions in your checkout):
 
 ```
@@ -94,7 +107,12 @@ InterfaceFunction/target/InterfaceFunction-V1.0.0.150630.war
 NetworkOfficeService/target/NetworkOfficeService-V1.0.0.180612.war
 ```
 
-On Windows, if Surefire cannot fork because `%TEMP%` contains non-ASCII characters, see [Troubleshooting](TROUBLESHOOTING.md). Do not treat `-DforkCount=0` as equivalent test isolation.
+On Windows, if Surefire cannot fork because `%TEMP%` contains non-ASCII characters,
+set `TEMP` and `TMP` to an existing, writable ASCII-only directory before running
+Maven (in PowerShell, e.g. `New-Item -ItemType Directory -Force D:\temp\mestudy-surefire;
+$env:TEMP='D:\temp\mestudy-surefire'; $env:TMP=$env:TEMP; mvn -B verify`).
+This preserves forked test execution. See [Troubleshooting](TROUBLESHOOTING.md).
+`-DforkCount=0` is a last-resort diagnostic and does not provide equivalent isolation.
 
 The `-client` jar is produced by the `maven-jar-plugin` execution with
 `classifier=client`, and contains only `**/client/**` and `**/common/**` classes. That is

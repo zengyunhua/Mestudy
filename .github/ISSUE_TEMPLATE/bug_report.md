@@ -32,13 +32,14 @@ labels: bug
 ## Does the module build for you?
 
 <!--
-Many modules depend on an internal Nexus that is not publicly reachable, so a clean
-build may fail on dependency resolution. That is a known limitation, not something you
-did wrong — but knowing it helps us tell the two apart.
+The four default reactor modules should build with public dependencies using JDK 8
+and `mvn -B verify`. NetPortalManagement is opt-in (`-Pprivate-deps`) and requires
+private Bee dependencies. If the default build cannot resolve a dependency, please
+report the artifact and repository URL (redact credentials).
 -->
 
 - [ ] Builds cleanly
-- [ ] Fails on dependency resolution (private Nexus)
+- [ ] Fails on dependency resolution (include artifact and module)
 - [ ] Fails for another reason (paste below)
 
 ## Logs / stack trace

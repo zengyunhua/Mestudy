@@ -13,6 +13,14 @@ This is a project-readiness checklist, **not** an official Codex for Open Source
 
 On October 26, 2026, the maintainer workstation ran `mvn -B -DforkCount=0 verify`: the four default modules packaged and eight tests passed, all in `IFaceSuportService`. This was not a clean external clone, used a populated local Maven cache, and disabled Surefire forking for the local Windows environment; it is **not** evidence of independent deployment or a clean-room public dependency resolution. The GitHub Actions workflow uses `mvn -B verify`, but check the actual run for the commit being submitted.
 
+On October 28, 2026, a later maintainer-workstation run of `mvn -B -DforkCount=0 verify`
+packaged all four public modules and ran 19 tests (8 in `IFaceSuportService`, 4 in
+`IFaceSuperService_hn`, 4 in `InterfaceFunction`, and 3 in `NetworkOfficeService`).
+`python scripts/verify_public_build.py` checked the four WARs and Surefire reports.
+This still used a populated local Maven cache and disabled forking: it is **not**
+independent reproduction. The CI workflow now asks for an isolated Maven repository
+and enforces a test/artefact check per module; confirm a green run for the submitted
+commit before citing it as evidence.
 ## Independent reproduction (ask a contributor who has not set up this repo)
 
 1. Start from a fresh clone in an empty working directory, without the maintainer's local Maven artifacts or private credentials. Record the exact commit SHA (`git rev-parse HEAD`), OS, `java -version` (JDK 8), and `mvn -v`.

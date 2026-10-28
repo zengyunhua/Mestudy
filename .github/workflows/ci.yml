@@ -28,13 +28,23 @@ jobs:
         with:
           distribution: temurin
           java-version: "8"
-          cache: maven
 
       - name: Show toolchain
         run: mvn -B -v
 
-      - name: Run unit tests and package
-        run: mvn -B verify
+      - name: Run unit tests and package with isolated dependencies
+        run: mvn -B -ntp -Dmaven.repo.local="$RUNNER_TEMP/mestudy-m2" verify
+
+      - name: Check all four module tests and WAR artifacts
+        run: python3 scripts/verify_public_build.py
+
+      - name: Preserve test reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: '*/target/surefire-reports/**'
+          if-no-files-found: warn
 
   # ---------------------------------------------------------------------------
   # Guard rails. These catch the mistakes that are easiest to make and most
