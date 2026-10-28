@@ -214,10 +214,11 @@
         <!-- This module declared com.tecsun.sisp_public:aamanagement-client and
              bee:xx.tool, both private, but no source file references either one:
              there is no import of com.tecsun.sisp_public or bee.*, no Class.forName
-             and no string reference in the resources. The module compiles and
+             and no active runtime wiring in the resources. The old commented
+             filter in web.xml has also been removed. The module compiles and
              packages into a war without them, so the declarations were dead
-             weight inherited from a sibling POM and are removed here. This is
-             what lets InterfaceFunction join the default reactor. -->
+             weight inherited from a sibling POM. This lets InterfaceFunction
+             join the default reactor. -->
         
       <dependency>
 			<groupId>com.google.code.gson</groupId>

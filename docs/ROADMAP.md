@@ -11,8 +11,9 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ## Phase 1 — Make the repository trustworthy (current)
 
-The blocker for anyone outside the original organisation is that the repository cannot be
-cloned and built. Everything else is secondary.
+Four modules now build in the default public reactor; the fifth remains optional and
+requires private artifacts. Security provenance and independent deployment evidence
+remain open work.
 
 - [x] Add a root README with architecture, module map and honest limitations
 - [x] Add per-module READMEs
@@ -21,7 +22,8 @@ cloned and built. Everything else is secondary.
 - [x] Replace committed credentials with `config.properties.example` templates
 - [x] Add `LICENSE`, `CONTRIBUTING`, `CODE_OF_CONDUCT`, `SECURITY`
 - [x] Stop tracking `target/` in git (CI verifies no build outputs are tracked)
-- [ ] Purge credentials from git history (see [SECURITY.md](../SECURITY.md))
+- [ ] Establish historical provenance and provisioning status, rotate any live values,
+      then decide on coordinated history cleanup (see [SECURITY.md](../SECURITY.md))
 - [~] Maintain `CHANGELOG.md` entries for future releases (v1.0.0 is documented)
 
 ## Phase 2 — Make it build
@@ -55,8 +57,9 @@ cloned and built. Everything else is secondary.
 - [ ] One controller test per module using `MockMvc` with mocked services
 - [ ] H2-backed integration test for one mapper per module (Oracle-specific SQL will need
       dialect guards; start with a mapper that uses portable SQL)
-- [~] GitHub Actions runs `mvn -B verify` on the default reactor on JDK 8; expand to a
-      JDK matrix and add coverage reporting as the suite matures
+- [~] GitHub Actions runs isolated `mvn -B verify` on the four-module default
+      reactor on JDK 8 with test/WAR checks; confirm actual run status per commit,
+      then expand to a JDK matrix and coverage reporting
 - [ ] Coverage reporting, with a floor that only ratchets upward
 
 ## Phase 4 — Documentation depth

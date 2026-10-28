@@ -49,7 +49,7 @@ when a Java system has to talk to a dozen heterogeneous government backends.
 | --- | --- | --- | :---: |
 | [`IFaceSuportService`](IFaceSuportService/README.md) | `sisp_IFaceSuportService` | Core interface service. Social-insurance queries, card services, employment, hospital, face verification, SMS, WeChat, bank/fee channels. Also ships the reusable **client SDK** jar (`classifier=client`). | 286 Java files |
 | [`NetworkOfficeService`](NetworkOfficeService/README.md) | `sisp_NetworkOfficeService` | Online government-service portal. Application drafts, submission, audit trail, electronic signature (PDF stamping), area/administrative division data. | 129 Java files |
-| [`IFaceSuperService_hn`](IFaceSuperService_hn/README.md) | `sisp_IFaceSuportService` (HN build) | Province-specific (Henan) variant of the interface service: card + social-insurance controllers against the provincial gateway. | 60 Java files |
+| [`IFaceSuperService_hn`](IFaceSuperService_hn/README.md) | `sisp_IFaceSuperService_hn` | Province-specific (Henan) variant of the interface service: card + social-insurance controllers against the provincial gateway. | 60 Java files |
 | [`InterfaceFunction`](InterfaceFunction/README.md) | `sisp_InterfaceFunction` | Platform security administration: users, roles, function/permission trees, login. | 49 Java files |
 | [`NetPortalManagement`](NetPortalManagement/README.md) | `sisp_NetPortalManagement` | Lightweight portal administration: portal users, policy documents, external web-connection registry. Uses the internal *Bee* persistence framework. | 11 Java files |
 
@@ -58,7 +58,10 @@ deployment into a servlet container.
 
 ## Architecture
 
-Every module follows the same vertical slice. There is no shared `common` artifact —
+The diagram and request lifecycle below describe `IFaceSuportService`, not a
+universal architecture for all five modules. The four public modules use Spring MVC
+and MyBatis; `NetPortalManagement` uses Bee/Jersey instead. There is no shared
+`common` artifact —
 each module carries its own copy of `common`/`util`, which keeps modules independently
 deployable at the cost of some duplication.
 
@@ -126,8 +129,8 @@ flowchart TB
 | --- | --- | --- |
 | Language / runtime | Java 8 (source/target 1.8) | Level is set once in the root POM via `maven.compiler.source`/`target`; modules must not override it |
 | Web framework | Spring MVC 4.0.8.RELEASE | XML configuration, no Spring Boot |
-| Persistence | MyBatis 3.2.4 | Mapper interfaces + XML, `SqlSessionTemplate` |
-| Connection pool | c3p0 (`ComboPooledDataSource`) | One bean per datasource |
+| Persistence | MyBatis 3.2.4; Bee in `NetPortalManagement` | Mapper interfaces + XML in public modules; private Bee APIs in portal administration |
+| Connection pool | c3p0 (`ComboPooledDataSource`) where configured | `NetworkOfficeService` uses `DriverManagerDataSource`; the Bee module configures its own datasource |
 | Database | Oracle 10g/11g | Multiple schemas per module |
 | Cache / session | Redis via Jedis | Dictionary cache, interface token, channel state |
 | SOAP | Apache Axis 1.x | Generated stubs for provincial gateway / HIS |
@@ -162,14 +165,15 @@ mvn -B verify
 #   InterfaceFunction/target/InterfaceFunction-V1.0.0.150630.war
 #   NetworkOfficeService/target/NetworkOfficeService-V1.0.0.180612.war
 
-# The one module that needs private jars is opt-in, see the table below
-mvn -B -Pprivate-deps verify
+# Optional fifth module, only in an authorized environment with all six private artifacts
+mvn -B -Pprivate-deps -pl NetPortalManagement -am verify
 ```
 
 The repository root holds an aggregator `pom.xml`, so Maven works from the top of the
 tree. Its default `<modules>` list is deliberately short: only the modules that resolve
 from Maven Central. The remaining one sits behind the `private-deps` profile so a fresh clone
-always builds green instead of dying on an unresolvable artifact. Each module keeps its
+is not blocked by an unresolvable private artifact; a green build still requires
+public dependencies to resolve and tests to pass. Each module keeps its
 own coordinates and version — the root POM supplies the module list, the source encoding
 and the Java 8 compiler level (1.8), which every module inherits.
 
@@ -182,8 +186,11 @@ servlet container:
 mvn -B test
 ```
 
-The assertion-based tests cover the client response envelope, request filter and
-`Page` paging behaviour. The Henan module compiles but has no automated tests yet.
+On October 28, 2026, `mvn -B -ntp -DforkCount=0 verify` passed 19 tests
+(8/4/4/3 across the four default modules) and produced four WARs on a maintainer
+workstation. These include client, filter, paging, utility, controller and Spring
+context checks; they do not prove deployment or cover most business flows. CI uses
+forked tests and an isolated Maven repository; confirm the run for your commit.
 Legacy HTTP smoke tests are intentionally excluded from this command because they
 require a running deployment and local fixtures. On Windows, if Surefire cannot start
 a forked JVM because `%TEMP%` contains non-ASCII characters — the usual case when the
@@ -203,13 +210,14 @@ private `bee` framework: four of the five compile and package from Maven Central
 | `IFaceSuperService_hn` | yes | yes | — |
 | `InterfaceFunction` | yes | yes | — (the private coordinates it declared were unused and are gone) |
 | `NetworkOfficeService` | yes | yes | — (one missing entity class was reconstructed) |
-| `NetPortalManagement` | no | `-Pprivate-deps` | `bee:cloud*` |
+| `NetPortalManagement` | no (private artifacts required) | `-Pprivate-deps` | six Bee/tool/AAM coordinates; see [dependency inventory](NetPortalManagement/README.md#build-and-dependency-boundary) |
 
 Two modules needed work to get here, and they needed different things.
 
 `InterfaceFunction` declared `com.tecsun.sisp_public:aamanagement-client` and
 `bee:xx.tool`. No source file imports either, no `Class.forName` mentions them, and the
-one `web.xml` reference to the AA client sits inside a commented-out `<filter>` block —
+former `web.xml` references to the AAM client were only commented-out filters
+(now removed) —
 so they were dead declarations copied from a sibling POM. `NetworkOfficeService` was the
 same.
 
@@ -231,7 +239,11 @@ All of that now fails a test instead of a deployment: `SpringContextLoadTest` lo
 real context and asserts every datasource URL and every mapper statement. The full list is
 in the [CHANGELOG](CHANGELOG.md#unreleased).
 
-`NetPortalManagement` is the genuine hold-out. Its beans are annotated with `@TableName`
+A fork user reports successfully building the project locally; the command, module
+scope and dependency source were not provided. The maintainer separately reports
+`NetPortalManagement` builds and deploys in their authorized environment. This feedback
+does not establish that the fifth module resolves from public repositories: an opt-in attempt
+on October 28, 2026 could not resolve its six private artifacts. Its beans are annotated with `@TableName`
 / `@Column` and extend `Doe`, and its service layer queries through `Cnd` / `Select`.
 That is a persistence framework, not a stray utility jar — the dependency cannot be
 deleted without rewriting the data-access layer.
@@ -293,9 +305,16 @@ full reference.
 
 ## Configuration
 
-Configuration is a single `config.properties` per module, loaded through
-`<context:property-placeholder>`. A sanitised template ships as
-`config.properties.example`; the real file is git-ignored.
+Every module ships a `config.properties.example`; copy it to `config.properties` and
+keep the real file untracked. The four Spring MVC modules read it through
+`<context:property-placeholder ignore-unresolvable="true">`, so `${key}` resolves in
+their XML — and an unknown key is left in place as the literal `${key}` rather than
+failing at startup. `NetPortalManagement` reads the same file through Bee's
+`Config.getInstance().get(key)` instead, which returns `null` for an unknown key. Both
+fail softly and neither announces the mistake; the symptom is a `${key}` or `null`
+reaching a URL. Its datasource is not in `config.properties` at all: it is in `ds.xml`,
+with framework bootstrap in `bee_application.xml`. See its
+[module guide](NetPortalManagement/README.md).
 
 | Key group | Purpose |
 | --- | --- |
@@ -311,7 +330,8 @@ Full reference: [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 
 ## API surface
 
-All HTTP endpoints answer with the same envelope:
+The Spring MVC API commonly uses a `Result` envelope for JSON responses;
+this is not a universal contract for Bee-dispatched `NetPortalManagement` endpoints:
 
 ```json
 {
@@ -343,14 +363,16 @@ domain prefix (`/iface/rest/`, `/iface/cardInfo/`, `/iface/user/`, ...). The
 This repository is a **curated archive of production-derived modules**, published for
 reference. It is maintained on a best-effort basis.
 
-- **Documentation**: in place — this README, a per-module README each, and the seven
+- **Documentation**: in place — this README, one README per module, and the ten
   documents under `docs/`.
-- **Build reproducibility**: four of five. `IFaceSuportService`, `IFaceSuperService_hn`,
+- **Public build scope**: four of five. `IFaceSuportService`, `IFaceSuperService_hn`,
   `InterfaceFunction` and `NetworkOfficeService` build from Maven Central alone and are
-  tested on every push; `NetPortalManagement` needs private jars, see below.
-- **Tests**: limited. CI runs assertion-based unit tests for the interface client
-  and request filter, plus `Page` paging behaviour, alongside compilation and
-  repository hygiene checks.
+  included in the public CI build; `NetPortalManagement` remains opt-in with six
+  private artifacts. A fork user reports a successful local project build, without
+  specifying its module scope; fifth-module deployment is not independently verified.
+- **Tests**: limited. The four public modules have 19 tests in the October 28
+  maintainer-workstation run; CI verifies a nonempty WAR and passing tests for each
+  public module, alongside repository hygiene checks. Confirm CI on the actual commit.
 - **Modernisation**: not planned in-place. The intent is to keep the original
   Spring 4 / XML style intact so the patterns stay readable. The language level is
   Java 8 (raised from 7) and that is as far as it goes — no framework upgrade.
@@ -364,16 +386,15 @@ is a good first contribution.
    `bee.cloud` persistence framework, which was never published publicly, so it is
    excluded from CI. The other four build against Maven Central alone — two of them only
    after dead dependencies were dropped and one missing entity class was reconstructed.
-2. **Credentials and personal data are still in the git history.** The
-   `config.properties` / `ds.xml` files are no longer tracked (they were replaced by
-   `.example` templates) and the current tree is clean, but 21 files across 11 commits
-   still carry their old contents. An audit of those commits is in
-   [SECURITY.md](SECURITY.md#1-credentials-committed-to-the-repository) and it is worth
-   reading before you clone this anywhere near a real deployment: the worst item is not a
-   password but an RSA **private key** for the payment-channel integration
-   (`zfb.app_private_key`), and the history also holds 57 values matching the 18-digit
-   resident ID pattern. Rotate the payment key pair first — see
-   [SECURITY.md](SECURITY.md) for the order and the procedure.
+2. **Historical sensitive-looking data needs owner review.** The current tree uses
+   `.example` templates instead of tracked local `config.properties` / `ds.xml`, but
+   Git history still contains credential-, payment-signing-key- and identity-shaped
+   values. Their provenance and real-world use are unverified. The
+   [security review](docs/SECURITY_REVIEW.md) records a category-only inventory and
+   the evidence/approval process. If a value was provisioned, its owner must revoke
+   or rotate it with the provider (especially payment signing material) before any
+   coordinated history cleanup. Do not assume every match identifies a real person
+   or a live secret; do not paste historical values into public channels.
 3. **Duplicated `common` layer.** Each module re-implements `Result`, `Page`,
    `CommUtil`, `AESUtil`. 53 class names exist in more than one module, and 51 of those
    53 have drifted apart — only `DevBean` and `SecretKeyBean` are still byte-identical
@@ -450,8 +471,8 @@ tags — please leave those intact if you fork this project.
 
 This codebase is derived from systems built for Chinese public-service institutions.
 It is published for **educational and reference purposes**. It is not affiliated with,
-endorsed by, or supported by any government agency. Any data, endpoints, credentials or
-identifiers present in the history are placeholders or historical artefacts and must not
-be used against live systems. You are responsible for complying with local law —
+endorsed by, or supported by any government agency. Credential- and identity-shaped
+historical values have not all been verified as synthetic or never provisioned;
+do not use them against live systems. You are responsible for complying with local law —
 including personal-information protection rules — before deploying anything derived from
 this repository.

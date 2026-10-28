@@ -1,8 +1,9 @@
 # Architecture
 
-This document explains how a request travels through a Mestudy module, how the Spring
-contexts are split, and which cross-cutting concerns exist. It describes the shape that
-all five modules share; differences are called out where they matter.
+This document primarily explains request handling in `IFaceSuportService` and the
+Spring MVC/MyBatis modules. `NetPortalManagement` instead uses Bee/Jersey with its own
+datasource and authentication filter; do not apply the Spring request lifecycle to it.
+Differences among the public modules are called out where relevant.
 
 - [1. Workspace layout](#1-workspace-layout)
 - [2. Layering](#2-layering)
@@ -17,11 +18,13 @@ all five modules share; differences are called out where they matter.
 
 ## 1. Workspace layout
 
-There is no parent POM and no aggregator. Each module is an independent Maven project
-that is built and deployed on its own:
+The root `pom.xml` is the parent and aggregator. Its default reactor builds four
+public modules; `-Pprivate-deps` opts in `NetPortalManagement` when its six private
+artifacts are available. Each module still produces a separately deployable WAR:
 
 ```
 Mestudy/
+├── pom.xml                      # parent and default four-module reactor
 ├── IFaceSuportService/          # core interface service + client SDK
 │   ├── pom.xml
 │   └── src/
@@ -33,9 +36,9 @@ Mestudy/
 │       │   ├── resources/
 │       │   │   ├── config/          # applicationContext.xml, springMVC-servlet.xml
 │       │   │   ├── mappings/        # MyBatis mapper XML
-│       │   │   └── config.properties
+│       │   │   └── config.properties.example  # copy locally; do not commit secrets
 │       │   └── webapp/WEB-INF/web.xml
-│       └── test/java/               # ad-hoc entry points, not a test suite
+│       └── test/java/               # focused automated tests; legacy smoke tests excluded
 ├── NetworkOfficeService/
 ├── IFaceSuperService_hn/
 ├── InterfaceFunction/
@@ -222,7 +225,7 @@ enforced by the framework; check each call site.
 you inherit a system with fifteen datasources. The cost is verbosity and no compile-time
 safety.
 
-**Per-module `common` copies over a shared artifact.** Independent deployability won.
+**Per-module `common` copies over a shared library.** Independent deployability won.
 The cost is drift: `Page` has a different constructor set in `InterfaceFunction` than in
 `IFaceSuportService`.
 

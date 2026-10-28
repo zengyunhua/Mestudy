@@ -1,22 +1,27 @@
 # Configuration reference
 
-Each module reads exactly one properties file from the classpath root:
-`src/main/resources/config.properties`.
+The four Spring MVC modules read `src/main/resources/config.properties` from
+the classpath root. `NetPortalManagement` ships one too, but reads it through the Bee
+framework rather than Spring, and keeps its datasource in `ds.xml`; see its section
+below and its [module guide](../NetPortalManagement/README.md).
 
 Two access paths exist:
 
 - **Spring beans** resolve placeholders through
   `<context:property-placeholder location="classpath:config.properties"/>`.
   This is how datasources, the view resolver and other XML-defined beans get values.
+  Every module sets `ignore-unresolvable="true"`, so an unknown key does **not** fail
+  the context — the literal `${key}` survives into whatever consumes it.
 - **Java code** goes through a per-module `Config` singleton
   (`Config.getInstance().get("key")`). This returns `null` for a missing key — it does
   **not** throw. A typo therefore fails silently at runtime, not at startup.
 
 That asymmetry is the single most common source of "it works in module A but not B"
-confusion. When a value looks empty, grep the key name before suspecting the property
-file.
+confusion, and the two failure shapes differ: `${key}` in a Spring-injected value,
+`null` in a `Config` lookup. When a value looks empty, grep the key name before
+suspecting the property file.
 
-A sanitised template ships as `config.properties.example` in each module. Copy it to
+A sanitised template ships as `config.properties.example` in every module. Copy it to
 `config.properties` and edit. The real file is git-ignored and must never be committed.
 
 ---
@@ -161,6 +166,13 @@ framework, configured by:
 - `ds.xml` — datasource definition
 
 Both are framework-specific; the connection settings live in `ds.xml`.
+
+`config.properties` is still read here, but only for non-datasource keys —
+`platform_context_path`, `inner_proxy_ip` and `inner_proxy_port`, through
+`Config.getInstance().get(...)` in `LogUtil` and `NetUserInfoApplication`. Because that
+is the `null`-returning path, a missing proxy key produces a URL containing the literal
+`null` rather than a startup failure. There is no `<context:property-placeholder>` in
+this module, so no `${...}` substitution happens at all.
 
 ## Conventions for new keys
 

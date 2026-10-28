@@ -21,6 +21,25 @@ This still used a populated local Maven cache and disabled forking: it is **not*
 independent reproduction. The CI workflow now asks for an isolated Maven repository
 and enforces a test/artefact check per module; confirm a green run for the submitted
 commit before citing it as evidence.
+
+The maintainer reports that the fifth module, `NetPortalManagement`, has also been
+modified and can compile and deploy in their environment. That report does not change
+the default four-module public build boundary: on October 28, 2026, the attempted
+`mvn -B -ntp -Pprivate-deps -pl NetPortalManagement -am -DforkCount=0 verify` in this
+checkout could not resolve six private Bee/framework dependencies. This environment
+cannot independently verify that module's build or deployment. A fork user reports
+a successful local project build but has not specified whether it included this
+module or which dependency source was used. Record a redacted
+successful build and deployment smoke test from an authorized environment separately;
+do not publish private artifacts, credentials or internal endpoints. A public-build
+claim requires a clean clone with redistributable dependencies and a reproducible CI run.
+
+For historical risk, `python scripts/audit_git_history.py` provides a local,
+category-only heuristic inventory; see [security review](SECURITY_REVIEW.md) for the
+October 28 counts, limitations and owner-only evidence record. No historical
+provenance, provider rotation or history-cleanup decision has yet been independently
+verified; a clean current-tree scan is not closure.
+
 ## Independent reproduction (ask a contributor who has not set up this repo)
 
 1. Start from a fresh clone in an empty working directory, without the maintainer's local Maven artifacts or private credentials. Record the exact commit SHA (`git rev-parse HEAD`), OS, `java -version` (JDK 8), and `mvn -v`.
@@ -35,7 +54,7 @@ commit before citing it as evidence.
 | --- | --- | --- |
 | Critical | Historical credential-shaped values and a payment-signing-key-shaped value remain in Git history; the owner states that these are synthetic, but provenance, actual provisioning, and history cleanup have not been verified. | Owner documents that each sensitive-looking value was never provisioned, or confirms rotation/revocation of any live value with affected providers. Coordinate safe history cleanup and record a sanitized remediation summary. Follow [SECURITY.md](../SECURITY.md); never publish historical values. |
 | High | No independently executable end-to-end deployment recipe with public test data. | A clean-room operator follows a versioned, non-sensitive test environment guide and reports a successful startup and expected smoke-test outcome. Do not commit proprietary Oracle/Redis jars or actual credentials; use publicly redistributable dependencies only. |
-| High | Only four of five modules build publicly; `NetPortalManagement` uses private Bee APIs. | Obtain redistribution rights and a lawful public dependency, or replace the persistence layer with tests; otherwise continue clearly marking the module private-only. |
+| High | Four modules build in the default public reactor. The maintainer reports a working fifth-module build/deployment in their environment, but `NetPortalManagement` still uses private Bee APIs and the opt-in build could not resolve six private dependencies here. | Obtain redistribution rights and a lawful public dependency, or replace the persistence layer with tests; otherwise continue clearly marking the module private-only. |
 | High | Automated tests are limited and do not establish runtime behaviour for every module. | Add focused tests for each public module, negative/security cases and CI coverage evidence; do not overstate current counts. |
 | Medium | `v1.0.0` predates the four-module public-build improvements. | After CI and security review, publish a new, accurately scoped release/tag with a changelog, verified build command, limitations and checksum/artifacts where applicable. Do not move the existing tag. |
 | Medium | Public adoption is hard to assess from stars alone. | Cite genuine external PRs, users, downstream projects, discussions or release downloads **with dates and links**; distinguish actual usage from stars/watches and do not fabricate metrics. |

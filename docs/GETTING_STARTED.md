@@ -126,8 +126,12 @@ the artefact a downstream terminal embeds.
 | `IFaceSuperService_hn` | yes | default | — |
 | `InterfaceFunction` | yes | default | — |
 | `NetworkOfficeService` | yes | default | — |
-| `NetPortalManagement` | no | `-Pprivate-deps` | `bee:cloud*` |
+| `NetPortalManagement` | no (private artifacts required) | `-Pprivate-deps` | six coordinates; [inventory](../NetPortalManagement/README.md#build-and-dependency-boundary) |
 
+A fork user reports a successful local project build; the command, module scope
+and dependency source were not provided. Separately, the maintainer reports
+`NetPortalManagement` builds and deploys with private artifacts in their environment.
+Neither report establishes that the fifth module builds from public repositories.
 `NetPortalManagement` is kept out of the default reactor on purpose: a build that stops
 on an unresolvable artifact teaches a newcomer nothing. Its dependency is genuinely
 referenced by the code, so it cannot simply be deleted — install the jars into your local
@@ -135,7 +139,8 @@ repository first, then build with the profile.
 
 Two modules moved into the default reactor during this work, for different reasons.
 `InterfaceFunction` declared two private coordinates that nothing used: no import of
-`com.tecsun.sisp_public` or `bee.*`, no `Class.forName`, no string in the resources.
+`com.tecsun.sisp_public` or `bee.*`, no `Class.forName` or active resource wiring.
+The old commented-out AAM filter references were removed from both public modules.
 `NetworkOfficeService` had the same dead declarations, but removing them exposed a source
 file that was never published — `BanjianVo`, referenced by four classes and by
 `mappings/draftsDAO.xml`. It has been reconstructed from the columns the mapper proves

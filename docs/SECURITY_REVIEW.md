@@ -20,6 +20,41 @@ The maintainer states that historical data is synthetic. This statement alone do
 | Database and SMTP credentials | Pending | Unknown | Pending | Verify environments; rotate live values |
 | Identity-number-shaped fixtures | Pending | Unknown | Pending | Record synthetic generation method; do not publish values |
 
+## Historical inventory (October 28, 2026)
+
+Run `python scripts/audit_git_history.py` on a full local clone. At baseline
+commit `d8a301d`, the inventory reported
+only category counts for reachable historical blob/path pairs: 4,135 inspected,
+0 skipped as oversized/binary, 44 pairs with ID-shaped values, 38 pairs with
+sensitive-assignment-shaped text, and 13 pairs with tracked local-configuration
+findings. These are **not** counts of unique people, live secrets, or incidents.
+The path listing and matching are heuristic; omissions and false positives are possible.
+Counts may change as Git history changes.
+No historical values should be copied into a ticket, pull request, CI log or this guide.
+The current-tree `python scripts/check_sensitive.py` remains the CI gate; the
+historical inventory is a local triage aid, not a remediation or proof of absence.
+
+## Private review record (non-sensitive metadata only)
+
+For each risk category, keep a restricted owner record with: category and affected
+service/environment; accountable owner; synthetic generator or test-system provenance
+(if applicable); whether ever provisioned (`yes`/`no`/`unknown`); provider-side
+verification reference; revocation or rotation ticket and date when provisioned;
+identity-fixture provenance without the identifier itself; reviewer and review date;
+and a history-cleanup decision plus approval reference. Do not include credential
+values, full identifiers, copies of sensitive files, or value hashes. An `unknown`
+provisioning status is not evidence that a value was harmless.
+
+**Order of operations:** identify the provider and owner privately; revoke or rotate
+any live value (especially payment signing material) before repository cleanup; then
+review all impacted paths and embedded data, tags, forks, releases and caches. Only
+with owner approval, backup and a tested mirror-clone plan should history be rewritten
+and coordinated with downstream consumers. Rewriting does not revoke a live key or
+remove copies already fetched. Where values are proven never provisioned and synthetic,
+record the decision not to rotate/rewrite explicitly. For identity-shaped data, verify
+synthetic provenance privately; real identifiers cannot be rotated. Do not assert closure
+until the responsible owner records the decision and independent reviewer signs off.
+
 ## Runtime configuration for modified paths
 
 Set these in the process environment (not in Git or CI logs) before invoking the relevant operations:

@@ -38,8 +38,8 @@ into it, so deleting the `<dependency>` block just moves the failure to compile 
 > way through `bee.cloud.service.listener.StartupListener`. Before deleting a
 > `<dependency>`, grep the resources as well as the sources — and check whether the
 > `web.xml` block that mentions it is actually commented out. In `InterfaceFunction` and
-> `NetworkOfficeService` the equivalent filter *is* inside `<!-- -->`, which is the real
-> reason those two could drop the declaration.
+> `NetworkOfficeService` the equivalent filters existed only in comments (now
+> removed), which is why those modules could drop the declaration.
 
 **Fix.** Pick one:
 

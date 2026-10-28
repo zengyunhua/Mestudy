@@ -23,6 +23,20 @@ grouped by scope rather than by a single release number.
   `src/test/resources/config.properties`, which shadows the production file on the test
   classpath. This is the first test in the repository that fails on broken wiring rather
   than on a broken helper; the other three modules still have no equivalent.
+- **A CI gate on what the build actually produced.** `scripts/verify_public_build.py`
+  inspects the four public modules after `mvn verify`: each needs exactly one nonempty WAR
+  and at least one Surefire XML report, with no failures or errors and at least one test
+  that actually ran. Maven exits 0 when `skipTests` is set or when forking is disabled and
+  nothing is collected, so the WAR and the reports are checked instead of trusting the
+  exit code. `scripts/test_verify_public_build.py` covers the empty-WAR, failing,
+  all-skipped, missing-report and malformed-report cases.
+- **A local history inventory.** `scripts/audit_git_history.py` walks
+  `git rev-list --objects --all` and counts historical blob/path pairs by the same
+  categories `check_sensitive.py` applies to the working tree, printing reason labels and
+  counts but never a matched value. It is triage for the owner, not remediation: it cannot
+  distinguish a synthetic fixture from a provisioned credential, and it runs outside CI
+  on purpose, where the checkout is shallow. The counts it produced at `d8a301d` are
+  recorded in `docs/SECURITY_REVIEW.md`.
 
 ### Fixed
 
@@ -70,8 +84,35 @@ grouped by scope rather than by a single release number.
   resolver's prefix. The duplicate `WEB-INF/jquery.js` — byte-identical to
   `WEB-INF/views/jquery.js` and present only to satisfy the old location — is deleted, so
   `/views/jquery.js` still resolves and the WAR is 283 KB smaller.
+- **CI invoked a script that was not in the repository.** The build job added in
+  `d8a301d` calls `python3 scripts/verify_public_build.py`, but the file was left
+  untracked, so that job stopped at `can't open file` on every push — after the Maven
+  build had already passed, which is the point at which the check was supposed to speak.
+  The script and its test are committed with the rest of this batch.
 
 ### Changed
+
+- **Each document now states the boundary of its claim.** Several guides described all
+  five modules as if they shared one architecture, one configuration mechanism and one
+  response envelope. `NetPortalManagement` shares none of them — it dispatches through
+  Bee, reads `ds.xml` instead of `config.properties`, and does not return `Result` — so
+  the architecture, API, configuration and getting-started documents now scope each
+  statement to the Spring MVC modules and point at the module guide for the exception.
+  Test counts and the fifth-module build are attributed to the run and the reporter that
+  produced them rather than asserted flatly, because neither has been reproduced from a
+  clean clone.
+- **The `NetPortalManagement` dependency boundary is an inventory, not a sentence.**
+  `NetPortalManagement/README.md` lists all six private coordinates with the evidence
+  that keeps each one — Java imports for the compile-time ones, `web.xml` registrations
+  and `@Application(entityPkg=...)` for the runtime-only ones. That distinction is the
+  whole point: "no import references it" is exactly the reasoning that correctly removed
+  the AAM client from the two public modules and would break startup here.
+- **The commented-out AAM filter is gone from `InterfaceFunction` and
+  `NetworkOfficeService`.** Both `web.xml` files carried the same
+  `<!-- <filter> AAMClientCommon ... -->` block — inert, but read by reviewers as
+  configuration. Removing it also removes the last mention of `com.tecsun.sisp_public`
+  from both modules, which turns the earlier "nothing references it" claim from arguable
+  into obvious.
 
 - **The WAR plugin is pinned to 2.2.** Without an explicit version Maven takes it from the
   super-POM, so the packaged artifact depended on which Maven version ran the build. 2.2

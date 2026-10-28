@@ -1,9 +1,10 @@
 # API overview
 
 There are **358 `@RequestMapping` declarations** across the workspace. This document
-defines the shared contract (envelope, status codes, paging) and indexes the endpoints
-by controller. It is a map, not a generated specification — per-endpoint request and
-response bodies are documented in the controller Javadoc.
+describes the Spring MVC API contract (envelope, status codes, paging) and indexes
+the controller endpoints. Bee-dispatched `NetPortalManagement` does not use the same
+`@RequestMapping`/`Result` contract. This is a map, not a generated specification;
+consult controller code and Javadoc for individual request and response bodies.
 
 - [1. Conventions](#1-conventions)
 - [2. Response envelope](#2-response-envelope)
@@ -28,8 +29,8 @@ response bodies are documented in the controller Javadoc.
 
 ## 2. Response envelope
 
-Every controller method returns `Result` (or `ResultVerify`, which extends it with paging
-fields):
+In the Spring MVC modules, JSON controller responses commonly use `Result`
+(or `ResultVerify`, which extends it with paging fields):
 
 ```json
 {

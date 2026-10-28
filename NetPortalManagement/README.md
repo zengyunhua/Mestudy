@@ -86,8 +86,9 @@ src/main/resources/
 </ds>
 ```
 
-> The committed `ds.xml` contains a real database password. Replace it before publishing
-> or sharing the repository — see [SECURITY.md](../SECURITY.md).
+> The current tree contains only `ds.xml.example` placeholders. Historical versions of
+> `ds.xml` contain credential-shaped values whose real-world use remains unverified; see
+> [SECURITY.md](../SECURITY.md). Never commit a local `ds.xml`.
 
 ### `bee_application.xml`
 
@@ -105,21 +106,34 @@ inner_proxy_ip=127.0.0.1
 inner_proxy_port=80
 ```
 
-## Build
+## Build and dependency boundary
 
-```bash
-cd NetPortalManagement
-mvn clean package
-```
+From the repository root, `mvn -B verify` builds the four default public modules.
+This module remains opt-in: `mvn -B -Pprivate-deps -pl NetPortalManagement -am verify`
+requires authorized access to the private artifacts. The maintainer reports it compiles
+and deploys in their environment; that is not evidence of a public-dependency
+build or independently verified deployment. A fork user has reported a local project
+build, but has not specified whether it included this module. Never add proprietary
+jars or credentials to the repository.
 
-**This module is the hardest to build publicly.** `@Application(entityPkg = {...})`
-references `com.tecsun.sb.entity` and `bee.cloud.*`, which come from proprietary jars in
-the internal Nexus. Without those artifacts the module will not compile. It is kept in
-the workspace because the *pattern* — framework-driven dispatch with an XML datasource —
-is worth seeing, and because it documents the original deployment topology.
+| Artifact | Evidence in this module | Decision |
+| --- | --- | --- |
+| `bee:bee.cloud:1.0.4` | Java imports `Doe`, `Table`, annotations, `CndFactory`, `Cnd`, `Select` in entities and services. | Compile-time requirement; keep unless replacing the Bee persistence APIs. |
+| `bee:bee.cloud.service:1.0.4` | `NetSuperApplication` extends `SuperApplication`; active `web.xml` names `StartupListener` and `bee.cloud.service.rest`. | Compile- and startup-time requirement; keep. |
+| `bee:bee.cloud.impl:1.0.0` | No direct Java import; framework startup and `CndFactory`/query execution may need its implementation. | Runtime role is plausible, not verified without private artifacts; do not remove on import search alone. |
+| `bee:bee.cloud.entity:1.0.0` | `@Application(entityPkg=...)` explicitly lists `bee.cloud.entity`; no direct Java import. | Runtime entity discovery may need it; verify with authorized startup/query tests before considering removal. |
+| `bee:xx.tool:1.0.1` | `LogUtil` and `NetUserInfoApplication` import `com.xx.util.property.Config`. | Compile-time requirement; keep unless replacing configuration access. |
+| `com.tecsun.sisp_public:aamanagement-client:1.0.5` | Active `web.xml` registers `AAMClient4Jersey` for `/*`; no Java import. | Startup/authentication requirement; never remove without a tested equivalent security filter. |
 
-If you want to experiment, the realistic path is to stub `SuperApplication` and `Table`
-locally; a full port to Spring MVC would be a rewrite, not a patch.
+No other module declares these private coordinates. Previously commented-out AAM filters
+in `InterfaceFunction` and `NetworkOfficeService` were inert and have been removed.
+Removing a direct Bee dependency would break compilation; dropping a runtime-only
+artifact based on imports alone risks broken startup or unauthorized endpoints. To
+reduce the private dependency surface, first obtain its actual artifact contents and
+runtime contract in an authorized environment, test startup, protected/unauthorized
+requests and representative database queries, then remove one artifact at a time with
+before/after WAR and smoke-test evidence. A public replacement of Bee or the AAM
+filter is a separate, security-sensitive migration, not a POM-only cleanup.
 
 ## Notes for contributors
 

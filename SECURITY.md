@@ -70,32 +70,27 @@ placeholders. Do not paste historical secrets into issues, logs or pull requests
 **If you are the repository owner, coordinate the following before claiming remediation:**
 
 1. **Classify each historical value with its owner.** If it was a synthetic fixture never provisioned to any service, record the provenance. If it was ever provisioned, revoke or rotate it with the provider. History rewriting does not revoke a live credential.
-2. **Decide whether to remove historical files.** If any were real, or if their
-   provenance cannot be established, plan a coordinated history cleanup. This rewrites
-   commit IDs, tags and forks and requires owner approval. For example, with
-   `git-filter-repo` in a fresh mirror clone (do not run in the active checkout):
-
-   ```bash
-   git filter-repo --path-glob '*/src/main/resources/config.properties' \
-                   --path 'NetPortalManagement/src/main/resources/ds.xml' \
-                   --invert-paths
-   ```
-
-   Or with BFG:
-
-   ```bash
-   bfg --delete-files config.properties
-   bfg --delete-files ds.xml
-   git reflog expire --expire=now --all && git gc --prune=now --aggressive
-   ```
+2. **Decide whether to remove historical files and embedded values.** If any were real,
+   or if their provenance cannot be established, plan a coordinated cleanup. Inventory
+   every affected path, revision, tag and embedded occurrence first. A path-only filter
+   does not remove credentials or identity data embedded in other files, while a broad
+   filename filter can also remove legitimate test fixtures. Back up the repository,
+   obtain owner approval and rehearse a narrowly scoped rewrite in a fresh mirror clone;
+   verify the resulting history before publishing it. Do not run a history filter in the
+   active checkout or force-push as an unreviewed first step.
 
 3. Coordinate any force-push with contributors and fork owners; history rewriting
    changes commit IDs and does not revoke already-copied credentials. Ask affected
    clones/forks to re-clone, and review tags, release artifacts and cached copies.
 4. Add a `.gitignore` rule (already present) so it cannot recur.
-5. Run `python3 scripts/check_sensitive.py` locally; the CI hygiene job runs it too.
+5. Run `python scripts/check_sensitive.py` locally; the CI hygiene job runs it too.
    This heuristic scans tracked sources and templates, not historical commits or
-   remote provider state. Consider dedicated secret scanning as defense in depth.
+   remote provider state. For a **local historical inventory** on a full clone, run
+   `python scripts/audit_git_history.py`. It prints category counts, not matched values;
+   it is heuristic, skips oversized/binary content, and cannot establish whether a
+   finding is a real credential or personal identifier. Do not treat a passing
+   current-tree scan or this inventory as complete remediation. Track the non-sensitive
+   decision and evidence in [the security review](docs/SECURITY_REVIEW.md).
 
 ### 2. Identity-number-shaped values in the history
 
