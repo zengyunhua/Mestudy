@@ -35,8 +35,11 @@
         </property>
     </bean>-->
 
-    <!-- 静态资源映射 -->
-    <mvc:resources mapping="/views/**" location="WEB-INF/" cache-period="31536000"/>
+    <!-- 静态资源映射. Scoped to WEB-INF/views/ on purpose: location="WEB-INF/" served
+         every path beneath WEB-INF, so /views/classes/config.properties returned the
+         datasource credentials and /views/lib/*.jar returned the module's jars. The view
+         resolver's prefix is /WEB-INF/views/ too, so this keeps one asset root. -->
+    <mvc:resources mapping="/views/**" location="/WEB-INF/views/" cache-period="31536000"/>
 
 
 

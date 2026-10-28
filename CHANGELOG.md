@@ -61,6 +61,15 @@ grouped by scope rather than by a single release number.
   so an unset value turns the download path into the literal string `null/...` and notice
   attachments fail at request time rather than at startup. Added, with a comment naming
   the symptom.
+- **`InterfaceFunction` had the same three defects.** The review that produced the fixes
+  above was then applied to the other modules, and this one carried all of them:
+  `javax.servlet:servlet-api` and `spring-test` were at compile scope and both sat in
+  `WEB-INF/lib`; and its `/views/**` mapping also used `location="WEB-INF/"`, so
+  `/views/classes/config.properties` and `/views/lib/*.jar` were reachable. Both scopes are
+  corrected and the mapping is scoped to `/WEB-INF/views/`, which is also the view
+  resolver's prefix. The duplicate `WEB-INF/jquery.js` — byte-identical to
+  `WEB-INF/views/jquery.js` and present only to satisfy the old location — is deleted, so
+  `/views/jquery.js` still resolves and the WAR is 283 KB smaller.
 
 ### Changed
 

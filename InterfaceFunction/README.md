@@ -135,7 +135,19 @@ cp target/InterfaceFunction-*.war $CATALINA_HOME/webapps/sisp.war
 ## Notes for contributors
 
 - **This module is the best entry point for a first contribution.** One datasource, no
-  external gateways, 48 files.
+  external gateways, 49 Java files.
+- **`javax.servlet:servlet-api` and `spring-test` must stay out of the WAR.** Both were at
+  compile scope, so both were packaged into `WEB-INF/lib`; Tomcat warns and skips the
+  servlet jar, and other containers can fail at startup with a `ClassCastException` on
+  `javax.servlet` types. They are `provided` and `test` respectively. If you add a
+  dependency that a container supplies, scope it.
+- **Never point `<mvc:resources>` at `WEB-INF/` itself.** The `/views/**` mapping used
+  `location="WEB-INF/"`, which serves any path beneath it — `/views/classes/config.properties`
+  returned the datasource credentials and `/views/lib/*.jar` returned the module's jars.
+  It is scoped to `/WEB-INF/views/`, matching the view resolver's prefix, and the duplicate
+  `WEB-INF/jquery.js` that only existed to satisfy the old location is gone. A resource
+  handler bypasses the container's own `WEB-INF` protection, so the location must name a
+  directory, never the parent.
 - **Authorisation is data-driven, not enforced by an interceptor.** The module can answer
   "may this interface user call this function?" via
   `UserServiceImpl.checkInterfaceUserRoleFunc(...)`, but there is no module-wide
