@@ -48,6 +48,10 @@ cloned and built. Everything else is secondary.
 
 - [~] Unit tests for the `common` layer (`Page` covered; `Result`, `AESUtil`, `JsonMapper`,
       date/number helpers) — no database required
+- [~] A context-load test per module that fails on an unbound mapper statement or a
+      mis-typed `${jdbc.*}` key, without needing a database —
+      `NetworkOfficeService` has one (`SpringContextLoadTest`); the other three modules
+      do not yet
 - [ ] One controller test per module using `MockMvc` with mocked services
 - [ ] H2-backed integration test for one mapper per module (Oracle-specific SQL will need
       dialect guards; start with a mapper that uses portable SQL)

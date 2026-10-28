@@ -48,7 +48,7 @@
     <!-- 一体化sisp_yth数据源 -->
     <bean id="sispYthdataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${jdbc.sisp_yth.driverClassName}"/>
-        <property name="url" value="${jdbc.sisp_public_yth.url}"/>
+        <property name="url" value="${jdbc.sisp_yth.url}"/>
         <property name="username" value="${jdbc.sisp_yth.username}"/>
         <property name="password" value="${jdbc.sisp_yth.password}"/>
     </bean>
@@ -62,10 +62,20 @@
     </bean>
 
     <!-- MyBatis begin -->
-    <!--sisp用户 classpath:/mappings/draftsDAO.xml -->
+    <!-- sisp用户. mapperLocations must cover every @MyBatisDao interface in the
+         package the matching MapperScannerConfigurer scans, otherwise the mapper
+         bean is created but every call fails with
+         "Invalid bound statement (not found)". drafts_sisp holds DraftsDAO,
+         PersonDAO and BusinessHandleDao. -->
     <bean id="sispSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="sispDataSource"/>
-        <property name="mapperLocations" value="classpath:/mappings/draftsDAO.xml"/>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:/mappings/draftsDAO.xml</value>
+                <value>classpath:/mappings/personDAO.xml</value>
+                <value>classpath:/mappings/BusinessHandleDao.xml</value>
+            </list>
+        </property>
         <property name="configLocation" value="classpath:/config/mybatis-config.xml"></property>
     </bean>
 

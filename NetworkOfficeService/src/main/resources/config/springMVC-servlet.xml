@@ -99,9 +99,12 @@
     
     <!--<mvc:resources location="/" mapping="/**"/>-->
     
-    <!-- 静态资源映射 -->
-    <mvc:resources mapping="/views/**" location="WEB-INF/" cache-period="31536000"/>
-    <mvc:resources mapping="/ftl/**" location="WEB-INF/" cache-period="31536000"/>
+    <!-- 静态资源映射. Scoped to the two asset directories on purpose: pointing
+         these at WEB-INF/ itself exposed everything under it, including
+         WEB-INF/classes/config.properties (database credentials) and
+         WEB-INF/lib/*.jar, to any caller that could reach /views/** . -->
+    <mvc:resources mapping="/views/**" location="/WEB-INF/views/" cache-period="31536000"/>
+    <mvc:resources mapping="/ftl/**" location="/WEB-INF/ftl/" cache-period="31536000"/>
 
 	
   

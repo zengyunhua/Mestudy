@@ -76,6 +76,10 @@ signpdf.download.url=/sisp/signdownload/sign/download/
 # Upload directories. Must be shared across nodes if you run more than one.
 SCFILEPATH=/data/upload/sc
 MATTERSCFILEPATH=/data/upload/matter
+# Root for government-notice attachments, read by GovernmentController.
+# Without this key the download path becomes the literal string "null/...",
+# so /adapter/notice attachment downloads fail with "下载失败".
+sbdt.file_savepath=/data/upload/sbdt
 
 # --- Electronic licence library (API endpoints) ----------------------------
 # List licences held by a person.

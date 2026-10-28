@@ -109,7 +109,14 @@ File storage:
 ```properties
 SCFILEPATH=/data/upload/sc
 MATTERSCFILEPATH=/data/upload/matter
+sbdt.file_savepath=/data/upload/sbdt
 ```
+
+`sbdt.file_savepath` is the root for government-notice attachments, read by
+`GovernmentController`. It is read through `Config.getInstance().get(...)`, which returns
+`null` for a missing key rather than failing — so leaving it unset turns the download path
+into the literal string `null/...` and attachment downloads fail at request time, not at
+startup.
 
 > `config.properties` in this module defines `iinner_proxy_ip` (double *i*). No code reads
 > it, so it is inert — but do not copy the spelling.
@@ -122,12 +129,40 @@ cp src/main/resources/config.properties.example src/main/resources/config.proper
 mvn clean package
 ```
 
+`SpringContextLoadTest` runs as part of `package`. It loads the real
+`applicationContext.xml` and asserts that each datasource reads its own `jdbc.<schema>.*`
+keys and that every scanned mapper statement is bound. No database is needed — the
+datasources connect lazily and MyBatis parses mapper XML without a server. Values come
+from `src/test/resources/config.properties`, which shadows the production file on the test
+classpath. That one file is committed — an explicit exception in `.gitignore` — because the
+test cannot run without it; every password in it is `CHANGE_ME`, and it gives each
+datasource a different url so a bean wired to the wrong key cannot pass by coincidence.
+
+On Windows, if the surefire fork fails with *"The forked VM terminated without properly
+saying goodbye"*, your `%TEMP%` path contains non-ASCII characters. Point Maven at an ASCII
+temp directory — see [docs/TROUBLESHOOTING.md](../docs/TROUBLESHOOTING.md):
+
+```bash
+mvn -Djava.io.tmpdir=D:\mvn-tmp clean package
+```
+
 ```bash
 cp target/NetworkOfficeService-*.war $CATALINA_HOME/webapps/sisp.war
 ```
 
 ## Notes for contributors
 
+- **Each `MapperScannerConfigurer` is paired with one `SqlSessionFactory`, and that
+  factory's `mapperLocations` must list the XML for *every* `@MyBatisDao` interface in the
+  package it scans.** Adding a DAO interface without adding its mapper to the right
+  factory still compiles and still creates the bean; the failure shows up only when a
+  method is called, as `Invalid bound statement (not found)`.
+- **Never point `<mvc:resources>` at `WEB-INF/` itself.** Both mappings in
+  `springMVC-servlet.xml` used `location="WEB-INF/"`, which serves any path beneath it —
+  including `classes/config.properties` (datasource credentials) and `lib/*.jar` — to
+  anyone who can reach `/views/**`. They are now scoped to `/WEB-INF/views/` and
+  `/WEB-INF/ftl/`. Keep that shape when adding an asset directory: a resource handler
+  bypasses the container's own `WEB-INF` protection.
 - **`CommonExceptionHandler` converts unhandled exceptions into a `Result`.** A 500 from
   this module usually means the handler itself failed.
 - **Signature is an outbound dependency.** Signing requires the external service, the
@@ -135,3 +170,9 @@ cp target/NetworkOfficeService-*.war $CATALINA_HOME/webapps/sisp.war
   happy path.
 - **Draft files are on local disk**, not object storage. Horizontal scaling requires a
   shared mount, otherwise a draft attached on node A is invisible on node B.
+- **`com.tecsun.sisp.net.modules.dao.yth.QueryByDao`** has no mapper XML and no scanner, so
+  no bean is created for it. Nothing injects it today; wiring it up needs a mapper and a
+  scanner entry, not just the interface.
+- **`src/main/webapp/WEB-INF/lib/print-2.1.1.jar`** is vendored into the WAR but every
+  reference to its single class (`Tecsun`) is commented out. It is dead weight in the
+  artifact.

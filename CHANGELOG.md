@@ -11,7 +11,62 @@ grouped by scope rather than by a single release number.
 
 ## [Unreleased]
 
-_No unreleased changes._
+### Added
+
+- **A context-load test for `NetworkOfficeService`.** `SpringContextLoadTest` loads the
+  real `applicationContext.xml` with no database and asserts the two things a successful
+  `mvn package` cannot see: that each `DriverManagerDataSource` reads its own
+  `jdbc.<schema>.url` key, and that every statement exposed by a scanned `@MyBatisDao`
+  interface is bound in the matching `SqlSessionFactory`. It runs during `package` and
+  needs no Oracle instance — the datasources connect lazily and MyBatis parses mapper XML
+  while building its `Configuration`. Values come from
+  `src/test/resources/config.properties`, which shadows the production file on the test
+  classpath. This is the first test in the repository that fails on broken wiring rather
+  than on a broken helper; the other three modules still have no equivalent.
+
+### Fixed
+
+- **`NetworkOfficeService` no longer packages `servlet-api` and `spring-test` into the
+  WAR.** `javax.servlet:servlet-api` was at compile scope, so it landed in
+  `WEB-INF/lib`; Tomcat logs a validation warning and skips the jar, and other containers
+  can fail at startup with a `ClassCastException` on `javax.servlet` types. It is now
+  `provided`, matching the sibling modules. `spring-test` was likewise at compile scope
+  and is now `test`. Verified against the built WAR: 61 jars under `WEB-INF/lib`, neither
+  artifact among them.
+- **`sispYthdataSource` read the wrong URL key.** It declared
+  `${jdbc.sisp_public_yth.url}` while every other property on the bean used
+  `jdbc.sisp_yth.*`, so the bean pointed at a different schema than its name and its
+  siblings imply. Corrected to `${jdbc.sisp_yth.url}`. This is the class of defect that
+  surfaces as missing rows rather than as an error, which is why the new test asserts
+  every datasource URL explicitly instead of trusting that the context started.
+- **Two mapper XML files were not loaded.** `sispSqlSessionFactory` listed only
+  `mappings/draftsDAO.xml`, but the package its `MapperScannerConfigurer` covers also
+  holds `PersonDAO` and `BusinessHandleDao`. Their beans were still created, and every
+  call failed at runtime with `Invalid bound statement (not found)`. All three are now in
+  `mapperLocations`.
+- **`/views/**` and `/ftl/**` served everything under `WEB-INF`.** Both
+  `<mvc:resources>` mappings used `location="WEB-INF/"` rather than a specific asset
+  directory, so `/views/classes/config.properties` returned the datasource credentials and
+  `/views/lib/*.jar` returned the module's jars. Scoped to `/WEB-INF/views/` and
+  `/WEB-INF/ftl/`. Anyone who deployed this module from an earlier commit should treat the
+  credentials in its `config.properties` as disclosed to whoever could reach `/views/**`.
+- **`web.xml` declared a welcome file the container cannot serve.**
+  `/WEB-INF/views/index.html` sits under `WEB-INF`, which a container never serves
+  directly, and the file does not exist either — so `/` returned an error instead of
+  falling through to the `DispatcherServlet`. The list is removed.
+- **`display-name` read `InterfaceFunction`.** Copy-paste from a sibling module; corrected
+  to `NetworkOfficeService`.
+- **`config.properties.example` was missing `sbdt.file_savepath`.** `GovernmentController`
+  reads it through `Config.getInstance().get(...)`, which returns `null` for a missing key,
+  so an unset value turns the download path into the literal string `null/...` and notice
+  attachments fail at request time rather than at startup. Added, with a comment naming
+  the symptom.
+
+### Changed
+
+- **The WAR plugin is pinned to 2.2.** Without an explicit version Maven takes it from the
+  super-POM, so the packaged artifact depended on which Maven version ran the build. 2.2
+  is what Maven 3.8.x selects, so the output does not change — it just stops drifting.
 
 ## [1.1.0] - 2026-10-26
 

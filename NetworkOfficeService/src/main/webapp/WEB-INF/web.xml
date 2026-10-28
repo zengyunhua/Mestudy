@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          id="WebApp_ID" version="2.5">
 
-    <display-name>InterfaceFunction</display-name>
+    <display-name>NetworkOfficeService</display-name>
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
@@ -77,7 +77,8 @@
         <filter-name>HiddenHttpMethodFilter</filter-name>
         <servlet-name>springMVC3</servlet-name>
     </filter-mapping>-->
-    <welcome-file-list>
-        <welcome-file>/WEB-INF/views/index.html</welcome-file>
-    </welcome-file-list>
+    <!-- No welcome-file-list: a container cannot serve a welcome file from under
+         WEB-INF, and the previous entry (/WEB-INF/views/index.html) did not
+         exist either, so "/" returned an error instead of falling through.
+         Requests for "/" now reach the DispatcherServlet mapped below. -->
 </web-app>

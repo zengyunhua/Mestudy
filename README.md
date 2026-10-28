@@ -223,6 +223,14 @@ from the columns the mapper proves exist, with the provenance recorded in its Ja
 That is the one place in this repository where the code is not the original: if you have
 the real schema, diff it against your DDL.
 
+Compiling was not the same as packaging correctly. The same module also shipped
+`javax.servlet:servlet-api` and `spring-test` inside `WEB-INF/lib`, pointed one datasource
+at another schema's `${jdbc.*}` key, loaded two of its three mapper XML files, and mapped
+`/views/**` at `WEB-INF/` itself — which served `classes/config.properties` on request.
+All of that now fails a test instead of a deployment: `SpringContextLoadTest` loads the
+real context and asserts every datasource URL and every mapper statement. The full list is
+in the [CHANGELOG](CHANGELOG.md#unreleased).
+
 `NetPortalManagement` is the genuine hold-out. Its beans are annotated with `@TableName`
 / `@Column` and extend `Doe`, and its service layer queries through `Cnd` / `Select`.
 That is a persistence framework, not a stray utility jar — the dependency cannot be
