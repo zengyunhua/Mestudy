@@ -36,7 +36,7 @@ com/tecsun/sisp/iface/
 │   ├── IFaceHttpsClient.java    # 26 static operations
 │   ├── LoginUtil.java           # token acquisition
 │   ├── HttpClientUtil.java      # request execution
-│   ├── SSLClient.java           # permissive HTTPS client
+│   ├── SSLClient.java           # HTTPS, strict hostname check
 │   └── instruction.txt          # original (Chinese) integration note
 ├── common/
 │   ├── vo/                      # transport objects: Result, Page, SecQueryBean, ...
@@ -159,4 +159,9 @@ Full reference: [../docs/CLIENT_SDK.md](../docs/CLIENT_SDK.md).
 - **`statusCode` is a `String`.** `"200"` / `"0"`, never a number.
 - **Transactions do not span datasources.** A flow touching `sisp` and `zhongjian` is
   eventually consistent — make it idempotent.
-- **`BusinessFilter` (XSS) is disabled** in `web.xml`. Re-enabling it is on the roadmap.
+- **`BusinessFilter` is a session filter, not an XSS filter.** It validates the Redis-backed
+  token, binds it to the caller's IP and checks the device id. It is registered on
+  `/iface/rest/*`, `/iface/cardInfo/*`, `/iface/bank/*`, `/iface/job/*` and
+  `/iface/his/hangtianhis/*` only — every other prefix, including `/iface/user/*`, is
+  unauthenticated. Closing that gap changes the client contract and is tracked in
+  [MODULE_REVIEW_IFACESUPORTSERVICE.md](../docs/MODULE_REVIEW_IFACESUPORTSERVICE.md).
