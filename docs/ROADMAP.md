@@ -50,10 +50,12 @@ remain open work.
 
 - [~] Unit tests for the `common` layer (`Page` covered; `Result`, `AESUtil`, `JsonMapper`,
       date/number helpers) — no database required
-- [~] A context-load test per module that fails on an unbound mapper statement or a
-      mis-typed `${jdbc.*}` key, without needing a database —
-      `NetworkOfficeService` has one (`SpringContextLoadTest`); the other three modules
-      do not yet
+- [x] A context-load test per module that fails on an unbound mapper statement or a
+      mis-typed `${jdbc.*}` key, without needing a database. All four public modules
+      have one (`SpringContextLoadTest`), including a reflection check over every
+      scanned mapper method
+- [ ] Write the missing SQL for `AreaDAO.insertUserRol` / `queryUserRloe`
+      (`NetworkOfficeService`; needs the role-table schema) or remove the two endpoints
 - [ ] One controller test per module using `MockMvc` with mocked services
 - [ ] H2-backed integration test for one mapper per module (Oracle-specific SQL will need
       dialect guards; start with a mapper that uses portable SQL)

@@ -13,6 +13,21 @@ grouped by scope rather than by a single release number.
 
 ### Added
 
+- **Context-load tests for the other three public modules.** `IFaceSuportService`,
+  `IFaceSuperService_hn` and `InterfaceFunction` now each have a `SpringContextLoadTest`,
+  so all four modules in the default reactor fail the build on broken wiring. Each test
+  loads the real `applicationContext.xml` with no database. Where a module has more than
+  one datasource, the test gives each one a distinct url in
+  `src/test/resources/config.properties` and asserts that every bean reads its own key.
+  c3p0 pools are built with `initialPoolSize=0`, so they acquire no connection.
+- **A reflection check for unbound mapper methods, in all four modules.** The test walks
+  every `MapperFactoryBean` and asserts that each interface method resolves to a
+  statement in the factory its scanner uses. The lookup is the same one MyBatis'
+  `MapperMethod.SqlCommand` makes. Adding a DAO method without its SQL now fails at build
+  time, where before it failed on the first call. Hand-picked statement ids could not
+  catch this. `IFaceSuperService_hn/.../SecQueryDAO.xml` looks like it defines
+  `selectReceive` and `insertSend`, but its whole body is commented out. A separate
+  assertion stops the check from passing vacuously when the scan finds no mappers.
 - **A context-load test for `NetworkOfficeService`.** `SpringContextLoadTest` loads the
   real `applicationContext.xml` with no database and asserts the two things a successful
   `mvn package` cannot see: that each `DriverManagerDataSource` reads its own
@@ -22,7 +37,7 @@ grouped by scope rather than by a single release number.
   while building its `Configuration`. Values come from
   `src/test/resources/config.properties`, which shadows the production file on the test
   classpath. This is the first test in the repository that fails on broken wiring rather
-  than on a broken helper; the other three modules still have no equivalent.
+  than on a broken helper.
 - **A CI gate on what the build actually produced.** `scripts/verify_public_build.py`
   inspects the four public modules after `mvn verify`: each needs exactly one nonempty WAR
   and at least one Surefire XML report, with no failures or errors and at least one test
@@ -37,6 +52,21 @@ grouped by scope rather than by a single release number.
   distinguish a synthetic fixture from a provisioned credential, and it runs outside CI
   on purpose, where the checkout is shallow. The counts it produced at `d8a301d` are
   recorded in `docs/SECURITY_REVIEW.md`.
+
+### Known issues
+
+- **`POST /userNet/drafts/insertUserRol` and `/userNet/drafts/queryUserRloe` in
+  `NetworkOfficeService` always fail** with `Invalid bound statement (not found)`. The
+  reflection check above found them. `AreaDAO.insertUserRol` and `AreaDAO.queryUserRloe`
+  have no SQL in `areaDAO.xml` or anywhere in git history, and writing it needs the real
+  role-table schema. The test lists them by name in `BROKEN_ENDPOINT_UNBOUND`, and the
+  module README documents them.
+- **Five more unbound mapper methods are dead code.** They have no SQL and no reachable
+  caller: `NetPersonDAO.findAllByPersonState` and `DRPersonInfoDao.insertView` in
+  `IFaceSuportService`, and `BusinessHandleDao.getBusinessHandlePageMapByCondition`,
+  `DraftsDAO.deleteInformation` and `PersonDAO.updateDraftsMessage` in
+  `NetworkOfficeService`. Each module's test lists them by name with the reason. They are
+  harmless until someone calls one.
 
 ### Fixed
 

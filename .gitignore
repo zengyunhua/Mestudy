@@ -18,10 +18,13 @@ out/
 # --- Local / secret configuration ------------------------------------------
 # Real credentials live here. Only the .example templates are committed.
 config.properties
-# Exception: the NetworkOfficeService context-load test needs a fixture with
-# distinct per-schema urls on the test classpath. It contains no real values
-# (every password is CHANGE_ME) and is not under src/main/resources, so
-# scripts/check_sensitive.py does not treat it as tracked local configuration.
+# Exception: each module's context-load test needs a fixture with distinct
+# per-schema urls on the test classpath. They contain no real values (every
+# password is CHANGE_ME) and are not under src/main/resources, so
+# scripts/check_sensitive.py does not treat them as tracked local configuration.
+!IFaceSuportService/src/test/resources/config.properties
+!IFaceSuperService_hn/src/test/resources/config.properties
+!InterfaceFunction/src/test/resources/config.properties
 !NetworkOfficeService/src/test/resources/config.properties
 ds.xml
 config-local.properties

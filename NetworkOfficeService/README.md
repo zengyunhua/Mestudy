@@ -150,6 +150,18 @@ mvn -Djava.io.tmpdir=D:\mvn-tmp clean package
 cp target/NetworkOfficeService-*.war $CATALINA_HOME/webapps/sisp.war
 ```
 
+## Known broken endpoints
+
+| Endpoint | Fails with | Cause |
+| --- | --- | --- |
+| `POST /userNet/drafts/insertUserRol` | `Invalid bound statement (not found)` | `AreaDAO.insertUserRol` has no SQL |
+| `POST /userNet/drafts/queryUserRloe` | `Invalid bound statement (not found)` | `AreaDAO.queryUserRloe` has no SQL |
+
+Neither statement exists in `areaDAO.xml` or anywhere in git history. Fixing them needs
+the real role-table schema. Until someone writes that SQL (or removes the endpoints),
+`SpringContextLoadTest` lists both methods in `BROKEN_ENDPOINT_UNBOUND`. Its reflection
+check fails on any *other* unbound mapper method.
+
 ## Notes for contributors
 
 - **Each `MapperScannerConfigurer` is paired with one `SqlSessionFactory`, and that

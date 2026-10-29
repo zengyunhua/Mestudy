@@ -1,11 +1,18 @@
 package com.tecsun.sisp.net;
 
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -88,6 +95,66 @@ public class SpringContextLoadTest {
                 ctx.containsBean("personDAO"));
         assertTrue("BusinessHandleDao mapper bean missing",
                 ctx.containsBean("businessHandleDao"));
+    }
+
+    /**
+     * Every method of every scanned @MyBatisDao interface must resolve to a
+     * statement in the factory its scanner is bound to. The hand-picked ids
+     * above cover one statement per factory; this covers all of them, so a new
+     * DAO method without XML fails here, not in production.
+     */
+    @Test
+    public void everyScannedMapperMethodIsBound() {
+        List<String> unbound = new ArrayList<String>();
+        for (MapperFactoryBean<?> factoryBean : mapperFactoryBeans()) {
+            // getObjectType() is the mapper interface; mybatis-spring 1.2.x has no getMapperInterface().
+            Class<?> mapper = factoryBean.getObjectType();
+            Configuration configuration = factoryBean.getSqlSession().getConfiguration();
+            for (Method method : mapper.getMethods()) {
+                // Same lookup as MyBatis' MapperMethod.SqlCommand, including inherited methods.
+                String id = mapper.getName() + "." + method.getName();
+                String inherited = method.getDeclaringClass().getName() + "." + method.getName();
+                if (!configuration.hasStatement(id) && !configuration.hasStatement(inherited)) {
+                    unbound.add(id);
+                }
+            }
+        }
+        unbound.removeAll(DEAD_UNBOUND);
+        unbound.removeAll(BROKEN_ENDPOINT_UNBOUND);
+        assertTrue("Mapper methods with no bound statement: " + unbound, unbound.isEmpty());
+    }
+
+    /**
+     * Declared with no statement, and nothing calls them, so they cannot fail
+     * at runtime. Before you call one, add its SQL and delete it from this
+     * list.
+     */
+    private static final List<String> DEAD_UNBOUND = Arrays.asList(
+            "com.tecsun.sisp.net.modules.dao.drafts_sisp.BusinessHandleDao.getBusinessHandlePageMapByCondition",
+            "com.tecsun.sisp.net.modules.dao.drafts_sisp.DraftsDAO.deleteInformation",
+            // PersonServiceImpl calls it, but nothing injects PersonService.
+            "com.tecsun.sisp.net.modules.dao.drafts_sisp.PersonDAO.updateDraftsMessage");
+
+    /**
+     * KNOWN BROKEN. DraftsController exposes these through AreaServiceImpl as
+     * POST /userNet/drafts/insertUserRol and /userNet/drafts/queryUserRloe.
+     * Their SQL does not exist in areaDAO.xml or anywhere in git history, so
+     * both endpoints always fail with "Invalid bound statement (not found)".
+     * They stay on this list until someone with the role-table schema writes
+     * the SQL, or the endpoints are removed. See NetworkOfficeService/README.md.
+     */
+    private static final List<String> BROKEN_ENDPOINT_UNBOUND = Arrays.asList(
+            "com.tecsun.sisp.net.modules.dao.area_sisppublic.AreaDAO.insertUserRol",
+            "com.tecsun.sisp.net.modules.dao.area_sisppublic.AreaDAO.queryUserRloe");
+
+    private static List<MapperFactoryBean<?>> mapperFactoryBeans() {
+        List<MapperFactoryBean<?>> beans = new ArrayList<MapperFactoryBean<?>>();
+        for (String name : ctx.getBeanNamesForType(MapperFactoryBean.class)) {
+            // "&" asks for the FactoryBean itself rather than the mapper proxy it produces.
+            String factoryName = name.startsWith("&") ? name : "&" + name;
+            beans.add((MapperFactoryBean<?>) ctx.getBean(factoryName));
+        }
+        return beans;
     }
 
     private void assertUrl(String beanName, String expectedUrl) {
