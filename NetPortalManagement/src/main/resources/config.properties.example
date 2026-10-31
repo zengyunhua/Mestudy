@@ -4,14 +4,34 @@
 # Copy to config.properties and replace every CHANGE_ME.
 # config.properties is git-ignored; never commit real credentials.
 #
-# NOTE: datasource settings for this module live in ds.xml, not here.
-#       See ../ds.xml.example
+# Resolution order for every key: JVM system property, then this file, then an
+# environment variable named NPM_<KEY> (jdbc.url -> NPM_JDBC_URL). A missing
+# required key throws at first use instead of failing later with a null.
+#
+# ds.xml and bee_application.xml are no longer read; they remain in the tree
+# only as historical artifacts of the Bee framework this module used to run on.
 # ===========================================================================
 
+# --- Datasource -----------------------------------------------------------
+# Required. These replace what ds.xml used to hold.
+jdbc.driver=oracle.jdbc.driver.OracleDriver
+jdbc.url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+jdbc.username=CHANGE_ME
+jdbc.password=CHANGE_ME
+
+# --- Security -------------------------------------------------------------
+# Required by ApiTokenFilter. Startup fails while this is absent or CHANGE_ME.
+api.token=CHANGE_ME
+
+# --- Web ------------------------------------------------------------------
 # Context path this application is deployed under.
 platform_context_path=/sisp
 
-# Internal proxy used by LogUtil and NetUserInfoApplication to build
-# service-to-service URLs.
+# Root directory for policy attachments. Relative paths resolve against the
+# container working directory.
+upload.dir=uploads
+
+# --- Internal proxy -------------------------------------------------------
+# Used by LogUtil and NetUserInfoApplication to build service-to-service URLs.
 inner_proxy_ip=127.0.0.1
 inner_proxy_port=80

@@ -1,23 +1,50 @@
 package com.tecsun.sisp.npm.service;
 
-import java.sql.SQLException;
+import com.tecsun.sisp.npm.util.Database;
+import com.tecsun.sisp.npm.util.JsonResponse;
 
 import javax.servlet.http.HttpServletRequest;
-
-
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Map;
 
-import bee.cloud.engine.db.annotation.Application;
-import bee.cloud.service.app.SuperApplication;
+public abstract class NetSuperApplication {
+    protected final HttpServletRequest request;
+    protected final int pageno;
+    protected final int pagesize;
 
-@Application(name = "sisp_source", alias = "sisp_source", dsn = "sisp_source", entityPkg = {"com.tecsun.sb.entity", "com.tecsun.sb.entity.common", "bee.cloud.engine.entity", "bee.cloud.engine.dog.entity", "bee.cloud.entity", "com.tecsun.sisp.npm.bean"})
-public class NetSuperApplication extends SuperApplication {
-
-    public NetSuperApplication(@Context HttpServletRequest request, @Context UriInfo ui) throws SQLException {
-        super(request);
-        // TODO Auto-generated constructor stub
+    protected NetSuperApplication(HttpServletRequest request, UriInfo uriInfo) {
+        this.request = request;
+        this.pageno = positiveInt(uriInfo, "pageno", 1);
+        this.pagesize = positiveInt(uriInfo, "pagesize", 5);
     }
 
+    protected Connection openConnection() throws SQLException {
+        return Database.open();
+    }
 
+    protected String ok(Object data) {
+        return JsonResponse.success(data);
+    }
+
+    protected String ok(Object data, Map<String, Object> extra) {
+        return JsonResponse.success(data, extra);
+    }
+
+    protected String error(String message) {
+        return JsonResponse.failure(message);
+    }
+
+    private int positiveInt(UriInfo uriInfo, String name, int defaultValue) {
+        if (uriInfo == null || uriInfo.getQueryParameters().getFirst(name) == null) {
+            return defaultValue;
+        }
+        try {
+            int value = Integer.parseInt(uriInfo.getQueryParameters().getFirst(name));
+            return value > 0 ? value : defaultValue;
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 }

@@ -164,12 +164,18 @@ Counts are `@RequestMapping` declarations per class, including the class-level m
 | `/iface/card` | `CardInfoController` | 6 | Card services (Henan gateway) |
 | `/iface/user` | `UserController` | 2 | Login / token (Henan gateway) |
 
-### NetPortalManagement — 0
+### NetPortalManagement — 11
 
-No HTTP endpoints. This module is a *Bee*-framework application whose entry points are
-`*Application` classes (`NetSuperApplication`, `NetUserInfoApplication`,
-`PolicyApplication`, `WebConnectionApplication`) invoked by the framework's dispatcher,
-not by Spring MVC.
+This module exposes standard Jersey resources under `/npmanagement`. The resources are
+protected by `ApiTokenFilter` and use the same `statusCode`/`message`/`data` envelope as
+the other public APIs. See the [module guide](../NetPortalManagement/README.md) for the
+endpoint table, token configuration, Oracle assumptions and upload behavior.
+
+| Base path | Resource | Endpoints | Domain |
+| --- | --- | :---: | --- |
+| `/npmanagement/netUserInfo` | `NetUserInfoApplication` | 5 | Portal users and passwords |
+| `/npmanagement/anp` | `PolicyApplication` | 5 | Policy documents and uploads |
+| `/npmanagement/web` | `WebConnectionApplication` | 1 | Web visit statistics |
 
 ## 7. Generating an OpenAPI description
 

@@ -1,96 +1,122 @@
 package com.tecsun.sisp.npm.service;
 
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import com.tecsun.sisp.npm.repository.NetPortalRepository;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.RowSet;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-
-import com.sun.org.apache.xpath.internal.axes.HasPositionalPredChecker;
-import com.tecsun.sisp.npm.bean.WebConnectionVO;
-import com.tecsun.sisp.npm.util.PublicMethod;
-import com.tecsun.sisp.npm.util.StaticBean;
-
-import bee.cloud.engine.db.DataType;
-import bee.cloud.engine.db.cnd.CndFactory;
-import bee.cloud.engine.db.core.Cnd;
-import bee.cloud.engine.db.siud.Select;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Path("/npmanagement/web")
 public class WebConnectionApplication extends NetSuperApplication {
+    private static final Logger LOGGER = Logger.getLogger(WebConnectionApplication.class);
+    private static final NetPortalRepository REPOSITORY = new NetPortalRepository();
 
-    public WebConnectionApplication(@Context HttpServletRequest request,@Context HttpServletResponse response, @Context UriInfo ui) throws SQLException {
+    public WebConnectionApplication(@Context HttpServletRequest request, @Context UriInfo ui) {
         super(request, ui);
     }
 
-    /**
-     * 按时间段查询网办访问量
-     * @param startDate
-     * @param endDate
-     * @param searchType
-     * @return
-     */
     @GET
     @Path("/getWebInfo")
-    public String getWebInfo(@QueryParam("startDate") String startDate, @QueryParam("endDate") String endDate,@QueryParam("searchType") String searchType) {
-        WebConnectionVO vo = new WebConnectionVO(doe);
-      //1.年，2.月(2015-02)，3.日
-        if("1".equals(searchType)){
-        	startDate=PublicMethod.formatDate(PublicMethod.getYearFirst(Integer.parseInt(startDate)),"yyyy-MM-dd")+" 00:00:00";
-        	endDate=PublicMethod.formatDate(PublicMethod.getYearLast(Integer.parseInt(endDate)),"yyyy-MM-dd")+" 23:59:59";
-        }else if("2".equals(searchType)){
-        	startDate=startDate+"-01 00:00:00";
-            endDate=PublicMethod.formatDate(PublicMethod.getLastDayOfMonth(Integer.parseInt(endDate.split("-")[0]),Integer.parseInt(endDate.split("-")[1])),"yyyy-MM-dd")+" 23:59:59";
-        }else if("3".equals(searchType)){
-        	startDate=startDate+" 00:00:00";
-            endDate=endDate+" 23:59:59";
-        }
-        StringBuffer sql = new StringBuffer();
-        List<Map> list = new ArrayList<Map>();
-       try {
-            Cnd cnd = CndFactory.getCnd(DataType.ORACLE, "1", Cnd.EQ, "1");
-            if(searchType.equals("1")){
-            	sql.append("select to_char(create_time,'yyyy') as create_time,count(1) as count FROM T_WEB_CONNECTION_INFO where ");
-            	sql.append("(create_time>= to_date('"+startDate+"','yyyy-MM-dd HH24:MI:SS')) AND ");
-            	sql.append("(create_time< to_date('"+endDate+"','yyyy-MM-dd HH24:MI:SS')) ");
-            	sql.append("group by to_char(create_time,'yyyy') order by create_time asc");
-            }else if(searchType.equals("2")){
-            	sql.append("select to_char(create_time,'yyyy-MM') as create_time,count(1) as count FROM T_WEB_CONNECTION_INFO where ");
-            	sql.append("(create_time>= to_date('"+startDate+"','yyyy-MM-dd HH24:MI:SS')) AND ");
-            	sql.append("(create_time< to_date('"+endDate+"','yyyy-MM-dd HH24:MI:SS')) ");
-            	sql.append("group by to_char(create_time,'yyyy-MM')  order by create_time asc");          
-            }else{
-            	sql.append("select to_char(create_time,'yyyy-MM-dd') as create_time,count(1) as count FROM T_WEB_CONNECTION_INFO where ");
-            	sql.append("(create_time>= to_date('"+startDate+"','yyyy-MM-dd HH24:MI:SS')) AND ");
-            	sql.append("(create_time< to_date('"+endDate+"','yyyy-MM-dd HH24:MI:SS')) ");
-            	sql.append("group by to_char(create_time,'yyyy-MM-dd')  order by create_time asc");
+    public String getWebInfo(@QueryParam("startDate") String startDate,
+                             @QueryParam("endDate") String endDate,
+                             @QueryParam("searchType") String searchType) {
+        try {
+            DateRange range = DateRange.parse(startDate, endDate, searchType);
+            try (Connection connection = openConnection()) {
+                List<Map<String, String>> values = REPOSITORY.connectionStats(
+                        connection, new Timestamp(range.start.getTime()), new Timestamp(range.end.getTime()), range.format);
+                return ok(values);
             }
-            System.out.println("============="+sql.toString());
-           RowSet rs = doe.query(sql.toString());
-           
-           while(rs.next()){
-        	   String create_time = rs.getString("create_time");
-        	   String count = rs.getString("count");
-        	   Map<String, String> map = new HashMap<String, String>();
-        	   map.put("name", create_time);
-        	   map.put("group", "网站访问量");
-        	   map.put("value", count);
-        	   list.add(map);
-           }
-            return ok(list, null);
+        } catch (IllegalArgumentException e) {
+            return error(e.getMessage());
         } catch (SQLException e) {
-        	logger.error("查询网办访问量出差",e);
+            LOGGER.error("查询网办访问量出错", e);
             return error("查询出错");
+        }
+    }
+
+    private static final class DateRange {
+        private final Date start;
+        private final Date end;
+        private final String format;
+
+        private DateRange(Date start, Date end, String format) {
+            this.start = start;
+            this.end = end;
+            this.format = format;
+        }
+
+        private static DateRange parse(String startValue, String endValue, String searchType) {
+            if ("1".equals(searchType)) {
+                int startYear = parseInteger(startValue, "开始年份");
+                int endYear = parseInteger(endValue, "结束年份");
+                if (endYear < startYear) {
+                    throw new IllegalArgumentException("结束年份不能早于开始年份");
+                }
+                return new DateRange(date(startYear, Calendar.JANUARY, 1),
+                        date(endYear + 1, Calendar.JANUARY, 1), "yyyy");
+            }
+            if ("2".equals(searchType)) {
+                Date start = parseDate(startValue, "yyyy-MM", "开始月份");
+                Date end = parseDate(endValue, "yyyy-MM", "结束月份");
+                if (end.before(start)) {
+                    throw new IllegalArgumentException("结束月份不能早于开始月份");
+                }
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(end);
+                calendar.add(Calendar.MONTH, 1);
+                return new DateRange(start, calendar.getTime(), "yyyy-MM");
+            }
+            if ("3".equals(searchType)) {
+                Date start = parseDate(startValue, "yyyy-MM-dd", "开始日期");
+                Date end = parseDate(endValue, "yyyy-MM-dd", "结束日期");
+                if (end.before(start)) {
+                    throw new IllegalArgumentException("结束日期不能早于开始日期");
+                }
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(end);
+                calendar.add(Calendar.DATE, 1);
+                return new DateRange(start, calendar.getTime(), "yyyy-MM-dd");
+            }
+            throw new IllegalArgumentException("searchType 只支持 1、2、3");
+        }
+
+        private static int parseInteger(String value, String label) {
+            try {
+                return Integer.parseInt(value);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(label + "格式不正确");
+            }
+        }
+
+        private static Date parseDate(String value, String pattern, String label) {
+            try {
+                SimpleDateFormat format = new SimpleDateFormat(pattern);
+                format.setLenient(false);
+                return format.parse(value);
+            } catch (ParseException e) {
+                throw new IllegalArgumentException(label + "格式不正确，应为 " + pattern);
+            }
+        }
+
+        private static Date date(int year, int month, int day) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.clear();
+            calendar.set(year, month, day);
+            return calendar.getTime();
         }
     }
 }

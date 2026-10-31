@@ -1,9 +1,9 @@
 # Architecture
 
 This document primarily explains request handling in `IFaceSuportService` and the
-Spring MVC/MyBatis modules. `NetPortalManagement` instead uses Bee/Jersey with its own
-datasource and authentication filter; do not apply the Spring request lifecycle to it.
-Differences among the public modules are called out where relevant.
+Spring MVC/MyBatis modules. `NetPortalManagement` uses standard Jersey/JDBC with its own
+repository layer and API-token filter; its resource lifecycle is different from Spring
+MVC but it no longer requires a proprietary framework.
 
 - [1. Workspace layout](#1-workspace-layout)
 - [2. Layering](#2-layering)
@@ -18,9 +18,8 @@ Differences among the public modules are called out where relevant.
 
 ## 1. Workspace layout
 
-The root `pom.xml` is the parent and aggregator. Its default reactor builds four
-public modules; `-Pprivate-deps` opts in `NetPortalManagement` when its six private
-artifacts are available. Each module still produces a separately deployable WAR:
+The root `pom.xml` is the parent and aggregator. Its default reactor builds all five
+public modules. Each module still produces a separately deployable WAR:
 
 ```
 Mestudy/
@@ -119,7 +118,7 @@ check which context is supposed to own it first.
 | `NetworkOfficeService` | `sispDataSource`, `sisppublicDataSource`, `sispPublicYthDataSource`, `sispYthdataSource`, `drDataSource` | `jdbc.sisp.*`, `jdbc.sisp_public.*`, `jdbc.sisp_public_yth.*`, `jdbc.sisp_yth.*`, `jdbc.drface.*` |
 | `IFaceSuperService_hn` | `dataSource`, `drDataSource` | `jdbc.sisp.*` (`dataSource`), `jdbc.ncCollect.*` (`drDataSource`) |
 | `InterfaceFunction` | `dataSource` | `jdbc.*` (single schema) |
-| `NetPortalManagement` | managed by the *Bee* framework via `ds.xml` | none in `config.properties` |
+| `NetPortalManagement` | scoped JDBC connections via `Database` | `jdbc.*`, `api.token`, `inner_proxy_*`, `upload.dir` |
 
 Two inconsistencies worth knowing before you debug a connection problem:
 

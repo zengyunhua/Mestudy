@@ -51,7 +51,7 @@ when a Java system has to talk to a dozen heterogeneous government backends.
 | [`NetworkOfficeService`](NetworkOfficeService/README.md) | `sisp_NetworkOfficeService` | Online government-service portal. Application drafts, submission, audit trail, electronic signature (PDF stamping), area/administrative division data. | 129 Java files |
 | [`IFaceSuperService_hn`](IFaceSuperService_hn/README.md) | `sisp_IFaceSuperService_hn` | Province-specific (Henan) variant of the interface service: card + social-insurance controllers against the provincial gateway. | 60 Java files |
 | [`InterfaceFunction`](InterfaceFunction/README.md) | `sisp_InterfaceFunction` | Platform security administration: users, roles, function/permission trees, login. | 49 Java files |
-| [`NetPortalManagement`](NetPortalManagement/README.md) | `sisp_NetPortalManagement` | Lightweight portal administration: portal users, policy documents, external web-connection registry. Uses the internal *Bee* persistence framework. | 11 Java files |
+| [`NetPortalManagement`](NetPortalManagement/README.md) | `sisp_NetPortalManagement` | Lightweight portal administration: portal users, policy documents, external web-connection registry. Uses standard JDBC and Jersey with a configurable API-token filter. | 16 Java files |
 
 All modules share the group id `com.tecsun.sisp` and are packaged as `war` for
 deployment into a servlet container.
@@ -59,8 +59,8 @@ deployment into a servlet container.
 ## Architecture
 
 The diagram and request lifecycle below describe `IFaceSuportService`, not a
-universal architecture for all five modules. The four public modules use Spring MVC
-and MyBatis; `NetPortalManagement` uses Bee/Jersey instead. There is no shared
+universal architecture for all five modules. Four modules use Spring MVC and MyBatis;
+`NetPortalManagement` uses standard JDBC/Jersey. There is no shared
 `common` artifact —
 each module carries its own copy of `common`/`util`, which keeps modules independently
 deployable at the cost of some duplication.
@@ -129,8 +129,8 @@ flowchart TB
 | --- | --- | --- |
 | Language / runtime | Java 8 (source/target 1.8) | Level is set once in the root POM via `maven.compiler.source`/`target`; modules must not override it |
 | Web framework | Spring MVC 4.0.8.RELEASE | XML configuration, no Spring Boot |
-| Persistence | MyBatis 3.2.4; Bee in `NetPortalManagement` | Mapper interfaces + XML in public modules; private Bee APIs in portal administration |
-| Connection pool | c3p0 (`ComboPooledDataSource`) where configured | `NetworkOfficeService` uses `DriverManagerDataSource`; the Bee module configures its own datasource |
+| Persistence | MyBatis 3.2.4 and JDBC | Mapper interfaces + XML in the Spring modules; parameterized JDBC repositories in portal administration |
+| Connection pool | c3p0 (`ComboPooledDataSource`) where configured | `NetworkOfficeService` uses `DriverManagerDataSource`; `NetPortalManagement` opens scoped JDBC connections |
 | Database | Oracle 10g/11g | Multiple schemas per module |
 | Cache / session | Redis via Jedis | Dictionary cache, interface token, channel state |
 | SOAP | Apache Axis 1.x | Generated stubs for provincial gateway / HIS |
@@ -156,7 +156,7 @@ flowchart TB
 git clone https://github.com/zengyunhua/Mestudy.git
 cd Mestudy
 
-# Build and verify the default reactor - the four modules whose dependencies are public
+# Build and verify all five modules
 mvn -B verify
 
 #   IFaceSuportService/target/IFaceSuportService-V1.0.0.150630.war         -> deploy
@@ -164,18 +164,13 @@ mvn -B verify
 #   IFaceSuperService_hn/target/IFaceSuperService_hn-V1.0.0.190107.war
 #   InterfaceFunction/target/InterfaceFunction-V1.0.0.150630.war
 #   NetworkOfficeService/target/NetworkOfficeService-V1.0.0.180612.war
-
-# Optional fifth module, only in an authorized environment with all six private artifacts
-mvn -B -Pprivate-deps -pl NetPortalManagement -am verify
+#   NetPortalManagement/target/NetPortalManagement-V1.0.0.150630.war
 ```
 
 The repository root holds an aggregator `pom.xml`, so Maven works from the top of the
-tree. Its default `<modules>` list is deliberately short: only the modules that resolve
-from Maven Central. The remaining one sits behind the `private-deps` profile so a fresh clone
-is not blocked by an unresolvable private artifact; a green build still requires
-public dependencies to resolve and tests to pass. Each module keeps its
-own coordinates and version — the root POM supplies the module list, the source encoding
-and the Java 8 compiler level (1.8), which every module inherits.
+tree. All five modules now resolve from public dependencies and are part of the default
+reactor. Each module keeps its own coordinates and version — the root POM supplies the
+module list, plugin versions, source encoding and Java 8 compiler level (1.8).
 
 ### Verify without external services
 
@@ -186,14 +181,12 @@ servlet container:
 mvn -B test
 ```
 
-On October 28, 2026, `mvn -B -ntp -DforkCount=0 verify` passed 19 tests
-(8/4/4/3 across the four default modules) and produced four WARs on a maintainer
-workstation. These include client, filter, paging, utility, controller and Spring
-context checks; they do not prove deployment or cover most business flows. CI runs the
-same command with forked tests against an isolated Maven repository, then applies
-`scripts/verify_public_build.py` to the WARs and Surefire reports: run #27 on `352fbe8`
-passed both jobs. Confirm the run for the commit you are citing — a later commit can
-regress it, as run #26 did.
+The public reactor now includes `NetPortalManagement`; its JDBC repositories compile
+without proprietary artifacts. The existing tests cover client, filter, paging, utility,
+controller, Spring-context and build-hygiene behavior; they do not prove deployment or
+cover every Oracle business flow. CI runs the same command with forked tests against an
+isolated Maven repository, then applies `scripts/verify_public_build.py` to all WARs and
+Surefire reports.
 Legacy HTTP smoke tests are intentionally excluded from this command because they
 require a running deployment and local fixtures. On Windows, if Surefire cannot start
 a forked JVM because `%TEMP%` contains non-ASCII characters — the usual case when the
@@ -201,9 +194,9 @@ account name is Chinese — point the temp directory at an ASCII path:
 `mvn -B -Djava.io.tmpdir=D:\mvn-tmp package` (create the directory first).
 `-DforkCount=0` also works but loses per-test isolation. See
 [troubleshooting](docs/TROUBLESHOOTING.md).
-This is a **partial** public build, not a claim that all five modules run without the
-private `bee` framework: four of the five compile and package from Maven Central, and
-`NetPortalManagement` does not.
+This is a **public dependency build**, not a claim that a fresh clone has an Oracle
+database or platform proxy available. `NetPortalManagement` now starts only after its
+JDBC and API-token configuration is supplied.
 
 ### Which modules build publicly
 
@@ -213,7 +206,7 @@ private `bee` framework: four of the five compile and package from Maven Central
 | `IFaceSuperService_hn` | yes | yes | — |
 | `InterfaceFunction` | yes | yes | — (the private coordinates it declared were unused and are gone) |
 | `NetworkOfficeService` | yes | yes | — (one missing entity class was reconstructed) |
-| `NetPortalManagement` | no (private artifacts required) | `-Pprivate-deps` | six Bee/tool/AAM coordinates; see [dependency inventory](NetPortalManagement/README.md#build-and-dependency-boundary) |
+| `NetPortalManagement` | yes | yes | Oracle JDBC, external platform proxy for photo/log endpoints, and a configured API token |
 
 Two modules needed work to get here, and they needed different things.
 
@@ -242,14 +235,11 @@ All of that now fails a test instead of a deployment: `SpringContextLoadTest` lo
 real context and asserts every datasource URL and every mapper statement. The full list is
 in the [CHANGELOG](CHANGELOG.md#unreleased).
 
-A fork user reports successfully building the project locally; the command, module
-scope and dependency source were not provided. The maintainer separately reports
-`NetPortalManagement` builds and deploys in their authorized environment. This feedback
-does not establish that the fifth module resolves from public repositories: an opt-in attempt
-on October 28, 2026 could not resolve its six private artifacts. Its beans are annotated with `@TableName`
-/ `@Column` and extend `Doe`, and its service layer queries through `Cnd` / `Select`.
-That is a persistence framework, not a stray utility jar — the dependency cannot be
-deleted without rewriting the data-access layer.
+`NetPortalManagement` previously depended on Bee ORM, Bee startup classes, `xx.tool` and
+the AAM Jersey filter. Those dependencies have been replaced with plain DTOs, a
+parameterized JDBC repository, standard Jersey servlet bootstrapping, `AppConfig` and a
+fail-closed API-token filter. The migration preserves the existing resource paths while
+making the security and configuration boundary explicit in the module guide.
 
 Everything else — Spring, MyBatis, Axis, Jersey, kaptcha and the Oracle JDBC driver —
 resolves from Maven Central.
@@ -312,11 +302,11 @@ Every module ships a `config.properties.example`; copy it to `config.properties`
 keep the real file untracked. The four Spring MVC modules read it through
 `<context:property-placeholder ignore-unresolvable="true">`, so `${key}` resolves in
 their XML — and an unknown key is left in place as the literal `${key}` rather than
-failing at startup. `NetPortalManagement` reads the same file through Bee's
-`Config.getInstance().get(key)` instead, which returns `null` for an unknown key. Both
-fail softly and neither announces the mistake; the symptom is a `${key}` or `null`
-reaching a URL. Its datasource is not in `config.properties` at all: it is in `ds.xml`,
-with framework bootstrap in `bee_application.xml`. See its
+failing at startup. `NetPortalManagement` resolves keys through `AppConfig`, which
+checks a JVM system property, then `config.properties`, then an environment variable
+(`jdbc.url` → `NPM_JDBC_URL`), and throws on a missing required key instead of returning
+`null`. Its datasource is therefore `jdbc.*` in this same file, not a separate `ds.xml`,
+and `api.token` is mandatory — the module refuses to start without it. See its
 [module guide](NetPortalManagement/README.md).
 
 | Key group | Purpose |
@@ -368,15 +358,15 @@ reference. It is maintained on a best-effort basis.
 
 - **Documentation**: in place — this README, one README per module, and the ten
   documents under `docs/`.
-- **Public build scope**: four of five. `IFaceSuportService`, `IFaceSuperService_hn`,
-  `InterfaceFunction` and `NetworkOfficeService` build from Maven Central alone and are
-  included in the public CI build; `NetPortalManagement` remains opt-in with six
-  private artifacts. A fork user reports a successful local project build, without
-  specifying its module scope; fifth-module deployment is not independently verified.
-- **Tests**: limited. The four public modules have 19 tests in the October 28
-  maintainer-workstation run; CI verifies a nonempty WAR and passing tests for each
-  public module, alongside repository hygiene checks. Run #27 on `352fbe8` is green;
-  confirm CI on the commit you are citing.
+- **Public build scope**: five of five. All modules are in the default reactor and
+  resolve from public dependencies; `NetPortalManagement` still needs Oracle and a
+  configured platform proxy for meaningful runtime checks.
+- **Tests**: limited. CI builds all five modules and verifies a nonempty WAR and passing
+  tests for the four Spring MVC modules (31 tests), alongside repository hygiene checks.
+  `NetPortalManagement` is built and packaged but is not yet covered by that gate: it has
+  no test sources, and `scripts/verify_public_build.py` still lists four modules. The new
+  JDBC layer needs an Oracle-compatible fixture before it can be asserted against, and
+  `AppConfig` and `ApiTokenFilter` could be covered without one.
 - **Modernisation**: not planned in-place. The intent is to keep the original
   Spring 4 / XML style intact so the patterns stay readable. The language level is
   Java 8 (raised from 7) and that is as far as it goes — no framework upgrade.
@@ -386,10 +376,10 @@ reference. It is maintained on a best-effort basis.
 These are documented on purpose — they are the honest state of the code, and each one
 is a good first contribution.
 
-1. **One module needs private jars.** `NetPortalManagement` depends on the internal
-   `bee.cloud` persistence framework, which was never published publicly, so it is
-   excluded from CI. The other four build against Maven Central alone — two of them only
-   after dead dependencies were dropped and one missing entity class was reconstructed.
+1. **Oracle-backed runtime flows need infrastructure.** The public build compiles and
+   packages all five modules, but portal queries, policy BLOBs and visit statistics still
+   require an authorized Oracle schema. Photo/log endpoints also call the configured
+   platform proxy.
 2. **Historical sensitive-looking data needs owner review.** The current tree uses
    `.example` templates instead of tracked local `config.properties` / `ds.xml`, but
    Git history still contains credential-, payment-signing-key- and identity-shaped
@@ -429,7 +419,8 @@ See [docs/ROADMAP.md](docs/ROADMAP.md). Near-term:
 - [x] Tag `v1.0.0`
 - [x] Bring `InterfaceFunction` into the default reactor (its private coordinates were unused)
 - [x] Reconstruct `BanjianVo` so `NetworkOfficeService` builds publicly
-- [ ] Make `NetPortalManagement` build against public artifacts
+- [x] Replace NetPortalManagement's private Bee/AAM runtime with public JDBC/Jersey components
+- [ ] Add Oracle-compatible integration tests for NetPortalManagement repositories
 - [ ] Scrub credentials and personal data from the git history
 - [ ] Add JUnit + H2 tests for the `common` layer and one controller per module
 - [ ] Generate an OpenAPI description from the existing controllers

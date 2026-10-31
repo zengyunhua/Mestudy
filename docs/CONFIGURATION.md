@@ -159,20 +159,26 @@ Used by `NetworkOfficeService` when a submitted application must be stamped.
 
 ## NetPortalManagement
 
-This module does not use `config.properties` for persistence. It uses the internal *Bee*
-framework, configured by:
+This module reads the same `config.properties`, but through `AppConfig` rather than a
+Spring placeholder. Each key is resolved in three steps — JVM system property,
+`config.properties`, then an environment variable named `NPM_<KEY>` with dots turned
+into underscores (`jdbc.url` → `NPM_JDBC_URL`) — and `AppConfig.required(...)` throws
+`IllegalStateException` at first use when a mandatory key is absent. That is stricter
+than the Spring modules, where a missing key survives as a literal `${key}`.
 
-- `bee_application.xml` — framework bootstrap and package scanning
-- `ds.xml` — datasource definition
+| Key | Required | Purpose |
+| --- | --- | --- |
+| `jdbc.url`, `jdbc.username`, `jdbc.password` | yes | Datasource read by `Database.open()` |
+| `jdbc.driver` | no | Defaults to `oracle.jdbc.driver.OracleDriver` |
+| `api.token` | yes | Shared secret checked by `ApiTokenFilter`; startup fails if absent, blank or `CHANGE_ME` |
+| `inner_proxy_ip`, `inner_proxy_port` | when used | Build service-to-service URLs in `LogUtil` and `NetUserInfoApplication` |
+| `platform_context_path` | no | Defaults to `/sisp`; appended to those URLs |
+| `upload.dir` | no | Defaults to `uploads`; root for policy attachments |
 
-Both are framework-specific; the connection settings live in `ds.xml`.
-
-`config.properties` is still read here, but only for non-datasource keys —
-`platform_context_path`, `inner_proxy_ip` and `inner_proxy_port`, through
-`Config.getInstance().get(...)` in `LogUtil` and `NetUserInfoApplication`. Because that
-is the `null`-returning path, a missing proxy key produces a URL containing the literal
-`null` rather than a startup failure. There is no `<context:property-placeholder>` in
-this module, so no `${...}` substitution happens at all.
+`ds.xml` and `bee_application.xml` are no longer read. They stay in the tree as
+historical artifacts of the Bee framework, and `ds.xml.example` still shows the shape of
+the original datasource definition. A working `config.properties` for this module
+therefore needs the `jdbc.*` keys that `ds.xml` used to hold.
 
 ## Conventions for new keys
 

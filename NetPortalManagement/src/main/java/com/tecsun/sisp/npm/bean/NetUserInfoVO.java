@@ -1,21 +1,12 @@
 package com.tecsun.sisp.npm.bean;
 
-import bee.cloud.engine.db.Doe;
-import bee.cloud.engine.db.annotation.Column;
-import bee.cloud.engine.db.annotation.TableName;
-import bee.cloud.engine.db.core.Table;
 
 /**
  * created by fuweifeng on 2015-5-31.
  */
-@TableName(name = "t_az01b")
-public class NetUserInfoVO extends Table {
-    public NetUserInfoVO(Doe doe) {
-        super(doe);
-    }
+public class NetUserInfoVO {
 
     public static final String CITYNO = "cityno";
-    @Column(name = CITYNO)
     private String cityno;// 城市代码
 
     public String getCityno() {
@@ -27,19 +18,15 @@ public class NetUserInfoVO extends Table {
     }
 
     public static final String GRBH = "grbh";
-    @Column(name = GRBH)
     private String grbh;// 个人编号
 
     public static final String CARDNO = "cardno";
-    @Column(name = CARDNO)
     private String cardno;// 社保卡号
 
     public static final String NAME = "name";
-    @Column(name = NAME)
     private String name;// 姓名
 
     public static final String CERNUM = "cernum";
-    @Column(name = CERNUM, pk = true)
     private String cernum;// 身份证号
 
     public String getGrbh() {
@@ -75,32 +62,25 @@ public class NetUserInfoVO extends Table {
     }
 
     public static final String MOBILE_ADDRESS = "mobile_address";
-    @Column(name = MOBILE_ADDRESS)
     private String mobile_address;// 通讯地址
 
     public static final String ADDRESS = "address";
-    @Column(name = ADDRESS)
     private String address;// 户籍所在地
 
     public static final String MOBILE = "mobile";
-    @Column(name = MOBILE)
     private String mobile;// 手机号码
 
     public static final String PHONE = "phone";
-    @Column(name = PHONE)
     private String phone;// 联系电话
 
     public static final String UNITNO = "unitno";
-    @Column(name = UNITNO)
     private String unitno;// 单位编号
 
     public static final String UNITNAME = "unitname";
-    @Column(name = UNITNAME)
     private String unitname;// 单位名称
 
 
     public static final String IS_UPDATE = "is_update";
-    @Column(name = IS_UPDATE)
     private String is_update;// 是否修改
 
     public String getIs_update() {
@@ -160,19 +140,15 @@ public class NetUserInfoVO extends Table {
     }
 
     public static final String BIRTHDAY = "birthday";
-    @Column(name = BIRTHDAY)
     private String birthday;// 出生日期
 
     public static final String NET_PASSWORD = "net_password";
-    @Column(name = NET_PASSWORD)
     private String net_password;// 登录密码
 
     public static final String NATION = "nation";
-    @Column(name = NATION)
     private String nation;// 民族
 
     public static final String SEX = "sex";
-    @Column(name = SEX)
     private String sex;// 性别
 
     public String getBirthday() {
@@ -208,43 +184,33 @@ public class NetUserInfoVO extends Table {
     }
 
     public static final String GJ = "gj";
-    @Column(name = GJ)
     private String gj;// 国籍
 
     public static final String CARD_STATUS = "card_status";
-    @Column(name = CARD_STATUS)
     private String card_status;// 社保卡状态
 
     public static final String FKRQ = "fkrq";
-    @Column(name = FKRQ)
     private String fkrq;// 发卡日期
 
     public static final String YXQZ = "yxqz";
-    @Column(name = YXQZ)
     private String yxqz;// 有效期至
 
     public static final String BANKID = "bankid";
-    @Column(name = BANKID)
     private String bankid;// 开户银行
 
     public static final String WD_BANK = "wd_bank";
-    @Column(name = WD_BANK)
     private String wd_bank;// 银行网点
 
     public static final String BANKNO = "bankno";
-    @Column(name = BANKNO)
     private String bankno;// 银行卡号
 
     public static final String EMAIL = "email";
-    @Column(name = EMAIL)
     private String email;// 邮箱地址
 
     public static final String REMARK = "remark";
-    @Column(name = REMARK)
     private String remark;// 备注
 
     public static final String PERSON_STATUS = "person_status";
-    @Column(name = PERSON_STATUS)
     private String person_status;// 人员状态
 
     public String getGj() {

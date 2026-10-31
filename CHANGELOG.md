@@ -67,6 +67,19 @@ grouped by scope rather than by a single release number.
   `DraftsDAO.deleteInformation` and `PersonDAO.updateDraftsMessage` in
   `NetworkOfficeService`. Each module's test lists them by name with the reason. They are
   harmless until someone calls one.
+- `Database.open()` returns a fresh `DriverManager` connection per call and closes it in
+  the caller; there is no pool. Fine for the traffic this module sees, but it is the
+  first thing to change under load.
+- The new JDBC layer has no automated tests. `scripts/verify_public_build.py` still lists
+  four modules, so `NetPortalManagement` is built and packaged but not gated; adding it
+  to that list is the next step, and it needs either an Oracle-compatible fixture or
+  tests that stop at the boundary (`AppConfig` resolution order and `ApiTokenFilter`
+  rejection both work without a database).
+- `ApiTokenFilter` is one shared secret, not per-user authentication. It replaces a
+  filter that was never exercised in this repository, so it should be treated as a
+  boundary to build on, not as equivalent to the platform's real auth.
+- `bee_application.xml` and `ds.xml.example` are kept in the tree as historical
+  artifacts. Nothing reads them.
 
 ### Fixed
 
@@ -122,23 +135,56 @@ grouped by scope rather than by a single release number.
 
 ### Changed
 
+- **All five modules now build from public dependencies; `NetPortalManagement` was
+  rewritten off the proprietary Bee stack.** This was the last hold-out, and the review
+  in this file previously called a port "a rewrite, not a patch" — it turned out to be
+  correct, and this is that rewrite. Removed: `bee:bee.cloud`, `bee:bee.cloud.service`,
+  `bee:bee.cloud.impl`, `bee:bee.cloud.entity`, `bee:xx.tool`,
+  `com.tecsun.sisp_public:aamanagement-client`, and with them the `private-deps` profile
+  in the root POM. Replaced by: plain DTOs instead of `Doe`/`Table` entities;
+  `NetPortalRepository` instead of `Cnd`/`Select`; a standard Jersey `ServletContainer`
+  instead of Bee startup dispatch; `AppConfig` instead of `com.xx.util.property.Config`;
+  and `ApiTokenFilter` instead of `AAMClient4Jersey`. `mvn -B verify` at the root now
+  produces five WARs.
+- **`NetPortalManagement` configuration moved from `ds.xml` into `config.properties`.**
+  `AppConfig` resolves each key from a JVM system property, then `config.properties`,
+  then an `NPM_*` environment variable (`jdbc.url` → `NPM_JDBC_URL`), and
+  `AppConfig.required(...)` throws at first use rather than returning `null`. That is a
+  deliberate behaviour change: the old loader handed back `null` for a missing key and
+  the failure surfaced later as a URL containing the string `null`. The template and
+  both configuration guides were updated to match, because they still pointed at
+  `ds.xml`.
+- **`ApiTokenFilter` fails closed.** It reads `api.token` at startup and throws if the
+  key is absent, blank or still `CHANGE_ME`, so a misconfigured deployment refuses to
+  serve rather than serving unauthenticated. The comparison is constant-time and the
+  token is accepted from either `X-API-Token` or `Authorization: Bearer`.
+- **`NetPortalRepository` uses parameterized JDBC throughout.** The one place SQL is
+  concatenated is the `to_char` date format in `connectionStats`, and its value comes
+  from a whitelist selected by `searchType` (`yyyy` / `yyyy-MM` / `yyyy-MM-dd`), never
+  from the request body.
+
 - **Each document now states the boundary of its claim.** Several guides described all
   five modules as if they shared one architecture, one configuration mechanism and one
-  response envelope. `NetPortalManagement` shares none of them — it dispatches through
-  Bee, reads `ds.xml` instead of `config.properties`, and does not return `Result` — so
-  the architecture, API, configuration and getting-started documents now scope each
-  statement to the Spring MVC modules and point at the module guide for the exception.
+  response envelope. `NetPortalManagement` shared none of them at that point — it
+  dispatched through Bee, read `ds.xml` instead of `config.properties`, and did not
+  return `Result` — so the architecture, API, configuration and getting-started documents
+  scope each statement to the Spring MVC modules and point at the module guide for the
+  exception. The rewrite described above has since narrowed that gap, but the scoping is
+  still the honest way to read those documents.
   Test counts and the fifth-module build are attributed to the run and the reporter that
   produced them rather than asserted flatly, because neither has been reproduced from a
   clean clone. The CI claims now cite a specific run — #27 on `352fbe8`, the first green
   one after the artefact gate was wired in ahead of the script it calls — instead of
   asking the reader to go and check.
 - **The `NetPortalManagement` dependency boundary is an inventory, not a sentence.**
-  `NetPortalManagement/README.md` lists all six private coordinates with the evidence
-  that keeps each one — Java imports for the compile-time ones, `web.xml` registrations
-  and `@Application(entityPkg=...)` for the runtime-only ones. That distinction is the
-  whole point: "no import references it" is exactly the reasoning that correctly removed
-  the AAM client from the two public modules and would break startup here.
+  Before the rewrite, `NetPortalManagement/README.md` listed all six private coordinates
+  with the evidence that kept each one — Java imports for the compile-time ones,
+  `web.xml` registrations and `@Application(entityPkg=...)` for the runtime-only ones.
+  That distinction is the whole point: "no import references it" is exactly the reasoning
+  that correctly removed the AAM client from the two public modules and would have broken
+  startup here. It is also why the port replaced the runtime pieces instead of deleting
+  them — a POM-only cleanup would have produced a WAR that started and then failed on the
+  first query.
 - **The commented-out AAM filter is gone from `InterfaceFunction` and
   `NetworkOfficeService`.** Both `web.xml` files carried the same
   `<!-- <filter> AAMClientCommon ... -->` block — inert, but read by reviewers as

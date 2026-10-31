@@ -3,34 +3,22 @@ package com.tecsun.sisp.npm.bean;
 
 import java.sql.Timestamp;
 
-import bee.cloud.engine.db.Doe;
-import bee.cloud.engine.db.annotation.Column;
-import bee.cloud.engine.db.annotation.TableName;
-import bee.cloud.engine.db.core.Table;
 
 /**
  * created by fuweifeng on 2015-6-1.
  */
-@TableName(name = "T_WEB_CONNECTION_INFO", alias = "connectoininfo")
-public class WebConnectionVO extends Table {
-
-    public WebConnectionVO(Doe doe) {
-        super(doe);
-    }
+public class WebConnectionVO {
 
     public static final String ID = "id";
 
-    @Column(name = ID, pk = true)
     private long id;
 
 
     public static final String IP = "ip";
-    @Column(name = IP)
     private String ip;
 
 
     public static final String MAC = "mac";
-    @Column(name = MAC)
     private String mac;
 
 
@@ -67,7 +55,6 @@ public class WebConnectionVO extends Table {
     }
 
     public static final String CREATE_TIME = "create_time";
-    @Column(name = CREATE_TIME)
     private String create_time;
 
 
