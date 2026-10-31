@@ -6,6 +6,7 @@
 
 # --- Maven build output -----------------------------------------------------
 target/
+.mvn-tmp/
 build/
 out/
 *.war

@@ -145,9 +145,12 @@ add it to that list rather than leaving the default build red.
 `java.io.tmpdir`. If `%TEMP%` contains non-ASCII characters — which it does for any Windows
 account with a Chinese user name, because the profile directory is used verbatim — the path
 is mangled on the way through the console code page and the fork cannot start. Tests run: 0,
-build fails, and no test report is written.
+build fails, and no test report is written. The repository now sets Maven's temporary
+directory to the ASCII-relative `.mvn-tmp` path through `.mvn/jvm.config`, so the current
+public build avoids this path entirely.
 
-**Fix.** Point the temp directory at an ASCII path:
+**Fix for older checkouts or custom Maven configurations.** Point the temp directory at
+an ASCII path:
 
 ```bash
 mvn -Djava.io.tmpdir=D:\mvn-tmp -pl IFaceSuportService test
@@ -159,12 +162,11 @@ unaffected, so CI never sees this.
 
 Two things worth knowing before you spend time on this:
 
-- Upgrading surefire does not help. Version 3.2.5 fails identically; the temp directory
-  has to be fixed on the JVM that runs Maven, which is why the flag goes on the command
-  line rather than into the POM.
+- The `.mvn/jvm.config` setting applies to normal Maven runs from this repository. The
+  command-line flag remains useful for older checkouts and custom Maven configurations.
 - It breaks `mvn package` and `mvn verify` too, not just `mvn test`, because both run the
-  test phase. On an account whose name is not ASCII, a fresh clone is red until you pass
-  the flag.
+  test phase. On an account whose name is not ASCII, an older checkout is red until you
+  pass the flag or copy the repository's `.mvn/jvm.config` setting.
 
 ### Java 11+ `IllegalAccessError` from Axis
 
