@@ -3,7 +3,7 @@
 This guide separates a public build (JDK 8 and Maven, no Oracle or Redis) from an optional deployment (Tomcat, Oracle, Redis, schemas and external services). A successful build is not proof of a runnable deployment.
 For deployment you additionally need Tomcat, Oracle, Redis, and working application configuration. For code exploration without a database, see [step 6](#6-optional-explore-without-a-database).
 
-Start with [the four-module build](#4-build-and-verify-independently) to check that you can contribute independently; skip step 3 unless deploying. Deployment time depends on your external infrastructure.
+Start with [the five-module build](#4-build-and-verify-independently) to check that you can contribute independently; skip step 3 unless deploying. Deployment time depends on your external infrastructure.
 
 ---
 
@@ -70,18 +70,18 @@ unresolvable placeholder. The full key list is in
 
 ## 4. Build and verify independently
 
-From the repository root. The default reactor is the four modules that resolve from
-Maven Central; the remaining one is opt-in:
+From the repository root. All five modules are in the default reactor and resolve from
+public dependencies:
 
 ```bash
-# Build everything in the default reactor, tests included
+# Build everything, tests included
 mvn -B verify
 
 # Tests only, no database and no deployed service
 mvn -B test
 
-# Optional: only after installing legitimately obtained private Bee jars
-mvn -B -Pprivate-deps verify
+# Assert each module produced a nonempty WAR and passing tests
+python3 scripts/verify_public_build.py
 ```
 
 For a clean dependency-resolution check on a fresh machine, point Maven at a new,
@@ -126,7 +126,7 @@ the artefact a downstream terminal embeds.
 | `IFaceSuperService_hn` | yes | default | — |
 | `InterfaceFunction` | yes | default | — |
 | `NetworkOfficeService` | yes | default | — |
-| `NetPortalManagement` | no (private artifacts required) | `-Pprivate-deps` | six coordinates; [inventory](../NetPortalManagement/README.md#build-and-dependency-boundary) |
+| `NetPortalManagement` | yes | default | Oracle schema and `api.token` at runtime; see its [module guide](../NetPortalManagement/README.md) |
 
 A fork user reports a successful local project build; the command, module scope
 and dependency source were not provided. Separately, the maintainer reports
@@ -168,17 +168,19 @@ POM:
 
 ### If the build still fails to resolve dependencies
 
-The default four-module build needs no private jars. Only optional `NetPortalManagement` requires the private Bee framework. Options:
+Every module now resolves from public repositories, so a failure here is a network,
+mirror or cache problem rather than a missing private artifact. Check, in order:
 
-1. **Use the default reactor** — all four public modules build without Bee.
-2. **Install all required, legally obtained artifacts** into your local repository. The following command illustrates one coordinate, not a complete dependency set:
-   ```bash
-   mvn install:install-file -Dfile=bee.cloud-1.0.4.jar \
-       -DgroupId=bee -DartifactId=bee.cloud -Dversion=1.0.4 -Dpackaging=jar
-   ```
-3. **Do not delete the Bee dependency**: the portal code actually uses it. Do not commit proprietary jars without redistribution rights.
+1. That Maven can reach Maven Central: `mvn -B -U dependency:resolve`.
+2. That no `settings.xml` mirror or proxy rewrites `central`.
+3. That the failure reproduces against an empty local repository —
+   `mvn -B -ntp -Dmaven.repo.local=<empty dir> verify`. A fresh repository is the only
+   way to tell a stale cache from a genuine resolution failure.
 
-This is a known limitation; see [ROADMAP.md](ROADMAP.md).
+`NetPortalManagement` used to need proprietary Bee jars and an opt-in profile. That
+dependency is gone: if you find a reference to `-Pprivate-deps` or `bee.cloud` in a
+guide, it is stale text, and if you find one in a POM, it is a fork that has not taken
+the port.
 
 ## 5. Deploy and smoke-test (requires infrastructure)
 
@@ -217,11 +219,14 @@ less docs/ARCHITECTURE.md
 # Inspect every HTTP endpoint without running anything
 grep -rn "@RequestMapping" --include=*.java . | head -50
 
-# Verify the four public modules - no datasource is contacted at build time
+# Verify all five modules - no datasource is contacted at build time
 mvn -B verify
+python3 scripts/verify_public_build.py
 ```
 
-The four-module default reactor resolves without private Bee jars. Only `-Pprivate-deps` needs authorised artifacts.
+The default reactor resolves without private jars. A green build still does not mean a
+working deployment: the portal module needs an Oracle schema and an `api.token` before
+it will serve a request.
 
 ## 7. Call the service from Java (requires a working deployment)
 

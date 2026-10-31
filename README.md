@@ -361,12 +361,12 @@ reference. It is maintained on a best-effort basis.
 - **Public build scope**: five of five. All modules are in the default reactor and
   resolve from public dependencies; `NetPortalManagement` still needs Oracle and a
   configured platform proxy for meaningful runtime checks.
-- **Tests**: limited. CI builds all five modules and verifies a nonempty WAR and passing
-  tests for the four Spring MVC modules (31 tests), alongside repository hygiene checks.
-  `NetPortalManagement` is built and packaged but is not yet covered by that gate: it has
-  no test sources, and `scripts/verify_public_build.py` still lists four modules. The new
-  JDBC layer needs an Oracle-compatible fixture before it can be asserted against, and
-  `AppConfig` and `ApiTokenFilter` could be covered without one.
+- **Tests**: limited but now covers every module. `scripts/verify_public_build.py`
+  requires a nonempty WAR and at least one passing test per module, and CI runs it after
+  `mvn -B verify`: 45 tests in total (12/8/7/4/14). The portal module's tests stop at the
+  boundary — `AppConfig` resolution order and `ApiTokenFilter` rejection, neither of which
+  needs a database. The JDBC repository itself is still uncovered and needs an
+  Oracle-compatible fixture.
 - **Modernisation**: not planned in-place. The intent is to keep the original
   Spring 4 / XML style intact so the patterns stay readable. The language level is
   Java 8 (raised from 7) and that is as far as it goes — no framework upgrade.

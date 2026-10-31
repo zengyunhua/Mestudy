@@ -39,7 +39,7 @@ grouped by scope rather than by a single release number.
   classpath. This is the first test in the repository that fails on broken wiring rather
   than on a broken helper.
 - **A CI gate on what the build actually produced.** `scripts/verify_public_build.py`
-  inspects the four public modules after `mvn verify`: each needs exactly one nonempty WAR
+  inspects every module after `mvn verify`: each needs exactly one nonempty WAR
   and at least one Surefire XML report, with no failures or errors and at least one test
   that actually ran. Maven exits 0 when `skipTests` is set or when forking is disabled and
   nothing is collected, so the WAR and the reports are checked instead of trusting the
@@ -52,6 +52,13 @@ grouped by scope rather than by a single release number.
   distinguish a synthetic fixture from a provisioned credential, and it runs outside CI
   on purpose, where the checkout is shallow. The counts it produced at `d8a301d` are
   recorded in `docs/SECURITY_REVIEW.md`.
+- **Unit tests for the portal module's configuration and token filter.** Fourteen tests
+  that need no database: six for `AppConfig` (a system property wins, a blank value counts
+  as absent, `required` throws naming the key) and eight for `ApiTokenFilter` (startup
+  refuses a missing, blank or `CHANGE_ME` token; a missing or wrong token gets a 401 and
+  never reaches the application; `X-API-Token` and `Authorization: Bearer` are both
+  accepted; CORS preflight is not authenticated). These are what let the module join
+  `scripts/verify_public_build.py`, which now gates all five modules — 45 tests in total.
 
 ### Known issues
 
@@ -70,11 +77,10 @@ grouped by scope rather than by a single release number.
 - `Database.open()` returns a fresh `DriverManager` connection per call and closes it in
   the caller; there is no pool. Fine for the traffic this module sees, but it is the
   first thing to change under load.
-- The new JDBC layer has no automated tests. `scripts/verify_public_build.py` still lists
-  four modules, so `NetPortalManagement` is built and packaged but not gated; adding it
-  to that list is the next step, and it needs either an Oracle-compatible fixture or
-  tests that stop at the boundary (`AppConfig` resolution order and `ApiTokenFilter`
-  rejection both work without a database).
+- The JDBC repository has no automated tests. The module is now in the gate, but what it
+  asserts is `AppConfig`'s resolution order and `ApiTokenFilter`'s rejection behaviour —
+  both stop at the boundary and need no database. `NetPortalRepository` itself is still
+  uncovered and needs an Oracle-compatible fixture.
 - `ApiTokenFilter` is one shared secret, not per-user authentication. It replaces a
   filter that was never exercised in this repository, so it should be treated as a
   boundary to build on, not as equivalent to the platform's real auth.

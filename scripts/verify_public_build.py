@@ -3,7 +3,8 @@ from pathlib import Path
 import sys
 import xml.etree.ElementTree as ET
 
-MODULES = ('IFaceSuportService', 'IFaceSuperService_hn', 'InterfaceFunction', 'NetworkOfficeService')
+MODULES = ('IFaceSuportService', 'IFaceSuperService_hn', 'InterfaceFunction', 'NetworkOfficeService',
+           'NetPortalManagement')
 
 def validate(root):
     problems = []
