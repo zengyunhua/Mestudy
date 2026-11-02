@@ -4,16 +4,13 @@
 
     This aggregator is also the parent of the five modules. The modules retain
     their original groupId and version, while shared encoding and Java 8 compiler
-    settings live here. A full reactor build still needs private dependencies.
+    settings live here. Every module resolves from Maven Central, so
+    `mvn -B verify` at the root builds all five WARs.
 
     Build prerequisites are documented in docs/GETTING_STARTED.md. In short:
       * JDK 8 - both the build JDK and the language level (source/target 1.8).
         JDK 9+ builds will warn about the bootstrap classpath; JDK 11+ breaks
         Axis 1.x at runtime. See docs/TROUBLESHOOTING.md.
-      * one module, NetPortalManagement, needs the private "bee.cloud"
-        persistence framework. It is excluded from the default reactor; add it
-        with -Pprivate-deps once those jars are in your local repository. See
-        docs/GETTING_STARTED.md and docs/TROUBLESHOOTING.md.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -28,7 +25,7 @@
     <name>Mestudy - social-insurance / e-government backend reference</name>
     <description>
         Reference implementation of a Chinese social-insurance / e-government backend:
-        5 Spring MVC + MyBatis modules, 358 HTTP endpoints, Oracle multi-schema, Axis SOAP.
+        four Spring MVC + MyBatis modules and one JDBC + Jersey module, Oracle multi-schema, Axis SOAP.
         Published for reference and educational use.
     </description>
     <url>https://github.com/zengyunhua/Mestudy</url>

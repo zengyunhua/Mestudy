@@ -16,52 +16,26 @@ do.
 ### Build fails to resolve dependencies
 
 ```
-Could not resolve dependencies for project com.tecsun.sisp:NetPortalManagement:...
-The following artifacts could not be resolved:
-  bee:bee.cloud:jar:1.0.4, bee:bee.cloud.service:jar:1.0.4,
-  bee:bee.cloud.impl:jar:1.0.0, bee:bee.cloud.entity:jar:1.0.0,
-  bee:xx.tool:jar:1.0.1, com.tecsun.sisp_public:aamanagement-client:jar:1.0.5
+Could not resolve dependencies for project com.tecsun.sisp:<module>:...
+The following artifacts could not be resolved: ...
 ```
 
-**Cause.** The default reactor no longer contains the one module that needs them, so this
-only appears when you opt in with `-Pprivate-deps`. `NetPortalManagement` depends on
-`bee.cloud`, the internal persistence framework, which was only ever published to an
-internal Nexus. Nothing in this repository can replace it — the code really does call
-into it, so deleting the `<dependency>` block just moves the failure to compile time.
+**Cause.** Every module resolves from Maven Central, so this is a network, mirror or
+cache problem rather than a missing private artifact. If the artifact named is
+`bee:bee.cloud*`, `bee:xx.tool` or `com.tecsun.sisp_public:aamanagement-client`, you are
+on a revision older than the `NetPortalManagement` port; pull `master`.
 
-> **A dependency can be used without a single `import`.** This is the trap that makes
-> these artifacts look dead. `com.tecsun.sisp_public:aamanagement-client` is never
-> imported by a Java file in `NetPortalManagement`, yet the module cannot start without
-> it: `src/main/webapp/WEB-INF/web.xml` names
-> `com.tecsun.sisp_public.aam.client.AAMClient4Jersey` as an active Jersey filter, and
-> the container resolves that class by string. `bee.cloud.service` is referenced the same
-> way through `bee.cloud.service.listener.StartupListener`. Before deleting a
-> `<dependency>`, grep the resources as well as the sources — and check whether the
-> `web.xml` block that mentions it is actually commented out. In `InterfaceFunction` and
-> `NetworkOfficeService` the equivalent filters existed only in comments (now
-> removed), which is why those modules could drop the declaration.
+**Fix.** Follow the checks in
+[GETTING_STARTED.md](GETTING_STARTED.md#if-the-build-still-fails-to-resolve-dependencies): reach Maven
+Central, rule out a rewriting mirror, then reproduce against an empty local repository.
 
-**Fix.** Pick one:
-
-1. **Do nothing.** The default reactor already excludes that module, so `mvn package`
-   at the root builds and passes. This is what CI does.
-2. Install the jars you already have into your local repository, then build with the
-   profile:
-
-   ```bash
-   mvn install:install-file -Dfile=bee.cloud-1.0.4.jar \
-       -DgroupId=bee -DartifactId=bee.cloud -Dversion=1.0.4 -Dpackaging=jar
-
-   mvn -B -Pprivate-deps package
-   ```
-
-   Repeat for `bee:bee.cloud.service`, `bee:bee.cloud.impl` and `bee:bee.cloud.entity`.
-3. If nothing in the sources references the artifact, delete the `<dependency>` block.
-   That is how `unieap-dataexchange-client` was removed, and how
-   `com.tecsun.sisp_public:aamanagement-client` and `bee:xx.tool` were removed from
-   `InterfaceFunction` and `NetworkOfficeService` — neither module imports them, and both
-   now build in the default reactor. Check before deleting: `NetPortalManagement` really
-   does use `bee.cloud` (`@TableName`, `@Column`, `Doe`, `Cnd`, `Select`).
+> **A dependency can be used without a single `import`.** This is the trap that made
+> the private artifacts look dead. `NetPortalManagement` once named
+> `com.tecsun.sisp_public.aam.client.AAMClient4Jersey` as an active Jersey filter in
+> `web.xml`, and the container resolved that class by string; `bee.cloud.service` was
+> referenced the same way through a listener. Before deleting a `<dependency>`, grep the
+> resources as well as the sources, and check whether the `web.xml` block that mentions it
+> is actually commented out.
 
 > **A missing class is not a missing jar.** Removing the unused coordinates from
 > `NetworkOfficeService` exposed `BanjianVo`, which four classes and

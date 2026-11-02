@@ -109,7 +109,7 @@ reference artifacts; they are not read by the public runtime. New deployments sh
 | POST | `/npmanagement/netUserInfo/updateNetUserInfoPwd/{cernum}/{net_password}` | Reset a portal password |
 | GET | `/npmanagement/anp/getPolicyInfo` | List policy documents with `title`, `pageno`, and `pagesize` |
 | POST | `/npmanagement/anp/savePolicy/{userId}/{appId}` | Insert or update a policy document |
-| GET | `/npmanagement/anp/uploadfile` | Upload an allowed policy attachment |
+| POST | `/npmanagement/anp/uploadfile` | Upload an allowed policy attachment (`multipart/form-data`) |
 | GET | `/npmanagement/anp/getPolicyById/{id}/{userId}/{appId}` | Load one policy document |
 | DELETE | `/npmanagement/anp/delPolicyById/{id}` | Delete one policy document |
 | GET | `/npmanagement/web/getWebInfo` | Aggregate web visits by year, month, or day |

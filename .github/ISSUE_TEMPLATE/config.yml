@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability privately
+    url: https://github.com/zengyunhua/Mestudy/security/advisories/new
+    about: Do not include security details in a public issue; use a private advisory instead.
+  - name: Read the getting-started guide
+    url: https://github.com/zengyunhua/Mestudy/blob/master/docs/GETTING_STARTED.md
+    about: Check prerequisites, build commands and configuration before opening a build issue.

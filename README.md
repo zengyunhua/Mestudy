@@ -323,8 +323,8 @@ Full reference: [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 
 ## API surface
 
-The Spring MVC API commonly uses a `Result` envelope for JSON responses;
-this is not a universal contract for Bee-dispatched `NetPortalManagement` endpoints:
+The Spring MVC modules commonly use a `Result` envelope for JSON responses, and
+`NetPortalManagement`'s `JsonResponse` emits the same three fields:
 
 ```json
 {
@@ -356,17 +356,17 @@ domain prefix (`/iface/rest/`, `/iface/cardInfo/`, `/iface/user/`, ...). The
 This repository is a **curated archive of production-derived modules**, published for
 reference. It is maintained on a best-effort basis.
 
-- **Documentation**: in place — this README, one README per module, and the ten
+- **Documentation**: in place — this README, one README per module, and the eleven
   documents under `docs/`.
 - **Public build scope**: five of five. All modules are in the default reactor and
   resolve from public dependencies; `NetPortalManagement` still needs Oracle and a
   configured platform proxy for meaningful runtime checks.
 - **Tests**: limited but now covers every module. `scripts/verify_public_build.py`
   requires a nonempty WAR and at least one passing test per module, and CI runs it after
-  `mvn -B verify`: 45 tests in total (12/8/7/4/14). The portal module's tests stop at the
-  boundary — `AppConfig` resolution order and `ApiTokenFilter` rejection, neither of which
-  needs a database. The JDBC repository itself is still uncovered and needs an
-  Oracle-compatible fixture.
+  `mvn -B verify`: 46 tests in total (12/8/7/4/15). The portal module's tests stop at the
+  boundary — `AppConfig` resolution order, `ApiTokenFilter` rejection and the upload
+  resource's HTTP method; none of which needs a database. The JDBC repository remains
+  uncovered and needs an Oracle-compatible fixture.
 - **Modernisation**: not planned in-place. The intent is to keep the original
   Spring 4 / XML style intact so the patterns stay readable. The language level is
   Java 8 (raised from 7) and that is as far as it goes — no framework upgrade.
@@ -401,10 +401,11 @@ is a good first contribution.
 4. **Thin test coverage.** The client, filter and `Page` have focused assertion-based tests,
    but most business flows are not covered. Legacy HTTP smoke tests require a
    running service and local fixtures, so they are excluded from default tests.
-5. **One release only.** `v1.0.0` is tagged and described in
-   [CHANGELOG.md](CHANGELOG.md); the per-module artifact versions in the POMs still
-   carry their original internal numbers (`V1.0.0.150630`, `V1.0.0.190107`) and are not
-   aligned with it.
+5. **Module versions are not aligned with releases.** `v1.0.0` and `v1.1.0` are tagged
+   and described in [CHANGELOG.md](CHANGELOG.md), but the per-module artifact versions in
+   the POMs still carry their original internal numbers (`V1.0.0.150630`,
+   `V1.0.0.190107`). The public-build and portal-port work since `v1.1.0` is in
+   [Unreleased](CHANGELOG.md#unreleased).
 
 ## Roadmap
 
@@ -436,6 +437,10 @@ See [docs/ROADMAP.md](docs/ROADMAP.md). Near-term:
 | [docs/CLIENT_SDK.md](docs/CLIENT_SDK.md) | Using `IFaceHttpsClient` from a Java consumer |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Build failures, encoding issues, Oracle/Redis gotchas |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Where this is going |
+| [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Category-only inventory of historical sensitive-looking values and the remediation process |
+| [docs/MODULE_REVIEW_IFACESUPORTSERVICE.md](docs/MODULE_REVIEW_IFACESUPORTSERVICE.md) | Code review of the core interface module |
+| [docs/OPEN_SOURCE_APPLICATION_GUIDE.md](docs/OPEN_SOURCE_APPLICATION_GUIDE.md) | What a reviewer can verify today, and how to reproduce it independently |
+| [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md) | Reproducible release, tagging and publication checklist |
 | Per-module READMEs | Linked from the [module map](#module-map) |
 
 ## Contributing
@@ -443,11 +448,14 @@ See [docs/ROADMAP.md](docs/ROADMAP.md). Near-term:
 Issues and pull requests are welcome — especially the items in
 [Known limitations](#known-limitations). Please read
 [CONTRIBUTING.md](CONTRIBUTING.md) first, and note that all participation is governed
-by the [Code of Conduct](CODE_OF_CONDUCT.md).
+by the [Code of Conduct](CODE_OF_CONDUCT.md). Repository ownership and review routing are
+recorded in [.github/CODEOWNERS](.github/CODEOWNERS); dependency updates are proposed
+monthly by Dependabot.
 
 Good first issues: adding a test, replacing a hard-coded constant with a configuration
-key, translating a class-level comment into English Javadoc, or removing one module's
-dependency on the private Nexus.
+key, translating a class-level comment into English Javadoc, or writing the missing SQL
+for one of the unbound mapper methods listed in the
+[CHANGELOG](CHANGELOG.md#known-issues).
 
 ## Security
 

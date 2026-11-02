@@ -24,6 +24,7 @@ import javax.ws.rs.core.UriInfo;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -34,13 +35,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 @Path("/npmanagement/anp")
 public class PolicyApplication extends NetSuperApplication {
     private static final Logger LOGGER = Logger.getLogger(PolicyApplication.class);
     private static final NetPortalRepository REPOSITORY = new NetPortalRepository();
     private static final long MAX_UPLOAD_SIZE = 1000000L;
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     public PolicyApplication(@Context HttpServletRequest request, @Context UriInfo ui) {
         super(request, ui);
@@ -86,7 +87,9 @@ public class PolicyApplication extends NetSuperApplication {
         }
     }
 
-    @GET
+    // POST, not GET: ServletFileUpload.isMultipartContent() returns false for any
+    // other method, so a GET mapping could only ever answer "请选择文件。".
+    @POST
     @Path("/uploadfile")
     public String uploadfile(@Context HttpServletResponse response) throws FileUploadException {
         if (!ServletFileUpload.isMultipartContent(request)) {
@@ -131,7 +134,7 @@ public class PolicyApplication extends NetSuperApplication {
                 return error("上传文件扩展名是不允许的扩展名。");
             }
             String generatedName = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) +
-                    "_" + new Random().nextInt(1000) + "." + extension;
+                    "_" + RANDOM.nextInt(1000) + "." + extension;
             try {
                 item.write(new File(dateDirectory, generatedName));
             } catch (Exception e) {

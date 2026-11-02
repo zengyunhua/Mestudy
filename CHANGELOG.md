@@ -52,13 +52,14 @@ grouped by scope rather than by a single release number.
   distinguish a synthetic fixture from a provisioned credential, and it runs outside CI
   on purpose, where the checkout is shallow. The counts it produced at `d8a301d` are
   recorded in `docs/SECURITY_REVIEW.md`.
-- **Unit tests for the portal module's configuration and token filter.** Fourteen tests
-  that need no database: six for `AppConfig` (a system property wins, a blank value counts
-  as absent, `required` throws naming the key) and eight for `ApiTokenFilter` (startup
-  refuses a missing, blank or `CHANGE_ME` token; a missing or wrong token gets a 401 and
-  never reaches the application; `X-API-Token` and `Authorization: Bearer` are both
-  accepted; CORS preflight is not authenticated). These are what let the module join
-  `scripts/verify_public_build.py`, which now gates all five modules — 45 tests in total.
+- **Unit tests for the portal module's configuration, token filter and resource mapping.**
+  Fifteen tests that need no database: six for `AppConfig` (a system property wins, a
+  blank value counts as absent, `required` throws naming the key), eight for `ApiTokenFilter`
+  (startup refuses a missing, blank or `CHANGE_ME` token; a missing or wrong token gets
+  a 401 and never reaches the application; `X-API-Token` and `Authorization: Bearer` are
+  both accepted; CORS preflight is not authenticated), and one that keeps the multipart
+  upload endpoint on POST. These are what let the module join
+  `scripts/verify_public_build.py`, which now gates all five modules — 46 tests in total.
 
 ### Known issues
 

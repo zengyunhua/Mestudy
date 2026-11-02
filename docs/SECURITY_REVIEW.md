@@ -61,7 +61,7 @@ Set these in the process environment (not in Git or CI logs) before invoking the
 
 - `HBNB_SERVICE_PASSWORD`: required by `IFaceSuportService` provincial service queries.
 - `SNB_SERVICE_PASSWORD`: reserved for the legacy SNB service integration; not read by active request paths.
-- `NPM_JDBC_URL`, `NPM_JDBC_USERNAME`, `NPM_JDBC_PASSWORD`: required by the `NetPortalManagement` `savePolicy` path. This module still needs its private Bee framework dependencies.
+- `NPM_JDBC_URL`, `NPM_JDBC_USERNAME`, `NPM_JDBC_PASSWORD`: required by every `NetPortalManagement` database path (`AppConfig` also accepts them as `jdbc.*` in `config.properties`). `NPM_API_TOKEN` (or `api.token`) is required for that module to start at all.
 
 Missing required values fail the affected operation explicitly, rather than falling back to a committed example. These changes do not turn the archive into a deployable public demo.
 

@@ -22,15 +22,16 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Random;
 
 @Path("/npmanagement/netUserInfo")
 public class NetUserInfoApplication extends NetSuperApplication {
     private static final Logger LOGGER = Logger.getLogger(NetUserInfoApplication.class);
     private static final NetPortalRepository REPOSITORY = new NetPortalRepository();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     public NetUserInfoApplication(@Context HttpServletRequest request, @Context UriInfo ui) {
         super(request, ui);
@@ -60,7 +61,7 @@ public class NetUserInfoApplication extends NetSuperApplication {
             }
             NetUserInfoVO user = users.get(0);
             int updateCount = parseCount(user.getIs_update()) + 1;
-            String password = String.format("%06d", new Random().nextInt(1000000));
+            String password = String.format("%06d", RANDOM.nextInt(1000000));
             int updated = REPOSITORY.updatePassword(connection, user.getCernum(),
                     MD5Generator.generateValue(password), String.valueOf(updateCount));
             return ok(updated == 1 ? "sucess" : "error");

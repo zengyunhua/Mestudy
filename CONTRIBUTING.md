@@ -48,7 +48,7 @@ mvn -v
 mvn -B verify
 ```
 
-This verifies the four publicly buildable modules without Oracle, Redis or local
+This verifies all five modules without Oracle, Redis or local
 `config.properties` files. Include the commit SHA, tool versions, command, result and
 redacted error log in a PR when reporting a build problem. For deployment and local
 configuration, follow [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
@@ -58,10 +58,10 @@ JDK 8 is the supported runtime. JDK 11+ breaks Axis 1.x — see
 
 ### Build limitation
 
-`NetPortalManagement` requires the private Bee persistence framework and is excluded
-from the default reactor. Its `-Pprivate-deps` profile works only with legally supplied
-jars installed locally; do not upload proprietary jars to this repository. If your change
-affects that module, explain what could and could not be verified in your PR.
+Every module builds from public dependencies, but the build does not exercise Oracle,
+Redis or the external gateways. If your change touches SQL, a datasource or an
+integration, explain in the PR what you could and could not verify. Never add
+proprietary jars to this repository.
 
 ## Coding conventions
 
@@ -193,7 +193,7 @@ Include:
 1. Module and version.
 2. JDK, Maven and container versions.
 3. The exact command that failed and the full stack trace.
-4. Whether you used the default four-module reactor or the optional private-deps profile.
+4. Whether you built the whole reactor or a single module (`-pl <module> -am`).
 
 ## Security issues
 

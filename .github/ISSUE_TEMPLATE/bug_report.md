@@ -32,10 +32,9 @@ labels: bug
 ## Does the module build for you?
 
 <!--
-The four default reactor modules should build with public dependencies using JDK 8
-and `mvn -B verify`. NetPortalManagement is opt-in (`-Pprivate-deps`) and requires
-private Bee dependencies. If the default build cannot resolve a dependency, please
-report the artifact and repository URL (redact credentials).
+All five modules should build with public dependencies using JDK 8 and
+`mvn -B verify`. If the build cannot resolve a dependency, please report the
+artifact and repository URL (redact credentials).
 -->
 
 - [ ] Builds cleanly

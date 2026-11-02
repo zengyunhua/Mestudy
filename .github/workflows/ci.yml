@@ -12,10 +12,9 @@ permissions:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # Build the default reactor: the modules whose dependencies are all on Maven
-  # Central. NetPortalManagement depends on the private "bee.cloud" persistence
-  # framework, which is not published anywhere public, so it sits behind the
-  # -Pprivate-deps profile and is not built here. See docs/TROUBLESHOOTING.md.
+  # Build the default reactor: all five modules, every dependency from Maven
+  # Central. The isolated local repository proves that nothing is served from a
+  # pre-populated cache.
   # ---------------------------------------------------------------------------
   build:
     name: Test and package (JDK 8)
@@ -35,7 +34,7 @@ jobs:
       - name: Run unit tests and package with isolated dependencies
         run: mvn -B -ntp -Dmaven.repo.local="$RUNNER_TEMP/mestudy-m2" verify
 
-      - name: Check all four module tests and WAR artifacts
+      - name: Check all five module tests and WAR artifacts
         run: python3 scripts/verify_public_build.py
 
       - name: Preserve test reports on failure

@@ -5,39 +5,32 @@ This is a project-readiness checklist, **not** an official Codex for Open Source
 ## What a reviewer can verify today
 
 - Source and Apache-2.0 license are visible in the repository; the five modules and their purpose are mapped in the [README](../README.md).
-- The default Maven reactor selects four publicly buildable WAR modules on JDK 8. GitHub Actions runs `mvn -B verify` on push and PR. `NetPortalManagement` is opt-in with `-Pprivate-deps` because its Bee persistence dependencies are not public.
+- The default Maven reactor builds all five WAR modules from Maven Central on JDK 8. GitHub Actions runs `mvn -B verify` against an isolated local repository on push and PR, then `scripts/verify_public_build.py` requires one nonempty WAR and at least one passing test per module.
 - [Getting started](GETTING_STARTED.md), [configuration](CONFIGURATION.md), [troubleshooting](TROUBLESHOOTING.md), [contributing](../CONTRIBUTING.md), [roadmap](ROADMAP.md), and [security policy](../SECURITY.md) document the current scope and limitations.
 - The repository is a **reference archive**, not a deployable demo. A Maven build does not verify Oracle schemas, Redis, Tomcat startup, external gateways, authentication, or end-to-end transactions.
 
 ## Current verification boundary
 
-On October 26, 2026, the maintainer workstation ran `mvn -B -DforkCount=0 verify`: the four default modules packaged and eight tests passed, all in `IFaceSuportService`. This was not a clean external clone, used a populated local Maven cache, and disabled Surefire forking for the local Windows environment; it is **not** evidence of independent deployment or a clean-room public dependency resolution. The GitHub Actions workflow uses `mvn -B verify`, but check the actual run for the commit being submitted.
+On November 2, 2026, the maintainer workstation (Windows 11, JDK 1.8.0_421, Maven 3.8.7)
+ran `mvn -B -ntp -Dmaven.repo.local=<empty-directory> verify` on `6137391`. All five modules
+packaged, and `python scripts/verify_public_build.py` reported 46 passing tests
+(12 `IFaceSuportService`, 8 `IFaceSuperService_hn`, 7 `InterfaceFunction`,
+4 `NetworkOfficeService`, 15 `NetPortalManagement`), none skipped. The empty repository
+run completed successfully; a contributor should still reproduce it independently because
+a local run is not a substitute for a public CI result. On Windows, prefer an ASCII-only
+Maven repository path when the user profile contains non-ASCII characters; see
+[troubleshooting](TROUBLESHOOTING.md).
 
-On October 28, 2026, a later maintainer-workstation run of `mvn -B -DforkCount=0 verify`
-packaged all four public modules and ran 19 tests (8 in `IFaceSuportService`, 4 in
-`IFaceSuperService_hn`, 4 in `InterfaceFunction`, and 3 in `NetworkOfficeService`).
-`python scripts/verify_public_build.py` checked the four WARs and Surefire reports.
-This still used a populated local Maven cache and disabled forking: it is **not**
-independent reproduction. The CI workflow asks for an isolated Maven repository and
-enforces a test/artefact check per module. Run #27 on `352fbe8` (October 28, 2026)
-passed both jobs. That run is the first green one after the artefact gate was wired
-into `ci.yml` one commit ahead of the script it calls, which is why run #26 failed with
-the Maven build already green — the gate itself was the only red. The green run proves
-the gate executes; it is not evidence of deployment, of Oracle/Redis/gateway behaviour,
-or of a clean-room resolution on your network. Confirm the run for the commit you are
-citing.
+The CI workflow is the stronger evidence because it resolves into an empty repository.
+Run #27 on `352fbe8` (October 28, 2026) was the first green run with the artefact gate,
+when the gate covered four modules. `NetPortalManagement` joined the reactor and the gate
+in `27f8ffe` and `6137391`; **cite the CI run for the exact commit you submit**, and do
+not reuse the run #27 result for later commits.
 
-The maintainer reports that the fifth module, `NetPortalManagement`, has also been
-modified and can compile and deploy in their environment. That report does not change
-the default four-module public build boundary: on October 28, 2026, the attempted
-`mvn -B -ntp -Pprivate-deps -pl NetPortalManagement -am -DforkCount=0 verify` in this
-checkout could not resolve six private Bee/framework dependencies. This environment
-cannot independently verify that module's build or deployment. A fork user reports
-a successful local project build but has not specified whether it included this
-module or which dependency source was used. Record a redacted
-successful build and deployment smoke test from an authorized environment separately;
-do not publish private artifacts, credentials or internal endpoints. A public-build
-claim requires a clean clone with redistributable dependencies and a reproducible CI run.
+`NetPortalManagement` was ported off the private Bee framework in `27f8ffe`. Its tests
+stop at the configuration and authentication boundary (`AppConfig` resolution order,
+`ApiTokenFilter` rejection). The JDBC repository has no automated test, and no one has
+run the ported module against an Oracle schema in a recorded, reproducible way.
 
 For historical risk, `python scripts/audit_git_history.py` provides a local,
 category-only heuristic inventory; see [security review](SECURITY_REVIEW.md) for the
@@ -48,7 +41,7 @@ verified; a clean current-tree scan is not closure.
 ## Independent reproduction (ask a contributor who has not set up this repo)
 
 1. Start from a fresh clone in an empty working directory, without the maintainer's local Maven artifacts or private credentials. Record the exact commit SHA (`git rev-parse HEAD`), OS, `java -version` (JDK 8), and `mvn -v`.
-2. From the repository root run `mvn -B verify`. Confirm the reactor succeeds, note the test counts and inspect the four `*/target/*.war` outputs. Do not opt into `-Pprivate-deps` for this public build.
+2. From the repository root run `mvn -B -ntp -Dmaven.repo.local=<empty dir> verify`, then `python scripts/verify_public_build.py`. Confirm the reactor succeeds, note the per-module test counts and inspect the five `*/target/*.war` outputs.
 3. Ask the contributor to report the actual time, confusing instructions, failed commands, and a redacted build log or a link to a public CI run. A screenshot can supplement this record; it is not by itself reproducible evidence. Do not expose secrets, personal data, internal addresses or full private configuration.
 4. Have the contributor file a documentation PR or issue about any friction if they are willing. An issue is not required simply to prove activity; real PRs, fixes, CI runs, releases and responses are better evidence than artificially created tickets.
 5. If demonstrating runtime behaviour, separately provide a safe, isolated Oracle schema/seed data, Redis, Tomcat and approved stubbed external integrations. Record startup logs, HTTP status, expected and actual response, and cleanup procedure. Until that exists, describe the claim as **buildable**, not **independently runnable**.
@@ -59,9 +52,9 @@ verified; a clean current-tree scan is not closure.
 | --- | --- | --- |
 | Critical | Historical credential-shaped values and a payment-signing-key-shaped value remain in Git history; the owner states that these are synthetic, but provenance, actual provisioning, and history cleanup have not been verified. | Owner documents that each sensitive-looking value was never provisioned, or confirms rotation/revocation of any live value with affected providers. Coordinate safe history cleanup and record a sanitized remediation summary. Follow [SECURITY.md](../SECURITY.md); never publish historical values. |
 | High | No independently executable end-to-end deployment recipe with public test data. | A clean-room operator follows a versioned, non-sensitive test environment guide and reports a successful startup and expected smoke-test outcome. Do not commit proprietary Oracle/Redis jars or actual credentials; use publicly redistributable dependencies only. |
-| High | Four modules build in the default public reactor. The maintainer reports a working fifth-module build/deployment in their environment, but `NetPortalManagement` still uses private Bee APIs and the opt-in build could not resolve six private dependencies here. | Obtain redistribution rights and a lawful public dependency, or replace the persistence layer with tests; otherwise continue clearly marking the module private-only. |
-| High | Automated tests are limited and do not establish runtime behaviour for every module. | Add focused tests for each public module, negative/security cases and CI coverage evidence; do not overstate current counts. |
-| Medium | `v1.0.0` predates the four-module public-build improvements. | After CI and security review, publish a new, accurately scoped release/tag with a changelog, verified build command, limitations and checksum/artifacts where applicable. Do not move the existing tag. |
+| High | `NetPortalManagement` builds publicly, but its ported JDBC repository has no automated test and no recorded run against Oracle. | An Oracle-compatible fixture (for example a Testcontainers Oracle XE image) exercising `NetPortalRepository`, or a redacted, reproducible smoke-test record from an authorized environment. |
+| High | Automated tests are limited and do not establish runtime behaviour for every module. | Add focused tests for each module, negative/security cases and CI coverage evidence; do not overstate current counts. |
+| Medium | `v1.1.0` predates the five-module public build and the portal port; that work is only in `[Unreleased]`. | After CI is green on the release commit, publish a new, accurately scoped release/tag with a changelog, verified build command, limitations and checksum/artifacts where applicable. Do not move existing tags. |
 | Medium | Public adoption is hard to assess from stars alone. | Cite genuine external PRs, users, downstream projects, discussions or release downloads **with dates and links**; distinguish actual usage from stars/watches and do not fabricate metrics. |
 
 ## Submission narrative

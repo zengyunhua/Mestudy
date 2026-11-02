@@ -23,7 +23,7 @@ public modules. Each module still produces a separately deployable WAR:
 
 ```
 Mestudy/
-├── pom.xml                      # parent and default four-module reactor
+├── pom.xml                      # parent and five-module reactor
 ├── IFaceSuportService/          # core interface service + client SDK
 │   ├── pom.xml
 │   └── src/

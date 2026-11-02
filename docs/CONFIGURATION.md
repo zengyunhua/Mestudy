@@ -1,9 +1,9 @@
 # Configuration reference
 
 The four Spring MVC modules read `src/main/resources/config.properties` from
-the classpath root. `NetPortalManagement` ships one too, but reads it through the Bee
-framework rather than Spring, and keeps its datasource in `ds.xml`; see its section
-below and its [module guide](../NetPortalManagement/README.md).
+the classpath root. `NetPortalManagement` ships one too, but reads it through its own
+`AppConfig` loader rather than Spring, and keeps its datasource in the same file under
+`jdbc.*`; see its section below and its [module guide](../NetPortalManagement/README.md).
 
 Two access paths exist:
 

@@ -11,9 +11,8 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ## Phase 1 — Make the repository trustworthy (current)
 
-Four modules now build in the default public reactor; the fifth remains optional and
-requires private artifacts. Security provenance and independent deployment evidence
-remain open work.
+All five modules now build in the default public reactor. Security provenance and
+independent deployment evidence remain open work.
 
 - [x] Add a root README with architecture, module map and honest limitations
 - [x] Add per-module READMEs
@@ -24,7 +23,7 @@ remain open work.
 - [x] Stop tracking `target/` in git (CI verifies no build outputs are tracked)
 - [ ] Establish historical provenance and provisioning status, rotate any live values,
       then decide on coordinated history cleanup (see [SECURITY.md](../SECURITY.md))
-- [~] Maintain `CHANGELOG.md` entries for future releases (v1.0.0 is documented)
+- [~] Maintain `CHANGELOG.md` entries for future releases (v1.0.0 and v1.1.0 are documented)
 
 ## Phase 2 — Make it build
 
@@ -34,14 +33,14 @@ remain open work.
       and `NetworkOfficeService` needed none of their private coordinates, so both now
       build publicly
 - [x] Stub the remainder behind an optional Maven profile so `mvn package` succeeds
-      without the internal Nexus (`-Pprivate-deps` opts the remaining one back in)
+      without the internal Nexus (the profile was removed once nothing needed it)
 - [x] Reconstruct `BanjianVo` so `NetworkOfficeService` leaves the profile too
 - [ ] Diff the reconstructed `BanjianVo` against a real `t_drafts` /
       `T_ITEM_MESSAGE` / `t_office_detailed` schema and correct any drift
-- [ ] Replace `NetPortalManagement`'s `bee.cloud` persistence layer, or accept that it
-      stays out of the default reactor
+- [x] Replace `NetPortalManagement`'s `bee.cloud` persistence layer with parameterized
+      JDBC, standard Jersey and an API-token filter
 - [~] Root POM is the aggregator and parent with shared encoding/compiler settings;
-      module versions remain separate and private dependencies are not yet replaced
+      module versions remain separate
 - [x] Set the language level to Java 8 (`maven.compiler.source`/`target` = `1.8`) once,
       in the root POM, and drop the per-module overrides
 - [ ] Verify a clean build on JDK 8 in a container with an empty `~/.m2`
@@ -51,7 +50,7 @@ remain open work.
 - [~] Unit tests for the `common` layer (`Page` covered; `Result`, `AESUtil`, `JsonMapper`,
       date/number helpers) — no database required
 - [x] A context-load test per module that fails on an unbound mapper statement or a
-      mis-typed `${jdbc.*}` key, without needing a database. All four public modules
+      mis-typed `${jdbc.*}` key, without needing a database. All four Spring modules
       have one (`SpringContextLoadTest`), including a reflection check over every
       scanned mapper method
 - [ ] Write the missing SQL for `AreaDAO.insertUserRol` / `queryUserRloe`
@@ -59,7 +58,7 @@ remain open work.
 - [ ] One controller test per module using `MockMvc` with mocked services
 - [ ] H2-backed integration test for one mapper per module (Oracle-specific SQL will need
       dialect guards; start with a mapper that uses portable SQL)
-- [~] GitHub Actions runs isolated `mvn -B verify` on the four-module default
+- [~] GitHub Actions runs isolated `mvn -B verify` on the five-module default
       reactor on JDK 8 with test/WAR checks; confirm actual run status per commit,
       then expand to a JDK matrix and coverage reporting
 - [ ] Coverage reporting, with a floor that only ratchets upward

@@ -2,8 +2,9 @@
 
 There are **358 `@RequestMapping` declarations** across the workspace. This document
 describes the Spring MVC API contract (envelope, status codes, paging) and indexes
-the controller endpoints. Bee-dispatched `NetPortalManagement` does not use the same
-`@RequestMapping`/`Result` contract. This is a map, not a generated specification;
+the controller endpoints. `NetPortalManagement` uses JAX-RS (`@Path`) resources instead of
+`@RequestMapping`, so its 11 endpoints are not in that count; they are listed in its
+[module guide](../NetPortalManagement/README.md#endpoints). This is a map, not a generated specification;
 consult controller code and Javadoc for individual request and response bodies.
 
 - [1. Conventions](#1-conventions)

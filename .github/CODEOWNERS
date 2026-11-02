@@ -1,0 +1,8 @@
+# Review all changes by default. The repository is maintained by a single owner today;
+# update this file when a second maintainer is formally added.
+* @zengyunhua
+
+# Keep security-sensitive changes visible to the owner.
+SECURITY.md @zengyunhua
+.github/workflows/ @zengyunhua
+scripts/ @zengyunhua
