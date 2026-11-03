@@ -6,8 +6,10 @@ production-hardened.
 
 ## Before tagging
 
-- [ ] Confirm the working tree contains no local configuration, build output, IDE files,
-      credentials, private keys or real personal data.
+- [ ] Confirm the release diff adds no local configuration, build output, IDE metadata,
+      credentials, private keys or real personal data. Existing legacy IDE metadata
+      must not be changed incidentally; remove it only in a separate, intentional
+      cleanup change after checking downstream users.
 - [ ] Review [SECURITY.md](../SECURITY.md) and [the historical security review](SECURITY_REVIEW.md).
       Any live credential must be rotated or revoked before release work continues.
 - [ ] Update `CHANGELOG.md` with the scope, verification boundary and known limitations.

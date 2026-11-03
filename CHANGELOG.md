@@ -13,14 +13,14 @@ grouped by scope rather than by a single release number.
 
 ### Added
 
-- **Context-load tests for the other three public modules.** `IFaceSuportService`,
+- **Context-load tests for all four Spring/MyBatis modules.** `IFaceSuportService`,
   `IFaceSuperService_hn` and `InterfaceFunction` now each have a `SpringContextLoadTest`,
-  so all four modules in the default reactor fail the build on broken wiring. Each test
+  joining the existing `NetworkOfficeService` test. Each test
   loads the real `applicationContext.xml` with no database. Where a module has more than
   one datasource, the test gives each one a distinct url in
   `src/test/resources/config.properties` and asserts that every bean reads its own key.
   c3p0 pools are built with `initialPoolSize=0`, so they acquire no connection.
-- **A reflection check for unbound mapper methods, in all four modules.** The test walks
+- **A reflection check for unbound mapper methods, in all four MyBatis modules.** The test walks
   every `MapperFactoryBean` and asserts that each interface method resolves to a
   statement in the factory its scanner uses. The lookup is the same one MyBatis'
   `MapperMethod.SqlCommand` makes. Adding a DAO method without its SQL now fails at build

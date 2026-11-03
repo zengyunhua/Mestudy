@@ -128,14 +128,12 @@ the artefact a downstream terminal embeds.
 | `NetworkOfficeService` | yes | default | — |
 | `NetPortalManagement` | yes | default | Oracle schema and `api.token` at runtime; see its [module guide](../NetPortalManagement/README.md) |
 
-A fork user reports a successful local project build; the command, module scope
-and dependency source were not provided. Separately, the maintainer reports
-`NetPortalManagement` builds and deploys with private artifacts in their environment.
-Neither report establishes that the fifth module builds from public repositories.
-`NetPortalManagement` is kept out of the default reactor on purpose: a build that stops
-on an unresolvable artifact teaches a newcomer nothing. Its dependency is genuinely
-referenced by the code, so it cannot simply be deleted — install the jars into your local
-repository first, then build with the profile.
+The current five-module reactor includes `NetPortalManagement` and resolves its
+compile-time dependencies from public repositories. Its build and packaging do not require
+an Oracle connection, but meaningful runtime checks still require an authorized Oracle
+schema, the configured `api.token`, and the platform proxy settings described in the
+module guide. Do not treat a successful public build as proof that the deployment is
+independently runnable.
 
 Two modules moved into the default reactor during this work, for different reasons.
 `InterfaceFunction` declared two private coordinates that nothing used: no import of
