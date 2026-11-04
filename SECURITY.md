@@ -152,6 +152,20 @@ It is currently dead code — `StartupListener` calls `DataBase.init()` and the
 `DBConnection.initConn()` call is commented out. **Do not revive it.** If you need ad-hoc
 SQL, use a MyBatis mapper with bound parameters.
 
+## Recently fixed security control
+
+### SMS verification code disclosure
+
+`IFaceSuportService` endpoints `POST /iface/user/getMobileCode` and
+`POST /iface/user/getMobileCodeByNew` no longer return the generated OTP in the HTTP
+response. The code is sent only through the configured SMS provider and retained in Redis
+for server-side verification. Existing deployments must update clients that read the
+legacy `random` response field; that field is intentionally absent after the fix.
+
+This change does not by itself add route authentication, phone-number ownership checks,
+rate limiting, or failed-attempt limits. Those controls remain deployment and follow-up
+hardening requirements.
+
 ## What is *not* a problem
 
 Worth stating, because it is the first thing a reviewer checks:

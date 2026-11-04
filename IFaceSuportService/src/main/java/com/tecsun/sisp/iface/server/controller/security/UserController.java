@@ -398,11 +398,23 @@ public class UserController extends BaseController {
             return result(result, message, null);
         }
 
-/**
-         * 获取验证码   && 
-         * @param bean
-         * @return
-         */
+    /**
+     * Build the response allowlist for SMS requests without exposing the OTP.
+     */
+    static Map<String, String> buildSmsResponse(SmsRequstBean smsRequest) {
+        Map<String, String> response = new HashMap<String, String>();
+        // Keep this response allowlist free of the OTP. It is delivered only through SMS.
+        response.put("name", smsRequest.getName());
+        response.put("newPhoneNo", smsRequest.getNewPhoneNo());
+        response.put("cernum", smsRequest.getCernum());
+        return response;
+    }
+
+    /**
+     * 获取验证码
+     * @param bean
+     * @return
+     */
 
     @RequestMapping(value = "/getMobileCode",method = RequestMethod.POST)
     @ResponseBody
@@ -426,10 +438,7 @@ public class UserController extends BaseController {
                     SmsSendUtil.SmsSend(smsRequstBean);
                     JedisUtil.setValue(vo.getMobile(), random, 2);
                     message="获取验证码成功";
-                    map.put("random",random);
-                    map.put("name",smsRequstBean.getName());
-                    map.put("newPhoneNo",smsRequstBean.getNewPhoneNo());
-                    map.put("cernum",smsRequstBean.getCernum());
+                    map = buildSmsResponse(smsRequstBean);
                 }
                 else{
                     result=Constants.RESULT_MESSAGE_ERROR;
@@ -474,10 +483,7 @@ public Result getMobileCodeByNew(@RequestBody SecQueryBean bean) throws Exceptio
                 SmsSendUtil.SmsSend(smsRequstBean);
                 JedisUtil.setValue(bean.getNewPhoneNo(), random, 2);
                 message="获取验证码成功";
-                map.put("random",random);
-                map.put("name",smsRequstBean.getName());
-                map.put("newPhoneNo",smsRequstBean.getNewPhoneNo());
-                map.put("cernum",smsRequstBean.getCernum());
+                map = buildSmsResponse(smsRequstBean);
             }
             else{
                 result=Constants.RESULT_MESSAGE_ERROR;

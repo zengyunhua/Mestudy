@@ -42,49 +42,27 @@ on the roadmap it is labelled with the phase, so this file does not silently dup
 
 ## P0 — fix before calling this deployable
 
-### 1. The SMS code is handed back to whoever asked for it
+### 1. SMS verification code disclosure (fixed)
 
-`web.xml` registers `BusinessFilter` on five prefixes only:
+The two SMS endpoints in `UserController` generate a code, send it through `SmsSendUtil`,
+and retain it in Redis for server-side verification:
 
-```
-/iface/rest/*   /iface/cardInfo/*   /iface/bank/*   /iface/job/*   /iface/his/hangtianhis/*
-```
+| Endpoint | Code generation | SMS/Redis handling | Response behavior |
+| --- | --- | --- | --- |
+| `POST /iface/user/getMobileCode` | `checkMobile` | `SmsSendUtil` + `JedisUtil` | `random` is omitted |
+| `POST /iface/user/getMobileCodeByNew` | `getMobileCodeByNew` | `SmsSendUtil` + `JedisUtil` | `random` is omitted |
 
-`UserController` is mapped at `/iface/user` (`UserController.java:43`), which matches none
-of them. Its two code endpoints then put the code into the response map:
+The previous `map.put("random", random)` response writes were removed. The verification
+code is now delivered only through the SMS provider and is never included in the JSON
+response, preventing a caller or intermediary with response access from reading the OTP.
+Existing response metadata (`name`, `newPhoneNo`, and `cernum`) remains unchanged for
+compatibility; clients must no longer expect a `random` field.
 
-| Line | Statement |
-| --- | --- |
-| `UserController.java:419` | `String random = CommUtil.getRandomNum(4);` |
-| `UserController.java:427` | `JedisUtil.setValue(vo.getMobile(), random, 2);` |
-| `UserController.java:429` | `map.put("random", random);` |
-| `UserController.java:446` | `return this.result(result, message, map);` |
-
-`getMobileCodeByNew` (`:458–487`) does the same at `:467`, `:475`, `:477`, and its
-`newPhoneNo` is supplied by the caller rather than looked up from a user record.
-
-So an unauthenticated caller can post any phone number to `/iface/user/getMobileCodeByNew`,
-read the code out of the JSON body, and complete a phone-number change. The SMS is a
-decoration, not a control.
-
-Secondary problem: `CommUtil.getRandomNum` (`CommUtil.java:210–220`) uses `java.util.Random`
-and removes each drawn digit from the pool, so the space is 4 distinct digits (5040)
-rather than 10000, on a predictable generator.
-
-**Why decision:** removing `random` from the response breaks every client that currently
-reads it. That may be all of them — the field is in the published response shape. The fix
-needs a coordinated client change, or a feature flag, not a silent edit.
-
-**Options, cheapest first**
-
-1. Delete `map.put("random", ...)` and add `/iface/user/getMobileCode*` to `BusinessFilter`.
-   Only viable if no deployed client reads the field.
-2. Keep the field but stop returning it for `getMobileCodeByNew` (the change-phone path) —
-   narrows the hole without touching the login flow.
-3. Return it only when a `debug` flag is on, default off.
-
-Whichever is chosen, `getRandomNum` should use `SecureRandom` and keep the full digit pool.
-
+This fix addresses the code-disclosure issue only. The routes are still outside the
+currently configured `BusinessFilter` prefixes, and `getMobileCodeByNew` still accepts a
+caller-supplied phone number. Those authorization and identity-binding issues remain
+follow-up hardening work. `CommUtil.getRandomNum` also still uses `java.util.Random`; it
+should be migrated to `SecureRandom` in a separately tested change.
 ### 2. Photo upload writes to a caller-controlled path
 
 Chain:

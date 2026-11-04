@@ -61,6 +61,13 @@ grouped by scope rather than by a single release number.
   upload endpoint on POST. These are what let the module join
   `scripts/verify_public_build.py`, which now gates all five modules — 46 tests in total.
 
+### Fixed
+
+- **SMS verification code disclosure in `IFaceSuportService`.** `POST /iface/user/getMobileCode`
+  and `POST /iface/user/getMobileCodeByNew` still send the one-time code through the SMS
+  provider and retain it in Redis, but no longer include `random` in the HTTP response.
+  Clients must treat SMS delivery as the only code-delivery channel.
+
 ### Known issues
 
 - **`POST /userNet/drafts/insertUserRol` and `/userNet/drafts/queryUserRloe` in
