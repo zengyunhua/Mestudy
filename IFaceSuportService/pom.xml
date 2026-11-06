@@ -324,12 +324,6 @@
 			<version>3.6.6.Final</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.servicemix.examples</groupId>
-			<artifactId>org.apache.servicemix.examples.itests.cxf-soap-handler-osgi</artifactId>
-			<version>4.3.0</version>
-		</dependency>
-
 		<!-- 省农保jar start -->
 		<dependency>
 			<groupId>org.apache.ws.commons.axiom</groupId>

@@ -387,9 +387,19 @@ public class JobServiceImpl implements JobService {
 		String imgStr = vo.getPicBase64Str();
 		
 		//把base64字符照片保存到本地，并保留照片路径（插入本地数据库）
-        String pic_path = constructPicPathAndName(vo);
-        vo.setSfzzplj(pic_path);
-		PicUtil.GenerateImage(imgStr, pic_path);
+		String pic_dir = Config.getInstance().get("jiuye_job_idcard_picture_dir");
+		if (StringUtils.isBlank(pic_dir)) {
+			return new Result(Constants.RESULT_MESSAGE_ERROR, "没有配置就业模块身份证/社保卡照片保存路径", null);
+		}
+		String pic_name = constructPicName(vo);
+		if (pic_name == null) {
+			return new Result(Constants.RESULT_MESSAGE_PARAM, "证件号码（zjhm）格式不正确", null);
+		}
+		if (!PicUtil.writeImage(imgStr, pic_dir, pic_name)) {
+			return new Result(Constants.RESULT_MESSAGE_ERROR, "照片保存失败（格式错误或超过大小限制）", null);
+		}
+		String pic_path = pic_dir + File.separator + pic_name;
+		vo.setSfzzplj(pic_path);
 		Thumbnails.of(pic_path).size(93,114).toFile(pic_path);//压缩照片，小于32k
 		File file = new File(pic_path);
 		
@@ -415,25 +425,16 @@ public class JobServiceImpl implements JobService {
 	
 
 	/**
-	 * 构造照片名称和路径
+	 * 构造照片名称：证件号码_时间戳.jpg。
+	 * 证件号码来自请求，只允许字母、数字、下划线和连字符，否则返回 null。
 	 */
-	private String constructPicPathAndName(SavePictureVo vo) {
-		//名称
-		String zjhm = vo.getZjhm();
+	static String constructPicName(SavePictureVo vo) {
+		String zjhm = StringUtils.trimToEmpty(vo.getZjhm());
+		if (!zjhm.matches("[A-Za-z0-9_-]{1,32}")) {
+			return null;
+		}
 		String timeStamp = new SimpleDateFormat("yyyMMddHHmmss").format(new Date());
-		String pic_name = zjhm+"_"+timeStamp+".jpg";
-		
-		//路径
-		String pic_path = Config.getInstance().get("jiuye_job_idcard_picture_dir");
-		if(StringUtils.isBlank(pic_path)){
-			return "没有配置就业模块身份证/社保卡照片保存路径";
-		}
-		File file = new File(pic_path);
-		if(!file.exists()){
-			file.mkdirs();
-		}
-		
-        return pic_path += File.separator+pic_name;
+		return zjhm+"_"+timeStamp+".jpg";
 	}
 
 	

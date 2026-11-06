@@ -363,7 +363,7 @@ reference. It is maintained on a best-effort basis.
   configured platform proxy for meaningful runtime checks.
 - **Tests**: limited but now covers every module. `scripts/verify_public_build.py`
   requires a nonempty WAR and at least one passing test per module, and CI runs it after
-  `mvn -B verify`: 46 tests in total (12/8/7/4/15). The portal module's tests stop at the
+  `mvn -B verify`: 62 tests in total (28/8/7/4/15). The portal module's tests stop at the
   boundary — `AppConfig` resolution order, `ApiTokenFilter` rejection and the upload
   resource's HTTP method; none of which needs a database. The JDBC repository remains
   uncovered and needs an Oracle-compatible fixture.
@@ -398,8 +398,9 @@ is a good first contribution.
    available here, but it is not a mechanical merge — the smallest copy is usually the
    only one a given module actually calls, so every divergence has to be resolved by
    reading its callers.
-4. **Thin test coverage.** The client, filter and `Page` have focused assertion-based tests,
-   but most business flows are not covered. Legacy HTTP smoke tests require a
+4. **Thin test coverage.** The client, filter, `Page`, photo-upload validation and
+   startup/shutdown helpers have focused assertion-based tests, but most business flows
+   are not covered. Legacy HTTP smoke tests require a
    running service and local fixtures, so they are excluded from default tests.
 5. **Module versions are not aligned with releases.** `v1.0.0` and `v1.1.0` are tagged
    and described in [CHANGELOG.md](CHANGELOG.md), but the per-module artifact versions in

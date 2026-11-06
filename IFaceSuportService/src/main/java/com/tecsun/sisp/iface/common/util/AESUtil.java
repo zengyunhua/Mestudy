@@ -1,6 +1,5 @@
 package com.tecsun.sisp.iface.common.util;
 
-import com.tecsun.sisp.iface.server.util.Config;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
@@ -25,22 +24,7 @@ import java.util.Base64;
  * 10.将base 64 code AES解密
  */
 public class AESUtil {
-	
-	public static void main(String[] args) throws Exception {
-		String content = "/rest/post/type&4028822a4d5680df014d56ac7f93000e";
-//		String content = "/rest/post/list&4028822a4d5680df014d56ac7f93000e";
-		System.out.println("加密前：" + content);
 
-		String key = Config.getInstance().get("hr_encryption_key");
-		System.out.println("加密密钥和解密密钥：" + key);
-		
-		String encrypt = aesEncrypt(content, key);
-		System.out.println("加密后：" + encrypt);
-		
-		String decrypt = aesDecrypt(encrypt, key);
-		System.out.println("解密后：" + decrypt);
-	}
-	
 	/**
 	 * 将byte[]转为各种进制的字符串
 	 * @param bytes byte[]

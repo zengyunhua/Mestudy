@@ -19,9 +19,10 @@ import java.util.Properties;
  * broken address. If a configuration value looks empty at runtime, grep the key name
  * before suspecting the properties file.
  *
- * <p>The singleton is initialised lazily and is not synchronised; concurrent first access
- * may construct two instances. In practice the class is first touched during servlet
- * initialisation, before request handling begins.
+ * <p>The singleton is created once, under a lock, on first access. If
+ * {@code /config.properties} is not on the classpath, {@link #getInstance()} throws
+ * {@link IllegalStateException} with that message instead of failing later with a
+ * {@code NullPointerException} from inside {@link Properties#load(InputStream)}.
  *
  * <p>Usage:
  * <pre>{@code
@@ -31,7 +32,7 @@ import java.util.Properties;
 public class Config {
     private Log log = LogFactory.getLog(Config.class);
     private static final String CONIFG_FILE = "/config.properties";
-    private static Config instance = null;
+    private static volatile Config instance = null;
     private Properties props = new Properties();
 
     private Config() {
@@ -42,7 +43,11 @@ public class Config {
         InputStream in = null;
 
         try {
-            in = Config.class.getResourceAsStream("/config.properties");
+            in = Config.class.getResourceAsStream(CONIFG_FILE);
+            if (in == null) {
+                throw new IllegalStateException("Missing " + CONIFG_FILE
+                        + " on the classpath; copy config.properties.example and fill it in");
+            }
             this.props.load(in);
         } catch (IOException var11) {
             if(this.log.isErrorEnabled()) {
@@ -53,7 +58,7 @@ public class Config {
                 try {
                     in.close();
                 } catch (IOException var10) {
-                    var10.printStackTrace();
+                    this.log.warn("closing /config.properties failed", var10);
                 }
             }
 
@@ -62,11 +67,17 @@ public class Config {
     }
 
     public static Config getInstance() {
-        if(instance == null) {
-            instance = new Config();
+        Config config = instance;
+        if (config == null) {
+            synchronized (Config.class) {
+                config = instance;
+                if (config == null) {
+                    config = new Config();
+                    instance = config;
+                }
+            }
         }
-
-        return instance;
+        return config;
     }
 
     public String get(String key) {

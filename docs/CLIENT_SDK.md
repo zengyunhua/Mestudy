@@ -192,5 +192,6 @@ uses the JVM default trust store and strict hostname verification. Import privat
 
 ## 7. Complete example
 
-See [`Test.java`](../IFaceSuportService/src/main/java/com/tecsun/sisp/iface/client/Test.java)
-in the client package for a runnable `main`.
+The SDK does not ship a demo `main`. Combine the `ClientInit` call and the typed request
+from the [README](../README.md#using-the-client-sdk) in your own consumer; point it at a
+test deployment, never at a production host.

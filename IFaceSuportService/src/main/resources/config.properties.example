@@ -112,3 +112,9 @@ XIAOGANWEATHER=http://flash.weather.com.cn/wmaps/xml/xiaogan.xml
 # --- Card box capacity limits ----------------------------------------------
 cardmaxsize=80
 carboxcount=48
+
+# --- File storage ----------------------------------------------------------
+# Directory for ID / social-security-card photos uploaded through
+# POST /iface/job/savePicture (JobServiceImpl). Created on first use. Leave it
+# unset and that endpoint returns an error instead of saving the photo.
+jiuye_job_idcard_picture_dir=/home/disk/jiuye/idcard

@@ -16,27 +16,30 @@ on the roadmap it is labelled with the phase, so this file does not silently dup
 
 ## Summary
 
-| # | Item | Severity | Kind |
-| --- | --- | --- | --- |
-| 1 | OTP returned in the response body; `/iface/user` is outside the auth filter | **P0** | decision |
-| 2 | Photo path built from a request field — directory traversal, no size cap | **P0** | decision |
-| 3 | AES in ECB mode, key bytes read with the platform charset | P0 | decision |
-| 4 | `AESUtil.main()` prints the encryption key; class ships in the SDK jar | P0 | local |
-| 5 | Two dead classes that contain dangerous sinks | P1 | local |
-| 6 | Unbounded thread pool, double lazy init | P1 | local |
-| 7 | `contextDestroyed()` is empty — pools leak on redeploy | P1 | local |
-| 8 | Redis pool: unvalidated config, no auth, no close | P1 | local |
-| 9 | `Config` singleton race; missing file throws NPE | P1 | local |
-| 10 | 8 datasources, 7 transaction managers, default manager commented out | P1 | local |
-| 11 | Client jar ships 3 classes whose dependencies are not in the jar | P1 | decision |
-| 12 | `client/Test.java` ships in the SDK with a public IP | P2 | local |
-| 13 | Internal addresses hardcoded in `Constants` | P2 | decision |
-| 14 | Example config is missing 2 keys used by code | P2 | local |
-| 15 | README contradicts the code in two places | P2 | local |
-| 16 | 198 `printStackTrace`, 93 `System.out/err` | P2 | local |
-| 17 | 40 of 43 same-named classes have diverged from `_hn` | P2 | roadmap P5 |
-| 18 | 3 unit-test classes for 287 sources | P2 | roadmap P3 |
-| 19 | Dependency versions and one wrong artifact | P2 | decision |
+Status as of the Unreleased section of `CHANGELOG.md`: **fixed** items are done in code
+and covered by a test or by a build check; the rest are open.
+
+| # | Item | Severity | Kind | Status |
+| --- | --- | --- | --- | --- |
+| 1 | OTP returned in the response body; `/iface/user` is outside the auth filter | **P0** | decision | OTP fixed; filter open |
+| 2 | Photo path built from a request field — directory traversal, no size cap | **P0** | decision | **fixed** (6 endpoints) |
+| 3 | AES in ECB mode, key bytes read with the platform charset | P0 | decision | open |
+| 4 | `AESUtil.main()` prints the encryption key; class ships in the SDK jar | P0 | local | **fixed** |
+| 5 | Two dead classes that contain dangerous sinks | P1 | local | **fixed** |
+| 6 | Unbounded thread pool, double lazy init | P1 | local | **fixed** |
+| 7 | `contextDestroyed()` is empty — pools leak on redeploy | P1 | local | **fixed** |
+| 8 | Redis pool: unvalidated config, no auth, no close | P1 | local | config + close fixed; auth open (Jedis 2.6) |
+| 9 | `Config` singleton race; missing file throws NPE | P1 | local | **fixed** |
+| 10 | 8 datasources, 7 transaction managers, default manager commented out | P1 | local | open |
+| 11 | Client jar ships 3 classes whose dependencies are not in the jar | P1 | decision | `AESUtil` fixed; 2 open |
+| 12 | `client/Test.java` ships in the SDK with a public IP | P2 | local | **fixed** |
+| 13 | Internal addresses hardcoded in `Constants` | P2 | decision | open |
+| 14 | Example config is missing 2 keys used by code | P2 | local | **fixed** |
+| 15 | README contradicts the code in two places | P2 | local | **fixed** |
+| 16 | 198 `printStackTrace`, 93 `System.out/err` | P2 | local | open |
+| 17 | 40 of 43 same-named classes have diverged from `_hn` | P2 | roadmap P5 | open |
+| 18 | 3 unit-test classes for 287 sources | P2 | roadmap P3 | 7 classes, 28 tests |
+| 19 | Dependency versions and one wrong artifact | P2 | decision | wrong artifact removed; versions open |
 
 ---
 
@@ -63,7 +66,14 @@ currently configured `BusinessFilter` prefixes, and `getMobileCodeByNew` still a
 caller-supplied phone number. Those authorization and identity-binding issues remain
 follow-up hardening work. `CommUtil.getRandomNum` also still uses `java.util.Random`; it
 should be migrated to `SecureRandom` in a separately tested change.
-### 2. Photo upload writes to a caller-controlled path
+### 2. Photo upload writes to a caller-controlled path (fixed)
+
+**Status:** fixed. `savePicture` and the five `/iface/cssp` upload endpoints now write
+through `PicUtil.writeImage(data, directory, fileName)` (name check, canonical-path
+containment, 5 MiB cap); `savePicture` additionally restricts `zjhm` to
+`[A-Za-z0-9_-]{1,32}` after trimming. The JPEG-signature check from `_hn` was **not**
+copied, because these endpoints have never enforced a format and terminals may send PNG.
+The analysis below is the original finding.
 
 Chain:
 
@@ -311,6 +321,11 @@ fix has to be applied twice and verified twice. `docs/ROADMAP.md` Phase 5 alread
 shared `sisp-common` artifact; this measurement is the argument for prioritising it.
 
 ### 18. Test coverage
+
+*Update:* the module now has 7 unit-test classes and 28 tests. The new ones cover the
+item 2, 6, 7 and 8 fixes (`PicUtilTest`, `JobServicePictureNameTest`,
+`CsspBusControllerUploadTest`, `StartupResourcesTest`), and `SpringContextLoadTest` loads
+the real context. The text below describes the state at review time.
 
 Three unit-test classes cover utility corners: `PageTest` (paging arithmetic),
 `BusinessFilterTest` (`hasPermission` parsing), `IFaceHttpsClientTest`

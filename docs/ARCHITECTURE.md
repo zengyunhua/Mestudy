@@ -161,12 +161,15 @@ Controller method
 
 ### Startup sequence
 
-`StartupListener` implements `ServletContextListener` and extends `ContextLoader`. On
-`contextInitialized`:
+`StartupListener` implements `ServletContextListener`. On `contextInitialized`:
 
-1. `DataBase.init()` — builds the Redis connection pool from `redis_core_database`.
-2. `ThreadPoolUtil.init()` — creates the shared executor used by async work.
-3. (Commented out) legacy direct JDBC bootstrap.
+1. `DataBase.init()` — builds the Redis connection pool from `redis_core_database`
+   (`host_port`; a malformed value throws `IllegalStateException` naming the key).
+2. `ThreadPoolUtil.init()` — creates the shared executor used by async work: 32 threads,
+   a 1000-task queue, and caller-runs when both are full.
+
+On `contextDestroyed` it drains the executor for up to 10 seconds, then closes the Redis
+pool, so a redeploy does not leak threads or connections.
 
 If Redis is unreachable, the listener throws and the application fails to deploy. This
 is intentional: the token and dictionary caches are load-bearing.

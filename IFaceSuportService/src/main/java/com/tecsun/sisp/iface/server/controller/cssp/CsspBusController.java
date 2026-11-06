@@ -198,30 +198,13 @@ public class CsspBusController extends BaseController {
             return error("电子签名不能为空", "电子签名不能为空");
         }
 
-        File file = new File(collectPhotoPath3);//collectPhotoPath3
-        if(!file.exists()){
-            file.mkdirs();
+        String signFileName = "QM_" + signName + "_" + new SimpleDateFormat("yyyyMMddhhmmss").format(new Date()) + ".jpg";
+        if (!PicUtil.isSafeFileName(signFileName)) {
+            return error("电子签名名称不合法", "电子签名名称不合法");
         }
-
-        String signPhotoPath = collectPhotoPath3 + "QM_" +signName +"_"+ new SimpleDateFormat("yyyyMMddhhmmss").format(new Date()) + ".jpg";
-        if (signPhotoPath != null) {
-            OutputStream os = null;
-            try {
-                os = new FileOutputStream(new File(signPhotoPath));
-                os.write(Base64.getMimeDecoder().decode(pic));
-            } catch (Exception e) {
-                e.printStackTrace();
-                return error("电子签名读取错误", "电子签名读取错误");
-            } finally {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if(StringUtils.isEmpty(signPhotoPath)){
-            return error("参保人电子签名不能为空","参保人电子签名不能为空");
+        String signPhotoPath = collectPhotoPath3 + signFileName;
+        if (!PicUtil.writeImage(pic, collectPhotoPath3, signFileName)) {
+            return error("电子签名读取错误", "电子签名读取错误");
         }
         bean.setSignPhoto(signPhotoPath);
 
@@ -396,31 +379,18 @@ public class CsspBusController extends BaseController {
             return result("201", "参保人身份证不能为空");
         }
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        File file = new File(collectPhotoPath1);
-        if(!file.exists()){
-            file.mkdirs();
+        if (!PicUtil.isSafeFileName(picName + ".jpg")) {
+            return result("201", "图片名称不合法");
         }
+
+        Map<String, Object> map = new HashMap<String, Object>();
         String PhotoPath2 = collectPhotoPath1 + picName + ".jpg";
         map.put("picName", picName);
         map.put("picPath", PhotoPath2);
         map.put("cernum", cernum);
         map.put("name", name);
-        if (PhotoPath2 != null) {
-            OutputStream os = null;
-            try {
-                os = new FileOutputStream(new File(PhotoPath2));
-                os.write(Base64.getMimeDecoder().decode(pic));
-            } catch (Exception e) {
-                e.printStackTrace();
-                return this.result("302", "图片读取错误");
-            } finally {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (!PicUtil.writeImage(pic, collectPhotoPath1, picName + ".jpg")) {
+            return this.result("302", "图片读取错误");
         }
         csspQueryService.insertPic(map);
         return result("200", "上传图片成功");
@@ -595,27 +565,13 @@ public class CsspBusController extends BaseController {
         // System.out.println("picName=="+picName);
         // System.out.println("name=="+name);
         if(check != null && check.equals(Constants.STATUSMAP.get("STATUSMAP_02"))){ //照片处理成功
-            File file = new File(collectPhotoPath2);
-            System.out.println("1");
-            if(!file.exists()){
-                file.mkdirs();
+            // picName was stored by uploadPicInfoByTSB from request data; re-check before use.
+            if (!PicUtil.isSafeFileName(picName + ".jpg")) {
+                return this.result("201", "图片名称不合法");
             }
             String path2= collectPhotoPath2 + picName+".jpg";
-            System.out.println("path2=="+path2);
-            OutputStream os = null;
-            try {
-                os = new FileOutputStream(new File(path2));
-                os.write(Base64.getMimeDecoder().decode(base46String));
-                System.out.println("2");
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (!PicUtil.writeImage(base46String, collectPhotoPath2, picName + ".jpg")) {
                 return this.result("302", "图片读取错误");
-            } finally {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("picName", picName);
@@ -672,32 +628,19 @@ public class CsspBusController extends BaseController {
             return result("201", "参保人照片不能为空");
         }
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        File file = new File(sfzPhotoPath);
-        if(!file.exists()){
-            file.mkdirs();
+        if (!PicUtil.isSafeFileName(cerNum + ".jpg")) {
+            return result("201", "身份证号码格式不正确");
         }
+
+        Map<String, Object> map = new HashMap<String, Object>();
         String photoPath = sfzPhotoPath + cerNum + ".jpg";
         map.put("cerNum", cerNum);
         map.put("photoPath", photoPath);
         map.put("name", name);
         map.put("sex", sex);
         map.put("birthday", birthday);
-        if (photoPath != null) {
-            OutputStream os = null;
-            try {
-                os = new FileOutputStream(new File(photoPath));
-                os.write(Base64.getMimeDecoder().decode(photo));
-            } catch (Exception e) {
-                e.printStackTrace();
-                return this.result("302", "图片读取错误");
-            } finally {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (!PicUtil.writeImage(photo, sfzPhotoPath, cerNum + ".jpg")) {
+            return this.result("302", "图片读取错误");
         }
         csspQueryService.insertPic(map);
         return result("200", "上传图片成功");
@@ -966,6 +909,12 @@ public class CsspBusController extends BaseController {
                 return result("0", "参保人身份证不能为空");
             }
         }
+        // 0：本人，1：代他人办理。The ID number goes into the file name, so check it first.
+        String photoFileName = "person" + "_" + (bean.getNo().equals("0") ? certNum : agencertNum)
+                + new SimpleDateFormat("yyyyMMddhhmmss").format(new Date()) + ".jpg";
+        if (!PicUtil.isSafeFileName(photoFileName)) {
+            return result("0", "证件号码格式不正确");
+        }
         UseInfoBean  useInfoBean =getInfo();
         if(useInfoBean == null || (useInfoBean.getOrgId() == null || useInfoBean.getOrgId() == 0)){
             return result("301","请先到后台把德生宝和社保网点关联起来");
@@ -973,24 +922,10 @@ public class CsspBusController extends BaseController {
         Integer id = useInfoBean.getOrgId();
         String data = csspQueryService.getOrgAddress(id);
         String orgAddress = csspQueryService.getrcmWdname(id);
-        File file = new File(sfzPhotoPath);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        String photoPath1,photoPath2;
-        if(bean.getNo().equals("0")) {
-            photoPath1 = sfzPhotoPath + "person" +"_" + certNum +new SimpleDateFormat("yyyyMMddhhmmss").format(new Date())+ ".jpg";
-            // photoPath2 = sfzPhotoPath + "signature" +"_" + certNum  +new SimpleDateFormat("yyyyMMddhhmmss").format(new Date())+ ".jpg";
-        }
-        else {
-            photoPath1 = sfzPhotoPath + "person" + "_" + agencertNum +new SimpleDateFormat("yyyyMMddhhmmss").format(new Date()) + ".jpg";
-            /// photoPath2 = sfzPhotoPath + "signature" + "_" + agencertNum +new SimpleDateFormat("yyyyMMddhhmmss").format(new Date())+ ".jpg";
-        }
-       /* PicUtil.GenerateImage(PicUtil.GetImageStr(bean.getBase64Stringqmz()), photoPath1);
-        PicUtil.GenerateImage(PicUtil.GetImageStr(bean.getBase64Stringqmz()), photoPath2);*/
+        String photoPath1 = sfzPhotoPath + photoFileName;
         try {
-            PicUtil.GenerateImage(ppic, photoPath1);
-            //   PicUtil.GenerateImage(qmpic, photoPath2);
+            // The write result was never checked here; keep that so callers without a photo still succeed.
+            PicUtil.writeImage(ppic, sfzPhotoPath, photoFileName);
             bean.setOrgid(orgAddress);
             bean.setRphotoPath(photoPath1);
             //  bean.setQmphotoPath(photoPath2);

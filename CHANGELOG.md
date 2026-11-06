@@ -60,16 +60,66 @@ grouped by scope rather than by a single release number.
   both accepted; CORS preflight is not authenticated), and one that keeps the multipart
   upload endpoint on POST. These are what let the module join
   `scripts/verify_public_build.py`, which now gates all five modules — 46 tests in total.
+- **Regression tests for the `IFaceSuportService` fixes below** (12 → 28 tests, 62 in the
+  reactor): `PicUtilTest` (traversal names, size cap, invalid base64, directory
+  creation), `JobServicePictureNameTest`, `CsspBusControllerUploadTest` (a hostile name is
+  rejected before any service is called), and `StartupResourcesTest` (Redis `host_port`
+  parsing, bounded pool, named daemon workers, shutdown then re-init).
 
 ### Fixed
 
+- **Photo upload path traversal in `IFaceSuportService`.** `POST /iface/job/savePicture`
+  and five `/iface/cssp` endpoints (`applyCard`, `uploadPicInfoByTSB`, `auditByTSB`,
+  `uploadSfzByTSB`, `uploadCardPicInfo`) built the output file name from a request field
+  and wrote the decoded image there. They now use `PicUtil.writeImage`, which rejects path
+  separators, `..` and control characters, confirms the canonical target stays inside the
+  directory, and caps decoded images at 5 MiB. `savePicture` also limits `zjhm` to
+  `[A-Za-z0-9_-]{1,32}`. Stored paths keep their previous format.
+  **Client-visible:** requests with such names now get `201` (`/iface/cssp`), `0`
+  (`uploadCardPicInfo`) or `-300` (`savePicture`) instead of a write.
+- **`savePicture` with no photo directory configured** used the error text as a file path
+  and wrote it into the working directory. It now returns an error result.
+  `jiuye_job_idcard_picture_dir` is added to `config.properties.example`.
+- **Unbounded thread pool.** `ThreadPoolUtil` used `SynchronousQueue` with
+  `Integer.MAX_VALUE` threads, so a burst created a thread per task. It is now 32 named
+  daemon threads, a 1000-task queue and `CallerRunsPolicy`, with one synchronised
+  initialiser instead of two racing ones.
+- **Pools leaked on redeploy.** `StartupListener.contextDestroyed` was empty. It now
+  drains the executor (10 s) and closes the Redis pool. The unused `extends ContextLoader`
+  is gone.
+- **Unreadable startup failures.** A `redis_core_database` without `_port` threw
+  `ArrayIndexOutOfBoundsException`; it now throws `IllegalStateException` naming the key.
+  A missing `config.properties` threw a `NullPointerException` from `Properties.load`; it
+  now throws `IllegalStateException` saying the file is missing. `Config.getInstance()` is
+  thread-safe on first access.
+- **SMS verification codes from `java.util.Random`.** `CommUtil.getRandomNum` now uses
+  `SecureRandom`. The format (distinct digits) is unchanged.
 - **SMS verification code disclosure in `IFaceSuportService`.** `POST /iface/user/getMobileCode`
   and `POST /iface/user/getMobileCodeByNew` still send the one-time code through the SMS
   provider and retain it in Redis, but no longer include `random` in the HTTP response.
   Clients must treat SMS delivery as the only code-delivery channel.
 
+### Removed
+
+- **Dead code with dangerous sinks in `IFaceSuportService`**: `DBConnection` (shared
+  static `Statement`, raw SQL, leaked connections; its only call was commented out),
+  `CommUtil.getMACAddress` (concatenated an IP into `Runtime.exec`), the unused
+  `FaceController.GenerateImage`, `AESUtil.main()` (printed `hr_encryption_key`) and
+  `client/Test.java` (a demo `main` with a public IP). The last two shipped in the client
+  jar. Removing `AESUtil`'s `server.util.Config` import also means `AESUtil` in the client
+  jar no longer needs a class that is not in the jar.
+- **An unused test-example artifact** in `IFaceSuportService`:
+  `org.apache.servicemix.examples.itests.cxf-soap-handler-osgi:4.3.0`. Nothing referenced
+  its classes. The WAR's `WEB-INF/lib` loses exactly that one jar.
+
 ### Known issues
 
+- **`/iface/cssp/*` is not behind `BusinessFilter`.** The photo-upload endpoints there
+  validate file names now, but accept unauthenticated writes into the photo directories.
+  See `SECURITY.md` §8; adding the prefix is a contract change for the terminals.
+- **`AESUtil` still uses `AES/ECB` and the platform charset for the key**, and
+  `Constants` still hard-codes internal endpoints. Both need a migration decision; see
+  `docs/MODULE_REVIEW_IFACESUPORTSERVICE.md` items 3 and 13.
 - **`POST /userNet/drafts/insertUserRol` and `/userNet/drafts/queryUserRloe` in
   `NetworkOfficeService` always fail** with `Invalid bound statement (not found)`. The
   reflection check above found them. `AreaDAO.insertUserRol` and `AreaDAO.queryUserRloe`
@@ -420,8 +470,8 @@ First tagged release. Everything below landed in this release.
 
 ### Deprecated
 
-- `DBConnection` in `IFaceSuportService` and `IFaceSuperService_hn`. It is dead code with
-  a shared static `Statement`; do not revive it.
+- `DBConnection` in `IFaceSuperService_hn`. It is dead code with a shared static
+  `Statement`; do not revive it. (The `IFaceSuportService` copy has since been removed.)
 
 ## Historical commits
 

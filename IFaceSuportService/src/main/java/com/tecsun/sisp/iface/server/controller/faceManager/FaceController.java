@@ -802,33 +802,6 @@ public class FaceController extends BaseController{
 	        }, 0, 2 * 1000);
     }
 
-    /**
-     *  base64Str to pic
-     * @param imgStr base64 字符串
-     * @param path 存储路径
-     * @return
-     */
-    public static boolean GenerateImage(String imgStr,String path) { // 对字节数组字符串进行Base64解码并生成voice
-        if (imgStr == null)
-            return false;
-        try {
-            byte[] b = Base64.getMimeDecoder().decode(imgStr);
-            for (int i = 0; i < b.length; ++i) {
-                if (b[i] < 0) {// 调整异常数据
-                    b[i] += 256;
-                }
-            }
-//            String imgFilePath = "C:/Users/sandwich/Desktop/base64/12.jpg";// 新生成的voice
-            OutputStream out = new FileOutputStream(path);//imgFilePath
-            out.write(b);
-            out.flush();
-            out.close();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    
     //------------------孝感生存认证新版本start--------------------------------------------
     //1、采集功能: 判断是否为离退休人员或遗嘱-checkPersonInfo、采集-tsbCollect；
     //2、生存认证功能：verify-认证、

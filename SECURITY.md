@@ -144,15 +144,41 @@ endpoints are open.
 
 ### 7. Dead but dangerous JDBC helper
 
-`DBConnection` (in `IFaceSuportService` and `IFaceSuperService_hn`) holds a **static**
-`Statement` and exposes `executeQuery(String sql)` / `executeUpdate(String sql)` that
-execute caller-supplied SQL.
+`DBConnection` held a **static** `Statement` and exposed `executeQuery(String sql)` /
+`executeUpdate(String sql)` that execute caller-supplied SQL. It was dead code and has been
+**deleted from `IFaceSuportService`**. The copy in `IFaceSuperService_hn`
+(`common/util/DBConnection.java`) is still present and still unreferenced.
+**Do not revive it.** If you need ad-hoc SQL, use a MyBatis mapper with bound parameters.
 
-It is currently dead code — `StartupListener` calls `DataBase.init()` and the
-`DBConnection.initConn()` call is commented out. **Do not revive it.** If you need ad-hoc
-SQL, use a MyBatis mapper with bound parameters.
+### 8. Photo-upload routes under `/iface/cssp` are not behind `BusinessFilter`
 
-## Recently fixed security control
+`web.xml` applies `BusinessFilter` to `/iface/rest`, `/iface/cardInfo`, `/iface/bank`,
+`/iface/job` and `/iface/his/hangtianhis`. `CsspBusController` is mounted at
+`/iface/cssp`, so `applyCard` (signature image), `uploadPicInfoByTSB`, `auditByTSB`,
+`uploadSfzByTSB` and `uploadCardPicInfo` accept requests without a session token. The file
+names are now
+validated (see below), but anyone who can reach the service can still write images into
+the configured photo directories. Adding the prefix to the filter changes the contract
+for the terminals that call these routes, so it is left to the deployment owner.
+
+## Recently fixed security controls
+
+### Photo upload path traversal
+
+Six endpoints in `IFaceSuportService` built an output file name from a request field
+(`zjhm`, `cerNum`, `certNum`/`agentcertNum`, `picName`, `signName`) and wrote the decoded
+image there, so a value like `../../webapps/ROOT/x` escaped the photo directory. They
+also decoded base64 with no size limit. All of them now go through
+`PicUtil.writeImage(data, directory, fileName)`, which:
+
+- rejects names containing `/`, `\`, `:`, control characters, or equal to `.`/`..`;
+- checks that the canonical target is still directly inside the directory;
+- rejects data that is not base64, is empty, or decodes to more than 5 MiB.
+
+`POST /iface/job/savePicture` additionally restricts `zjhm` to `[A-Za-z0-9_-]{1,32}`
+(after trimming), and returns an error instead of writing to the working directory when
+`jiuye_job_idcard_picture_dir` is not configured. Regression tests:
+`PicUtilTest`, `JobServicePictureNameTest`, `CsspBusControllerUploadTest`.
 
 ### SMS verification code disclosure
 

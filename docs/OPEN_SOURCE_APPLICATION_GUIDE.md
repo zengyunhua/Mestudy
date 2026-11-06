@@ -11,12 +11,16 @@ This is a project-readiness checklist, **not** an official Codex for Open Source
 
 ## Current verification boundary
 
-On November 3, 2026, the maintainer workstation (Windows 11, JDK 1.8.0_421, Maven 3.8.7)
-ran `mvn -B -ntp -Dmaven.repo.local=<empty-directory> verify` on `70c0029`. All five modules
-packaged, and `python scripts/verify_public_build.py` reported 46 passing tests
-(12 `IFaceSuportService`, 8 `IFaceSuperService_hn`, 7 `InterfaceFunction`,
-4 `NetworkOfficeService`, 15 `NetPortalManagement`), none skipped. The empty repository
-run completed successfully; a contributor should still reproduce it independently because
+On November 6, 2026, the maintainer workstation (Windows 11, JDK 1.8.0_421, Maven 3.8.7)
+ran `mvn -B -ntp -Dmaven.repo.local=<empty-directory> clean verify` on the working tree
+on top of `1660792` (the photo-upload, thread-pool and shutdown fixes listed under
+`[Unreleased]` in the changelog, not yet committed at the time of the run). Dependencies
+resolved through the workstation's Central mirror (Aliyun). All five modules packaged, and
+`python scripts/verify_public_build.py` reported 62 passing tests
+(28 `IFaceSuportService`, 8 `IFaceSuperService_hn`, 7 `InterfaceFunction`,
+4 `NetworkOfficeService`, 15 `NetPortalManagement`), none skipped;
+`scripts/check_sensitive.py` reported 0 findings over 702 tracked paths.
+A contributor should still reproduce it independently because
 a local run is not a substitute for a public CI result. On Windows, prefer an ASCII-only
 Maven repository path when the user profile contains non-ASCII characters; see
 [troubleshooting](TROUBLESHOOTING.md).
@@ -54,6 +58,7 @@ verified; a clean current-tree scan is not closure.
 | High | No independently executable end-to-end deployment recipe with public test data. | A clean-room operator follows a versioned, non-sensitive test environment guide and reports a successful startup and expected smoke-test outcome. Do not commit proprietary Oracle/Redis jars or actual credentials; use publicly redistributable dependencies only. |
 | High | `NetPortalManagement` builds publicly, but its ported JDBC repository has no automated test and no recorded run against Oracle. | An Oracle-compatible fixture (for example a Testcontainers Oracle XE image) exercising `NetPortalRepository`, or a redacted, reproducible smoke-test record from an authorized environment. |
 | High | Automated tests are limited and do not establish runtime behaviour for every module. | Add focused tests for each module, negative/security cases and CI coverage evidence; do not overstate current counts. |
+| High | Photo-upload routes under `/iface/cssp` are outside `BusinessFilter`, so they accept unauthenticated writes (file names are validated since the `[Unreleased]` fix). | Owner decides whether terminals can send the session token, then adds the prefix to `web.xml` with a test, or documents the network control that replaces it. See [SECURITY.md](../SECURITY.md) §8. |
 | Medium | `v1.1.0` predates the five-module public build and the portal port; that work is only in `[Unreleased]`. | After CI is green on the release commit, publish a new, accurately scoped release/tag with a changelog, verified build command, limitations and checksum/artifacts where applicable. Do not move existing tags. |
 | Medium | Public adoption is hard to assess from stars alone. | Cite genuine external PRs, users, downstream projects, discussions or release downloads **with dates and links**; distinguish actual usage from stars/watches and do not fabricate metrics. |
 
