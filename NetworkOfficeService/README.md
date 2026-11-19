@@ -150,17 +150,23 @@ mvn -Djava.io.tmpdir=D:\mvn-tmp clean package
 cp target/NetworkOfficeService-*.war $CATALINA_HOME/webapps/sisp.war
 ```
 
-## Known broken endpoints
+## Explicitly unsupported role endpoints
 
-| Endpoint | Fails with | Cause |
+| Endpoint | Current response | Reason |
 | --- | --- | --- |
-| `POST /userNet/drafts/insertUserRol` | `Invalid bound statement (not found)` | `AreaDAO.insertUserRol` has no SQL |
-| `POST /userNet/drafts/queryUserRloe` | `Invalid bound statement (not found)` | `AreaDAO.queryUserRloe` has no SQL |
+| `POST /userNet/drafts/insertUserRol` | HTTP 501, JSON `statusCode: "501"`, `data: null` | Verified role-table schema/SQL is unavailable |
+| `POST /userNet/drafts/queryUserRloe` | HTTP 501, JSON `statusCode: "501"`, `data: null` | Verified role-table schema/SQL is unavailable |
 
-Neither statement exists in `areaDAO.xml` or anywhere in git history. Fixing them needs
-the real role-table schema. Until someone writes that SQL (or removes the endpoints),
-`SpringContextLoadTest` lists both methods in `BROKEN_ENDPOINT_UNBOUND`. Its reflection
-check fails on any *other* unbound mapper method.
+The URLs and request types are retained for compatibility, but the handlers no longer
+call a DAO or pretend a write/query succeeded. The unbound methods were removed from
+`AreaDAO`, and the special `BROKEN_ENDPOINT_UNBOUND` test exemption was removed.
+Deprecated internal service methods fail explicitly with `UnsupportedOperationException`.
+Other role/matter endpoints are not changed by this patch.
+
+`UnsupportedRoleEndpointsTest` checks the real MVC HTTP/JSON response, GET rejection,
+invalid JSON and no DAO access without a database. Re-enabling these two operations
+requires verified schema/SQL, authorization review and database tests; do not guess
+SQL or treat the 501 handlers as an implemented role-management feature.
 
 ## Notes for contributors
 

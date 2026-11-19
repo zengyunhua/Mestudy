@@ -15,8 +15,9 @@ public class JobServicePictureNameTest {
     }
 
     @Test
-    public void acceptsIdNumbers() {
-        assertTrue(nameFor("11010119900101001X").matches("11010119900101001X_\\d{14}\\.jpg"));
+    public void acceptsSyntheticIdentifiers() {
+        // Only the documented synthetic identity fixture is used; X is tested with a non-ID name.
+        assertTrue(nameFor("exampleX").matches("exampleX_\\d{14}\\.jpg"));
         assertTrue(nameFor(" 110101199001010015 ").startsWith("110101199001010015_"));
     }
 

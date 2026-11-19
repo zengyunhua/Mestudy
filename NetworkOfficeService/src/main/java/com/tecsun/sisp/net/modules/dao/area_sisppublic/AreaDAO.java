@@ -3,7 +3,6 @@ package com.tecsun.sisp.net.modules.dao.area_sisppublic;
 import com.tecsun.sisp.net.common.MyBatisDao;
 import com.tecsun.sisp.net.modules.entity.request.DictionaryBean;
 import com.tecsun.sisp.net.modules.entity.request.MatterRoleBean;
-import com.tecsun.sisp.net.modules.entity.request.UserRoleBean;
 import com.tecsun.sisp.net.modules.entity.response.*;
 
 import java.util.HashMap;
@@ -15,8 +14,6 @@ public interface AreaDAO {
 	
 	public List<AreaVo> queryByArea();
 	public List<DictionaryVo> queryPersonStatus(DictionaryBean bean);
-	public long insertUserRol(UserRolVo vo);//添加角色
-	public List<UserRolVo> queryUserRloe(UserRoleBean vo);//角色查询
 	public long inserttMatteRole(MatterRoleBean vo);//保存权限
 	public List<MatterRoleBean> queryByCorrelation(MatterRoleBean vo);//关联查询
 	public UserVO getUserById(int userId);

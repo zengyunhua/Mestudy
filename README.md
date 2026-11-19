@@ -47,7 +47,7 @@ when a Java system has to talk to a dozen heterogeneous government backends.
 
 | Module | Artifact | What it does | Size |
 | --- | --- | --- | :---: |
-| [`IFaceSuportService`](IFaceSuportService/README.md) | `sisp_IFaceSuportService` | Core interface service. Social-insurance queries, card services, employment, hospital, face verification, SMS, WeChat, bank/fee channels. Also ships the reusable **client SDK** jar (`classifier=client`). | 286 Java files |
+| [`IFaceSuportService`](IFaceSuportService/README.md) | `sisp_IFaceSuportService` | Core interface service. Social-insurance queries, card services, employment, hospital, face verification, SMS, WeChat, bank/fee channels. Also ships the reusable **client SDK** jar (`classifier=client`). | 284 Java files |
 | [`NetworkOfficeService`](NetworkOfficeService/README.md) | `sisp_NetworkOfficeService` | Online government-service portal. Application drafts, submission, audit trail, electronic signature (PDF stamping), area/administrative division data. | 129 Java files |
 | [`IFaceSuperService_hn`](IFaceSuperService_hn/README.md) | `sisp_IFaceSuperService_hn` | Province-specific (Henan) variant of the interface service: card + social-insurance controllers against the provincial gateway. | 60 Java files |
 | [`InterfaceFunction`](InterfaceFunction/README.md) | `sisp_InterfaceFunction` | Platform security administration: users, roles, function/permission trees, login. | 49 Java files |
@@ -356,14 +356,17 @@ domain prefix (`/iface/rest/`, `/iface/cardInfo/`, `/iface/user/`, ...). The
 This repository is a **curated archive of production-derived modules**, published for
 reference. It is maintained on a best-effort basis.
 
-- **Documentation**: in place — this README, one README per module, and the eleven
-  documents under `docs/`.
+- **Documentation**: this README, per-module guides and focused documents under `docs/`.
+  See [maintenance progress](docs/MAINTENANCE_PROGRESS.md) for the current hardening batch
+  and [CSSP migration](docs/api/CSSP_AUTHENTICATION.md) for the new session requirement.
 - **Public build scope**: five of five. All modules are in the default reactor and
   resolve from public dependencies; `NetPortalManagement` still needs Oracle and a
   configured platform proxy for meaningful runtime checks.
 - **Tests**: limited but now covers every module. `scripts/verify_public_build.py`
-  requires a nonempty WAR and at least one passing test per module, and CI runs it after
-  `mvn -B verify`: 62 tests in total (28/8/7/4/15). The portal module's tests stop at the
+  requires a valid WAR without container/test libraries and at least one passing test
+  per module, and CI runs it after
+  `mvn -B verify`: the November 19 local clean run passed 81 tests (42/8/7/9/15),
+  none skipped. Public CI must still be verified for the eventual commit. The portal module's tests stop at the
   boundary — `AppConfig` resolution order, `ApiTokenFilter` rejection and the upload
   resource's HTTP method; none of which needs a database. The JDBC repository remains
   uncovered and needs an Oracle-compatible fixture.

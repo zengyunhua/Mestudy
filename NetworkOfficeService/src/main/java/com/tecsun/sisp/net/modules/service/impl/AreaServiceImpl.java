@@ -28,21 +28,16 @@ public class AreaServiceImpl implements AreaService {
         return areaDAO.queryPersonStatus(bean);
     }
 
-    //添加角色
+    /** @deprecated No verified role schema/SQL is available in the public project. */
+    @Deprecated
     public long insertUserRol(UserRolVo vo) {
-        long row = areaDAO.insertUserRol(vo);
-        return row;
+        throw new UnsupportedOperationException("Role schema and SQL are not available");
     }
 
-    //角色查询
+    /** @deprecated Use only after implementing and testing verified role SQL. */
+    @Deprecated
     public Page<UserRolVo> queryUserRloe(UserRoleBean vo) {
-        Page<UserRolVo> page = new Page<>(vo.getPageno(), vo.getPagesize());
-        vo.setPage(page);
-        List<UserRolVo> list = areaDAO.queryUserRloe(vo);
-        if (list != null && list.size() > 0) {
-            page.setData(list);
-        }
-        return page;
+        throw new UnsupportedOperationException("Role schema and SQL are not available");
     }
 
     @Override

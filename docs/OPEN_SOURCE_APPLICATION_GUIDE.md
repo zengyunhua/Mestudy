@@ -5,11 +5,19 @@ This is a project-readiness checklist, **not** an official Codex for Open Source
 ## What a reviewer can verify today
 
 - Source and Apache-2.0 license are visible in the repository; the five modules and their purpose are mapped in the [README](../README.md).
-- The default Maven reactor builds all five WAR modules from Maven Central on JDK 8. GitHub Actions runs `mvn -B verify` against an isolated local repository on push and PR, then `scripts/verify_public_build.py` requires one nonempty WAR and at least one passing test per module.
+- The default Maven reactor builds all five WAR modules from Maven Central on JDK 8. GitHub Actions runs `mvn -B verify` against an isolated local repository on push and PR, then `scripts/verify_public_build.py` requires a valid WAR without container/test libraries and at least one passing test per module.
 - [Getting started](GETTING_STARTED.md), [configuration](CONFIGURATION.md), [troubleshooting](TROUBLESHOOTING.md), [contributing](../CONTRIBUTING.md), [roadmap](ROADMAP.md), and [security policy](../SECURITY.md) document the current scope and limitations.
-- The repository is a **reference archive**, not a deployable demo. A Maven build does not verify Oracle schemas, Redis, Tomcat startup, external gateways, authentication, or end-to-end transactions.
+- The repository is a **reference archive**, not a deployable demo. A Maven build does not verify Oracle schemas, Redis, Tomcat startup, external gateways, deployed authentication, or end-to-end transactions.
 
 ## Current verification boundary
+
+The November 19 working-tree hardening batch and validation commands are recorded in
+[maintenance progress](MAINTENANCE_PROGRESS.md). The remote run for `659af20` on
+November 6 packaged successfully but failed repository hygiene because a newly tracked
+test fixture matched the identity-number scanner. The current patch uses the already
+documented synthetic fixture plus a non-identity X-suffixed name; the scanner is not
+weakened. Local validation does not change the remote run: push a reviewed commit and
+cite its own green CI before an application or release.
 
 On November 6, 2026, the maintainer workstation (Windows 11, JDK 1.8.0_421, Maven 3.8.7)
 ran `mvn -B -ntp -Dmaven.repo.local=<empty-directory> clean verify` on the working tree
@@ -58,7 +66,7 @@ verified; a clean current-tree scan is not closure.
 | High | No independently executable end-to-end deployment recipe with public test data. | A clean-room operator follows a versioned, non-sensitive test environment guide and reports a successful startup and expected smoke-test outcome. Do not commit proprietary Oracle/Redis jars or actual credentials; use publicly redistributable dependencies only. |
 | High | `NetPortalManagement` builds publicly, but its ported JDBC repository has no automated test and no recorded run against Oracle. | An Oracle-compatible fixture (for example a Testcontainers Oracle XE image) exercising `NetPortalRepository`, or a redacted, reproducible smoke-test record from an authorized environment. |
 | High | Automated tests are limited and do not establish runtime behaviour for every module. | Add focused tests for each module, negative/security cases and CI coverage evidence; do not overstate current counts. |
-| High | Photo-upload routes under `/iface/cssp` are outside `BusinessFilter`, so they accept unauthenticated writes (file names are validated since the `[Unreleased]` fix). | Owner decides whether terminals can send the session token, then adds the prefix to `web.xml` with a test, or documents the network control that replaces it. See [SECURITY.md](../SECURITY.md) §8. |
+| High | CSSP session protection is implemented locally, but terminal migration and object/organization permissions are not verified in deployment. Legacy CSSP username storage is still shared. | Confirm protected callers send `X-Token-Id`, verify fail-closed behavior in an authorized environment, and add per-session identity/ownership tests. See [SECURITY.md](../SECURITY.md) §8. |
 | Medium | `v1.1.0` predates the five-module public build and the portal port; that work is only in `[Unreleased]`. | After CI is green on the release commit, publish a new, accurately scoped release/tag with a changelog, verified build command, limitations and checksum/artifacts where applicable. Do not move existing tags. |
 | Medium | Public adoption is hard to assess from stars alone. | Cite genuine external PRs, users, downstream projects, discussions or release downloads **with dates and links**; distinguish actual usage from stars/watches and do not fabricate metrics. |
 

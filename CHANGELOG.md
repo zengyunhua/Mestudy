@@ -13,6 +13,19 @@ grouped by scope rather than by a single release number.
 
 ### Added
 
+- **WAR-content build gate.** Reject malformed WAR archives and bundled Servlet/JSP APIs,
+  Spring test utilities, JUnit and Hamcrest libraries. Three new Python regression tests
+  cover malformed archives, forbidden libraries and legitimate runtime libraries.
+- **CSSP authorization regression coverage.** Fourteen tests verify the deployment
+  descriptor, public-login boundary, header/legacy token handling, IP/channel/device
+  checks, ThirdSystem permissions, outage rejection and MVC-before-controller ordering.
+- **Unsupported-role HTTP contract tests.** Five database-free tests cover HTTP/JSON
+  501, invalid JSON, GET rejection, removal of unbound DAO methods and explicit internal
+  service failure.
+- **Client migration and maintenance evidence guides.** CSSP session requirements,
+  rollout steps, validation commands and owner-only blockers are recorded without claiming
+  that local tests establish public CI, production safety or historical provenance.
+
 - **Context-load tests for all four Spring/MyBatis modules.** `IFaceSuportService`,
   `IFaceSuperService_hn` and `InterfaceFunction` now each have a `SpringContextLoadTest`,
   joining the existing `NetworkOfficeService` test. Each test
@@ -67,6 +80,25 @@ grouped by scope rather than by a single release number.
   parsing, bounded pool, named daemon workers, shutdown then re-init).
 
 ### Fixed
+
+- **Current CI fixture mismatch.** Photo-name tests now use only the documented synthetic
+  identity fixture and `exampleX` for suffix coverage. Sensitive-data scanning and its
+  allowlist are unchanged.
+- **Anonymous CSSP requests.** `/iface/cssp/*` now goes through `BusinessFilter`; only
+  exact `POST /iface/cssp/login` is public. **Client-visible:** callers of photo,
+  audit, card registration and query routes must send an interface session token.
+  This does not fix shared CSSP identity or object-level ownership.
+- **Unbound role operations.** `insertUserRol` / `queryUserRloe` now return HTTP/JSON
+  501 without database access. Unbound DAO declarations and their test exemption were
+  removed; internal service methods are retained as deprecated, explicitly unsupported
+  operations until real schema/SQL is available.
+- **Transitive container-API packaging.** Parent dependency management keeps both Servlet
+  artifact coordinates `provided`, including Axis2's legacy Servlet API and kaptcha's
+  newer API. The WAR-content gate prevents a regression.
+- **Build consistency.** `NetworkOfficeService` inherits the parent's WAR plugin version
+  instead of pinning 2.2. The two modules with new MVC tests use a provided Servlet 3.0.1
+  API consistent with the documented container baseline; Spring test dependencies remain
+  test-only. Corrected the obsolete NOTICE claim that a private print JAR is still shipped.
 
 - **Photo upload path traversal in `IFaceSuportService`.** `POST /iface/job/savePicture`
   and five `/iface/cssp` endpoints (`applyCard`, `uploadPicInfoByTSB`, `auditByTSB`,

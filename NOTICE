@@ -24,13 +24,12 @@ Each file is present once per module, in the following locations:
   NetworkOfficeService/src/main/java/com/tecsun/sisp/net/common/page/
   NetworkOfficeService/src/main/java/com/tecsun/sisp/net/common/
 
-All other third-party code is consumed as declared Maven dependencies in each
-module's `pom.xml` and is not vendored into this repository, with one
-exception:
+Other third-party libraries are consumed as declared Maven dependencies in each
+module's `pom.xml`. Their own licence terms continue to apply; the project's
+Apache-2.0 licence does not relicense its dependencies.
 
-  NetworkOfficeService/src/main/webapp/WEB-INF/lib/print-2.1.1.jar
-
-That jar carries no licence metadata and its provenance is not recorded in the
-repository. It is retained for build compatibility only. Anyone redistributing
-this project commercially should establish its origin and licence terms first,
-or replace it with a dependency that declares one.
+Historical notes referred to `print-2.1.1.jar`. That file is not present in the
+current public source tree or current tracked build inputs and is not needed by the
+current public build. This does not establish the provenance or licence of a
+historical copy. Do not restore an unverified private JAR for redistribution;
+verify its origin and licence first or use a documented public replacement.

@@ -63,9 +63,12 @@ The envelope carries only two transport-level codes. Business outcomes are expre
 | --- | --- | --- |
 | `"200"` | Handled successfully | 200 |
 | `"0"` | Business failure or handled error | 200 |
+| `"501"` | The two unsupported role endpoints in `NetworkOfficeService` | 501 |
 
-HTTP status is not used to signal business failure. A 200 with `statusCode: "0"` is a
-normal, expected response — client code must check the envelope, not the HTTP status.
+Most legacy business failures use HTTP 200 with `statusCode: "0"`; clients must check
+both the HTTP status and envelope. Authorization failures can return HTTP 401/403/503.
+The explicitly unsupported `insertUserRol` / `queryUserRloe` routes return HTTP 501
+with JSON `statusCode: "501"` and never execute missing SQL.
 
 `NetworkOfficeService` additionally defines a `CommonExceptionHandler` that converts
 unhandled exceptions into a `Result` with a failure code, so a 500 should be rare there.
@@ -107,6 +110,12 @@ workspace is not consistent.
 4. The token expires after `redis_iface_expx` **minutes** of inactivity; the SDK renews it on a timer (`tokenTimeOut` minutes, minimum 60).
 
 The `IFaceHttpsClient` SDK implements all four steps. See [CLIENT_SDK.md](CLIENT_SDK.md).
+
+`BusinessFilter` now covers `/iface/cssp/*`, with only exact POST credential login
+public. All other CSSP routes, including card registration and photo reads/writes,
+require the interface token. CSSP credential login does not issue that token. See
+[CSSP authentication and migration](api/CSSP_AUTHENTICATION.md) for request examples,
+HTTP failure codes and remaining object-authorization limitations.
 
 ## 6. Endpoint index
 

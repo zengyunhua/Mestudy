@@ -88,6 +88,12 @@
         <url-pattern>/iface/his/hangtianhis/*</url-pattern>
     </filter-mapping>
 
+    <!-- CSSP login is the only public POST; all card writes, photos and audits require a session. -->
+    <filter-mapping>
+        <filter-name>BusinessFilter</filter-name>
+        <url-pattern>/iface/cssp/*</url-pattern>
+    </filter-mapping>
+
     <welcome-file-list>
         <welcome-file>/WEB-INF/views/index.html</welcome-file>
     </welcome-file-list>

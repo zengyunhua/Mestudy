@@ -1,5 +1,7 @@
 # IFaceSuportService — module review
 
+> Historical review. The November 19, 2026 hardening batch changes CSSP session protection and build checks. See [current security controls](../SECURITY.md) and [maintenance progress](MAINTENANCE_PROGRESS.md) before treating the observations below as current state.
+
 Scope: `IFaceSuportService` only (287 Java sources under `src/main`, 21 controllers,
 251 `@RequestMapping` declarations, 6 test sources). Findings below were read from the
 code at the commit this file was added; line numbers are from that revision.

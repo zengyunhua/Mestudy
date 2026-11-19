@@ -27,6 +27,26 @@ public class BusinessFilter implements Filter {
 
     private static Logger logger = LoggerFactory.getLogger(BusinessFilter.class);
 
+    private static boolean isPublicCsspLogin(HttpServletRequest request) {
+        // Exact URI and method: path parameters, encoded aliases and other methods cannot bypass auth.
+        return "POST".equals(request.getMethod())
+                && (request.getContextPath() + "/iface/cssp/login").equals(request.getRequestURI());
+    }
+
+    // Package-private seams keep authorization tests independent of Redis and vendor gateways.
+    String sessionValue(String key) throws Exception {
+        return JedisUtil.getValue(key);
+    }
+
+    void renewSession(String key, String value) throws Exception {
+        JedisUtil.setValue(key, value);
+    }
+
+    void renewSession(String key, String value, int minutes) throws Exception {
+        JedisUtil.setValue(key, value, minutes);
+    }
+
+
     public void init(FilterConfig filterConfig) throws ServletException {
 
     }
@@ -44,6 +64,11 @@ public class BusinessFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
+        // Only credential login is public. register/registerNew are card writes, not account signup.
+        if (isPublicCsspLogin(req)) {
+            chain.doFilter(request, response);
+            return;
+        }
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
         String ip = CommUtil.getIpAddr(req);
@@ -53,7 +78,7 @@ public class BusinessFilter implements Filter {
         }
         boolean authorized = false;
         try {
-            String redisIP = StringUtils.isNotBlank(tokenId) ? JedisUtil.getValue(tokenId) : null;
+            String redisIP = StringUtils.isNotBlank(tokenId) ? sessionValue(tokenId) : null;
             if (StringUtils.isBlank(redisIP) || !redisIP.equals(ip)) {
                 logger.warn("Rejected invalid or expired interface session");
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -62,7 +87,7 @@ public class BusinessFilter implements Filter {
             }
             // The channel is assigned at login. A caller-supplied method/deviceid cannot
             // select a less restrictive authorization path.
-            String channel = JedisUtil.getValue(Constants.CHANNELKEY + tokenId);
+            String channel = sessionValue(Constants.CHANNELKEY + tokenId);
             if (StringUtils.isBlank(channel)) {
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 resp.getWriter().print(GlobalResult.error_301("登录已失效，请重新登录"));
@@ -83,17 +108,17 @@ public class BusinessFilter implements Filter {
                     return;
                 }
                 String userkey = Constants.USERKEY + tokenId;
-                String userid = JedisUtil.getValue(userkey);
+                String userid = sessionValue(userkey);
                 if (StringUtils.isBlank(userid) || !checkUser(userid, actualMethod)) {
                     resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     resp.getWriter().print(GlobalResult.error_303("没有此接口权限"));
                     return;
                 }
-                JedisUtil.setValue(userkey, userid);
+                renewSession(userkey, userid);
                 String userAreaid = Constants.USERAREAID + tokenId;
-                String areaid = JedisUtil.getValue(userAreaid);
+                String areaid = sessionValue(userAreaid);
                 if (StringUtils.isNotBlank(areaid)) {
-                    JedisUtil.setValue(userAreaid, areaid);
+                    renewSession(userAreaid, areaid);
                 }
             } else if (!"TSB".equals(channel) && !"SelfService".equals(channel)
                     && !"NetPortal".equals(channel) && !"WeChat".equals(channel)) {
@@ -107,11 +132,11 @@ public class BusinessFilter implements Filter {
             }
             // Keep the server-assigned channel and token on the same sliding expiry.
             if ("SelfService".equals(channel)) {
-                JedisUtil.setValue(tokenId, ip, Constants.SELFSERVICETIMEOUT);
-                JedisUtil.setValue(Constants.CHANNELKEY + tokenId, channel, Constants.SELFSERVICETIMEOUT);
+                renewSession(tokenId, ip, Constants.SELFSERVICETIMEOUT);
+                renewSession(Constants.CHANNELKEY + tokenId, channel, Constants.SELFSERVICETIMEOUT);
             } else {
-                JedisUtil.setValue(tokenId, ip);
-                JedisUtil.setValue(Constants.CHANNELKEY + tokenId, channel);
+                renewSession(tokenId, ip);
+                renewSession(Constants.CHANNELKEY + tokenId, channel);
             }
             authorized = true;
         } catch (Exception e) {
@@ -125,7 +150,7 @@ public class BusinessFilter implements Filter {
             chain.doFilter(request, response);
         }
     }
-    private boolean checkDev(String deviceid) {
+    boolean checkDev(String deviceid) {
         if (StringUtils.isNotEmpty(deviceid)) {
             String result="";
             try {
@@ -190,7 +215,7 @@ public class BusinessFilter implements Filter {
                 || !(map.get("result") instanceof Map)) return false;
         return method.equals(((Map) map.get("result")).get("funCode"));
     }
-    private boolean checkUser(String userid , String method) throws IOException{
+    boolean checkUser(String userid , String method) throws IOException{
         try{
             String url = DictionaryUtil.getHost(Constants.INTERFACE_CHECKUSER)+"?userid="+java.net.URLEncoder.encode(userid, "UTF-8")+"&method="+java.net.URLEncoder.encode(method, "UTF-8");
             String result = DictionaryUtil.getClientRequest( url);

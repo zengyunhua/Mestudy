@@ -120,7 +120,6 @@ public class SpringContextLoadTest {
             }
         }
         unbound.removeAll(DEAD_UNBOUND);
-        unbound.removeAll(BROKEN_ENDPOINT_UNBOUND);
         assertTrue("Mapper methods with no bound statement: " + unbound, unbound.isEmpty());
     }
 
@@ -134,18 +133,6 @@ public class SpringContextLoadTest {
             "com.tecsun.sisp.net.modules.dao.drafts_sisp.DraftsDAO.deleteInformation",
             // PersonServiceImpl calls it, but nothing injects PersonService.
             "com.tecsun.sisp.net.modules.dao.drafts_sisp.PersonDAO.updateDraftsMessage");
-
-    /**
-     * KNOWN BROKEN. DraftsController exposes these through AreaServiceImpl as
-     * POST /userNet/drafts/insertUserRol and /userNet/drafts/queryUserRloe.
-     * Their SQL does not exist in areaDAO.xml or anywhere in git history, so
-     * both endpoints always fail with "Invalid bound statement (not found)".
-     * They stay on this list until someone with the role-table schema writes
-     * the SQL, or the endpoints are removed. See NetworkOfficeService/README.md.
-     */
-    private static final List<String> BROKEN_ENDPOINT_UNBOUND = Arrays.asList(
-            "com.tecsun.sisp.net.modules.dao.area_sisppublic.AreaDAO.insertUserRol",
-            "com.tecsun.sisp.net.modules.dao.area_sisppublic.AreaDAO.queryUserRloe");
 
     private static List<MapperFactoryBean<?>> mapperFactoryBeans() {
         List<MapperFactoryBean<?>> beans = new ArrayList<MapperFactoryBean<?>>();

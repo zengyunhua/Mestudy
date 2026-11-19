@@ -53,14 +53,17 @@ independent deployment evidence remain open work.
       mis-typed `${jdbc.*}` key, without needing a database. All four Spring modules
       have one (`SpringContextLoadTest`), including a reflection check over every
       scanned mapper method
-- [ ] Write the missing SQL for `AreaDAO.insertUserRol` / `queryUserRloe`
-      (`NetworkOfficeService`; needs the role-table schema) or remove the two endpoints
-- [ ] One controller test per module using `MockMvc` with mocked services
+- [x] Stop exposing unbound role DAO calls: the two legacy role URLs now return HTTP/JSON
+      501 without database access; removed the DAO declarations and broken-endpoint exemption
+- [ ] Re-enable role operations only after verified role-table schema/SQL and database tests
+- [~] Controller tests using `MockMvc`: CSSP auth/path validation and unsupported role contracts
+      are covered; extend to the remaining modules and successful business flows
 - [ ] H2-backed integration test for one mapper per module (Oracle-specific SQL will need
       dialect guards; start with a mapper that uses portable SQL)
 - [~] GitHub Actions runs isolated `mvn -B verify` on the five-module default
       reactor on JDK 8 with test/WAR checks; confirm actual run status per commit,
       then expand to a JDK matrix and coverage reporting
+- [x] Validate WAR archives and reject container/test libraries in the public build gate
 - [ ] Coverage reporting, with a floor that only ratchets upward
 
 ## Phase 4 — Documentation depth
@@ -81,6 +84,8 @@ independent deployment evidence remain open work.
 - [ ] Replace `static` state in `IFaceHttpsClient` with an instance-based client
 - [ ] Inject gateway clients instead of instantiating SOAP stubs at call sites
 - [x] Re-enable `BusinessFilter` session authorization on selected interface routes (not XSS sanitization)
+- [x] Protect `/iface/cssp/*` except exact POST credential login; regression-test fail-closed behavior
+- [ ] Isolate the legacy CSSP username per session and enforce object/organization ownership
 - [x] Use the JVM default trust store and strict hostname verification in `SSLClient`
 - [ ] Move credentials out of properties files into environment variables or a secret
       store

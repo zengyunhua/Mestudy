@@ -150,16 +150,29 @@ endpoints are open.
 (`common/util/DBConnection.java`) is still present and still unreferenced.
 **Do not revive it.** If you need ad-hoc SQL, use a MyBatis mapper with bound parameters.
 
-### 8. Photo-upload routes under `/iface/cssp` are not behind `BusinessFilter`
+### 8. CSSP interface sessions and remaining authorization limitations
 
-`web.xml` applies `BusinessFilter` to `/iface/rest`, `/iface/cardInfo`, `/iface/bank`,
-`/iface/job` and `/iface/his/hangtianhis`. `CsspBusController` is mounted at
-`/iface/cssp`, so `applyCard` (signature image), `uploadPicInfoByTSB`, `auditByTSB`,
-`uploadSfzByTSB` and `uploadCardPicInfo` accept requests without a session token. The file
-names are now
-validated (see below), but anyone who can reach the service can still write images into
-the configured photo directories. Adding the prefix to the filter changes the contract
-for the terminals that call these routes, so it is left to the deployment owner.
+**Fixed in the current working tree:** `web.xml` now maps `BusinessFilter` to
+`/iface/cssp/*`. Only the exact `POST /iface/cssp/login` credential-login route bypasses
+this filter. `register` and `registerNew` are social-security card registrations,
+not account signup, and remain protected. Photo writes, audit operations and personal
+queries require the existing Redis-backed interface session, IP/channel checks and
+applicable device or ThirdSystem method checks. Missing/expired sessions return HTTP
+401, rejected permissions return 403, and session-service failures return 503 before
+calling a controller. No anonymous fallback is enabled.
+
+**Client-visible change:** callers must obtain an interface token via
+`/iface/user/checkLogin` and send `X-Token-Id` on protected CSSP requests. The CSSP
+credential-login response does not issue this interface token. The legacy `tokenId`
+parameter is still accepted, but headers are preferred to avoid URL logging. Coordinate
+terminal updates before deployment; retain network controls rather than bypassing the
+filter for old clients. See [CSSP migration and examples](docs/api/CSSP_AUTHENTICATION.md).
+
+This closes the anonymous-write boundary, not all authorization problems. Interface
+channel authentication does not establish per-person or per-organization ownership.
+The legacy CSSP credential login also stores its username under a shared Redis key;
+isolation of that identity and object-level permissions still need a separate design
+and regression tests. Other unmapped prefixes remain subject to the risks above.
 
 ## Recently fixed security controls
 

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -754,46 +755,23 @@ public class DraftsController extends BaseController{
 		return resultVerify(statusCode, message);
 	}
 
-	// 新增权限分配角色
-	@RequestMapping(value = "/insertUserRol", method = RequestMethod.POST, produces = "application/json")
-	@ResponseBody
-	public Result insertUserRol(@RequestBody UserRolVo bean) throws Exception {
-		String statusCode = Constants.RESULT_MESSAGE_SUCCESS;
-		String message = "操作成功";
-		long row = areaService.insertUserRol(bean);
-		if (row > 0) {
-			result(statusCode, message);
-			logger.info("添加成功!");
-		} else {
-			statusCode = Constants.RESULT_MESSAGE_ERROR;
-			message = "添加失败!";
-		}
-		return resultVerify(statusCode, message);
-	}
+    /** Role SQL was never supplied. Keep the URL, but do not execute an unbound mapper. */
+    @Deprecated
+    @RequestMapping(value = "/insertUserRol", method = RequestMethod.POST, produces = "application/json")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    public Result insertUserRol(@RequestBody UserRolVo bean) {
+        return new Result("501", "角色接口尚未实现：需要确认角色表结构和 SQL", null);
+    }
 
-	// 角色列表查询精准查询 不模糊匹配需要改动
-	@RequestMapping(value = "/queryUserRloe", method = RequestMethod.POST, produces = "application/json")
-	@ResponseBody
-	public Result queryUserRloe(@RequestBody UserRoleBean bean)
-			throws Exception {
-		String statusCode = Constants.RESULT_MESSAGE_SUCCESS;
-		String message = "操作成功";
-
-		try {
-			Page<UserRolVo> list = areaService.queryUserRloe(bean);
-			if (list.getData() != null && list.getData().size() > 0) {
-				return resultVerify(statusCode, message, list);
-			} else {
-				return resultVerify(Constants.RESULT_MESSAGE_SUCCESS, "暂未获取到相关信息");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			statusCode = Constants.RESULT_MESSAGE_ERROR;
-			message = "获取失败";
-			logger.error("数据出现异常", e);
-		}
-		return resultVerify(statusCode, message);
-	}
+    /** Retains the legacy spelling and returns an explicit, non-success HTTP/JSON contract. */
+    @Deprecated
+    @RequestMapping(value = "/queryUserRloe", method = RequestMethod.POST, produces = "application/json")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    public Result queryUserRloe(@RequestBody UserRoleBean bean) {
+        return new Result("501", "角色接口尚未实现：需要确认角色表结构和 SQL", null);
+    }
 	
 		
 	//保存权限

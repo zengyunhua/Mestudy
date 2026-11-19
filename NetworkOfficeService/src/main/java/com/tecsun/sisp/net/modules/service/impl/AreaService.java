@@ -14,8 +14,12 @@ public interface AreaService {
 	
 	public List<AreaVo> queryByArea();
 	public List<DictionaryVo> queryPersonStatus(DictionaryBean bean);
-	public long insertUserRol(UserRolVo vo);//添加角色
-	public Page<UserRolVo> queryUserRloe(UserRoleBean vo);//角色查询
+	/** @deprecated Disabled until verified role SQL exists. */
+	@Deprecated
+	public long insertUserRol(UserRolVo vo);
+	/** @deprecated Disabled until verified role SQL exists. */
+	@Deprecated
+	public Page<UserRolVo> queryUserRloe(UserRoleBean vo);
 	public long inserttMatteRole(MatterRoleBean vo);//保存权限
 	public List<MatterRoleBean> queryByCorrelation(MatterRoleBean vo);//关联查询
 	 public UserVO getUserById(int userId);

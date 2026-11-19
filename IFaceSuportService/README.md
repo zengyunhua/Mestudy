@@ -134,6 +134,11 @@ $CATALINA_HOME/bin/startup.sh
 - `ContextLoaderListener` + `StartupListener` (Redis pool, thread pool)
 - `DispatcherServlet` `springMVC3` mapped to `/`
 - `HiddenHttpMethodFilter` (allows PUT/DELETE from HTML forms)
+- `BusinessFilter` on the interface prefixes listed below, including `/iface/cssp/*`
+
+The compile-time Servlet API is 3.0.1 with `provided` scope, matching the documented
+Tomcat 7/8 container baseline. Spring test utilities are test-only; neither belongs
+in the WAR library directory.
 
 ## Using the SDK
 
@@ -161,7 +166,12 @@ Full reference: [../docs/CLIENT_SDK.md](../docs/CLIENT_SDK.md).
   eventually consistent — make it idempotent.
 - **`BusinessFilter` is a session filter, not an XSS filter.** It validates the Redis-backed
   token, binds it to the caller's IP and checks the device id. It is registered on
-  `/iface/rest/*`, `/iface/cardInfo/*`, `/iface/bank/*`, `/iface/job/*` and
-  `/iface/his/hangtianhis/*` only — every other prefix, including `/iface/user/*`, is
-  unauthenticated. Closing that gap changes the client contract and is tracked in
-  [MODULE_REVIEW_IFACESUPORTSERVICE.md](../docs/MODULE_REVIEW_IFACESUPORTSERVICE.md).
+  `/iface/rest/*`, `/iface/cardInfo/*`, `/iface/bank/*`, `/iface/job/*`,
+  `/iface/his/hangtianhis/*` and `/iface/cssp/*`. Within CSSP, only the exact POST
+  credential-login route is public; `register`/`registerNew` are protected card writes.
+  Protected callers must send an interface session token, not just rely on a successful
+  CSSP credential login. See [migration examples](../docs/api/CSSP_AUTHENTICATION.md).
+  Other prefixes, including `/iface/user/*`, are not covered by this filter. Object-level
+  ownership and the legacy shared CSSP username still need review; this is not complete
+  security hardening. The older [module review](../docs/MODULE_REVIEW_IFACESUPORTSERVICE.md)
+  is a historical review; current controls are recorded in [SECURITY.md](../SECURITY.md).

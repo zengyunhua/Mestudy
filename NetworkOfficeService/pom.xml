@@ -182,8 +182,8 @@
              javax.servlet types. Same scope as the sibling modules use. -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -303,15 +303,10 @@
 
     <build>
         <plugins>
-            <!-- Pinned: without an explicit version Maven resolves the war plugin
-                 from the super-POM, so the packaged artifact depends on which
-                 Maven version runs the build. 2.2 is the version the super-POM
-                 of Maven 3.8.x selects, so pinning it changes nothing about the
-                 output - it just stops the output from drifting. -->
+            <!-- Inherit the WAR plugin version from the root parent's pluginManagement. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
